@@ -31,23 +31,43 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Usuario extends Model
 {
-    
+    /** 👇 CLAVE: nombre de tabla y PK personalizada */
+    protected $table = 'usuarios';
+    protected $primaryKey = 'id_usuario';
+    public $timestamps = false;         // tu tabla usa fecha_registro, no created_at/updated_at
+    public $incrementing = true;        // Laravel ya no pedirá el id manualmente
+    protected $keyType = 'int';         // el id es entero
+
+    /** Paginación por defecto */
     protected $perPage = 20;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
+     * Campos que se pueden llenar en masa (mass assignable)
      */
-    protected $fillable = ['id_usuario', 'nombres', 'apellidos', 'ci', 'foto_ci', 'licencia_conducir', 'foto_licencia', 'genero', 'correo', 'telefono', 'direccion_domicilio', 'contrasena', 'estado', 'entidad_pertenencia', 'tipo_sangre', 'id_rol', 'fecha_registro'];
-
+    protected $fillable = [
+        'nombres',
+        'apellidos',
+        'ci',
+        'foto_ci',
+        'licencia_conducir',
+        'foto_licencia',
+        'genero',
+        'correo',
+        'telefono',
+        'direccion_domicilio',
+        'contrasena',
+        'estado',
+        'entidad_pertenencia',
+        'tipo_sangre',
+        'id_rol',
+        'fecha_registro'
+    ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * Relación con roles
      */
     public function role()
     {
         return $this->belongsTo(\App\Models\Role::class, 'id_rol', 'id_rol');
     }
-    
 }

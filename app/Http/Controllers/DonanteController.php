@@ -39,7 +39,7 @@ class DonanteController extends Controller
     {
         Donante::create($request->validated());
 
-        return Redirect::route('donantes.index')
+        return Redirect::route('donante.index')
             ->with('success', 'Donante created successfully.');
     }
 
@@ -70,7 +70,7 @@ class DonanteController extends Controller
     {
         $donante->update($request->validated());
 
-        return Redirect::route('donantes.index')
+        return Redirect::route('donante.index')
             ->with('success', 'Donante updated successfully');
     }
 
@@ -78,7 +78,7 @@ class DonanteController extends Controller
     {
         Donante::find($id)->delete();
 
-        return Redirect::route('donantes.index')
+        return Redirect::route('donante.index')
             ->with('success', 'Donante deleted successfully');
     }
 }

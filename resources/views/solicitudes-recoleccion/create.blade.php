@@ -1,24 +1,23 @@
 @extends('adminlte::page')
 
 @section('template_title')
-    {{ __('Update') }} Usuario
+    {{ __('Create') }} Solicitudes Recoleccion
 @endsection
 
 @section('content')
     <section class="content container-fluid">
-        <div class="">
+        <div class="row">
             <div class="col-md-12">
 
                 <div class="card card-default">
                     <div class="card-header">
-                        <span class="card-title">{{ __('Update') }} Usuario</span>
+                        <span class="card-title">{{ __('Create') }} Solicitudes Recoleccion</span>
                     </div>
                     <div class="card-body bg-white">
-                        <form method="POST" action="{{ route('usuario.update', $usuario->id) }}"  role="form" enctype="multipart/form-data">
-                            {{ method_field('PATCH') }}
+                        <form method="POST" action="{{ route('solicitudes-recoleccions.store') }}"  role="form" enctype="multipart/form-data">
                             @csrf
 
-                            @include('usuario.form')
+                            @include('solicitudes-recoleccion.form')
 
                         </form>
                     </div>

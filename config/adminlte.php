@@ -373,6 +373,32 @@ return [
             'url' => '/producto',
             'icon' => 'fas fa-fw fa-box-open',
         ],
+        ['header' => 'GESTIÓN'],
+        [
+            'text' => 'Usuarios',
+            'url' => '/usuario',
+            'icon' => 'fas fa-fw fa-users',
+        ],
+        [
+            'text' => 'Donantes',
+            'url' => '/donante',
+            'icon' => 'fas fa-fw fa-hand-holding-heart',
+        ],
+        [
+            'text' => 'Solicitudes de Recolección',
+            'url' => '/solicitudes-recoleccions',
+            'icon' => 'fas fa-fw fa-clipboard-list',
+        ],
+        [
+            'text' => 'Paquetes',
+            'url' => '/paquete',
+            'icon' => 'fas fa-fw fa-box',
+        ],
+        [
+            'text' => 'Registros de Salida',
+            'url' => '/registros-salida',
+            'icon' => 'fas fa-fw fa-sign-out-alt',
+        ],
         [
             'text' => 'multilevel',
             'icon' => 'fas fa-fw fa-share',

@@ -1,14 +1,10 @@
 @extends('adminlte::page')
+
 @section('template_title')
     Donantes
 @endsection
 
 @section('content')
-<div class="mb-3">
-    <a href="{{ route('home') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Volver al inicio
-    </a>
-</div>
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
@@ -21,7 +17,7 @@
                             </span>
 
                              <div class="float-right">
-                                <a href="{{ route('donantes.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
+                                <a href="{{ route('donante.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
                                   {{ __('Create New') }}
                                 </a>
                               </div>
@@ -40,11 +36,14 @@
                                     <tr>
                                         <th>No</th>
                                         
-									<th >Nombres</th>
-									<th >Apellido Paterno</th>
-									<th >Apellido Materno</th>
-									<th >Correo</th>
+									<th >Id Donante</th>
+									<th >Nombre</th>
+									<th >Tipo</th>
+									<th >Email</th>
 									<th >Telefono</th>
+									<th >Direccion</th>
+									<th >Fecha Registro</th>
+									<th >Deleted By</th>
 
                                         <th></th>
                                     </tr>
@@ -54,16 +53,19 @@
                                         <tr>
                                             <td>{{ ++$i }}</td>
                                             
-										<td >{{ $donante->nombres }}</td>
-										<td >{{ $donante->apellido_paterno }}</td>
-										<td >{{ $donante->apellido_materno }}</td>
-										<td >{{ $donante->correo }}</td>
+										<td >{{ $donante->id_donante }}</td>
+										<td >{{ $donante->nombre }}</td>
+										<td >{{ $donante->tipo }}</td>
+										<td >{{ $donante->email }}</td>
 										<td >{{ $donante->telefono }}</td>
+										<td >{{ $donante->direccion }}</td>
+										<td >{{ $donante->fecha_registro }}</td>
+										<td >{{ $donante->deleted_by }}</td>
 
                                             <td>
-                                                <form action="{{ route('donantes.destroy', $donante->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('donantes.show', $donante->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('donantes.edit', $donante->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                <form action="{{ route('donante.destroy', $donante->id) }}" method="POST">
+                                                    <a class="btn btn-sm btn-primary " href="{{ route('donante.show', $donante->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                    <a class="btn btn-sm btn-success" href="{{ route('donante.edit', $donante->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>

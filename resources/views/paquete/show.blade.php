@@ -1,7 +1,7 @@
-@extends('layouts.app')
+@extends('adminlte::page')
 
 @section('template_title')
-    {{ $donante->name ?? __('Show') . " " . __('Donante') }}
+    {{ $paquete->name ?? __('Show') . " " . __('Paquete') }}
 @endsection
 
 @section('content')
@@ -11,46 +11,46 @@
                 <div class="card">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="float-left">
-                            <span class="card-title">{{ __('Show') }} Donante</span>
+                            <span class="card-title">{{ __('Show') }} Paquete</span>
                         </div>
                         <div class="float-right">
-                            <a class="btn btn-primary btn-sm" href="{{ route('donante.index') }}"> {{ __('Back') }}</a>
+                            <a class="btn btn-primary btn-sm" href="{{ route('paquete.index') }}"> {{ __('Back') }}</a>
                         </div>
                     </div>
 
                     <div class="card-body bg-white">
                         
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Id Donante:</strong>
-                                    {{ $donante->id_donante }}
+                                    <strong>Id Paquete:</strong>
+                                    {{ $paquete->id_paquete }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Nombre:</strong>
-                                    {{ $donante->nombre }}
+                                    <strong>Codigo Paquete:</strong>
+                                    {{ $paquete->codigo_paquete }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Tipo:</strong>
-                                    {{ $donante->tipo }}
+                                    <strong>Fecha Creacion:</strong>
+                                    {{ $paquete->fecha_creacion }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Email:</strong>
-                                    {{ $donante->email }}
+                                    <strong>Id Usuario:</strong>
+                                    {{ $paquete->id_usuario }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Telefono:</strong>
-                                    {{ $donante->telefono }}
+                                    <strong>Id Solicitud:</strong>
+                                    {{ $paquete->id_solicitud }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Direccion:</strong>
-                                    {{ $donante->direccion }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Fecha Registro:</strong>
-                                    {{ $donante->fecha_registro }}
+                                    <strong>Estado:</strong>
+                                    {{ $paquete->estado }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Deleted By:</strong>
-                                    {{ $donante->deleted_by }}
+                                    {{ $paquete->deleted_by }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Codigo Solicitud Externa:</strong>
+                                    {{ $paquete->codigo_solicitud_externa }}
                                 </div>
 
                     </div>
