@@ -1,14 +1,10 @@
 @extends('adminlte::page')
+
 @section('template_title')
-    Donantes
+    Estantes
 @endsection
 
 @section('content')
-<div class="mb-3">
-    <a href="{{ route('home') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Volver al inicio
-    </a>
-</div>
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
@@ -17,11 +13,11 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
 
                             <span id="card_title">
-                                {{ __('Donantes') }}
+                                {{ __('Estantes') }}
                             </span>
 
                              <div class="float-right">
-                                <a href="{{ route('donantes.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
+                                <a href="{{ route('estante.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
                                   {{ __('Create New') }}
                                 </a>
                               </div>
@@ -39,31 +35,24 @@
                                 <thead class="thead">
                                     <tr>
                                         <th>No</th>
-                                        
-									<th >Nombres</th>
-									<th >Apellido Paterno</th>
-									<th >Apellido Materno</th>
-									<th >Correo</th>
-									<th >Telefono</th>
-
+                                        <th>Id Almacen</th>
+                                        <th>Codigo Estante</th>
+                                        <th>Descripcion</th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($donantes as $donante)
+                                    @foreach ($estantes as $estante)
                                         <tr>
                                             <td>{{ ++$i }}</td>
-                                            
-										<td >{{ $donante->nombres }}</td>
-										<td >{{ $donante->apellido_paterno }}</td>
-										<td >{{ $donante->apellido_materno }}</td>
-										<td >{{ $donante->correo }}</td>
-										<td >{{ $donante->telefono }}</td>
+				<td >{{ $estante->id_almacen }}</td>
+				<td >{{ $estante->codigo_estante }}</td>
+				<td >{{ $estante->descripcion }}</td>
 
                                             <td>
-                                                <form action="{{ route('donantes.destroy', $donante->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('donantes.show', $donante->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('donantes.edit', $donante->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                <form action="{{ route('estante.destroy', $estante->id_estante) }}" method="POST">
+                                                    <a class="btn btn-sm btn-primary " href="{{ route('estante.show', $estante->id_estante) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                    <a class="btn btn-sm btn-success" href="{{ route('estante.edit', $estante->id_estante) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
@@ -76,7 +65,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $donantes->withQueryString()->links() !!}
+                {!! $estantes->withQueryString()->links() !!}
             </div>
         </div>
     </div>

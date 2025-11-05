@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('template_title')
-    {{ $donante->name ?? __('Show') . " " . __('Donante') }}
+    {{ __('Show') }} Campana
 @endsection
 
 @section('content')
@@ -11,34 +11,34 @@
                 <div class="card">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="float-left">
-                            <span class="card-title">{{ __('Show') }} Donante</span>
+                            <span class="card-title">{{ __('Show') }} Campana</span>
                         </div>
                         <div class="float-right">
-                            <a class="btn btn-primary btn-sm" href="{{ route('donantes.index') }}"> {{ __('Back') }}</a>
+                            <a class="btn btn-primary btn-sm" href="{{ route('campana.index') }}"> {{ __('Back') }}</a>
                         </div>
                     </div>
 
                     <div class="card-body bg-white">
                         
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Nombres:</strong>
-                                    {{ $donante->nombres }}
+                                    <strong>Nombre:</strong>
+                                    {{ $campana->nombre }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Apellido Paterno:</strong>
-                                    {{ $donante->apellido_paterno }}
+                                    <strong>Descripcion:</strong>
+                                    {{ $campana->descripcion }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Apellido Materno:</strong>
-                                    {{ $donante->apellido_materno }}
+                                    <strong>Fecha Inicio:</strong>
+                                    {{ $campana->fecha_inicio }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Correo:</strong>
-                                    {{ $donante->correo }}
+                                    <strong>Fecha Fin:</strong>
+                                    {{ $campana->fecha_fin }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Telefono:</strong>
-                                    {{ $donante->telefono }}
+                                    <strong>Imagen Banner:</strong>
+                                    {{ $campana->imagen_banner }}
                                 </div>
 
                     </div>

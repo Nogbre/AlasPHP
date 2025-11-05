@@ -339,6 +339,41 @@ return [
             'icon' => 'fas fa-fw fa-lock',
         ],
         [
+            'text' => 'Almacenes',
+            'url' => '/almacene',
+            'icon' => 'fas fa-fw fa-store',
+        ],
+        [
+            'text' => 'Estantes',
+            'url' => '/estante',
+            'icon' => 'fas fa-fw fa-inbox',
+        ],
+        [
+            'text' => 'Espacios',
+            'url' => '/espacio',
+            'icon' => 'fas fa-fw fa-box',
+        ],
+        [
+            'text' => 'Campañas',
+            'url' => '/campana',
+            'icon' => 'fas fa-fw fa-bullhorn',
+        ],
+        [
+            'text' => 'Puntos de Recolección',
+            'url' => '/puntos-recoleccion',
+            'icon' => 'fas fa-fw fa-globe',
+        ],
+        [
+            'text' => 'Categorías de Producto',
+            'url' => '/categorias-producto',
+            'icon' => 'fas fa-fw fa-list',
+        ],
+        [
+            'text' => 'Productos',
+            'url' => '/producto',
+            'icon' => 'fas fa-fw fa-box-open',
+        ],
+        [
             'text' => 'multilevel',
             'icon' => 'fas fa-fw fa-share',
             'submenu' => [

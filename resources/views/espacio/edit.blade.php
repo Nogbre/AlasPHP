@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('template_title')
-    {{ __('Update') }} Donante
+    {{ __('Update') }} Espacio
 @endsection
 
 @section('content')
@@ -11,14 +11,14 @@
 
                 <div class="card card-default">
                     <div class="card-header">
-                        <span class="card-title">{{ __('Update') }} Donante</span>
+                        <span class="card-title">{{ __('Update') }} Espacio</span>
                     </div>
                     <div class="card-body bg-white">
-                        <form method="POST" action="{{ route('donantes.update', $donante->id) }}"  role="form" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('espacio.update', $espacio->id_espacio) }}"  role="form" enctype="multipart/form-data">
                             {{ method_field('PATCH') }}
                             @csrf
 
-                            @include('donante.form')
+                            @include('espacio.form')
 
                         </form>
                     </div>

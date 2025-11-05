@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('template_title')
-    {{ $donante->name ?? __('Show') . " " . __('Donante') }}
+    {{ $producto->name ?? __('Show') . " " . __('Producto') }}
 @endsection
 
 @section('content')
@@ -11,34 +11,30 @@
                 <div class="card">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="float-left">
-                            <span class="card-title">{{ __('Show') }} Donante</span>
+                            <span class="card-title">{{ __('Show') }} Producto</span>
                         </div>
                         <div class="float-right">
-                            <a class="btn btn-primary btn-sm" href="{{ route('donantes.index') }}"> {{ __('Back') }}</a>
+                            <a class="btn btn-primary btn-sm" href="{{ route('producto.index') }}"> {{ __('Back') }}</a>
                         </div>
                     </div>
 
                     <div class="card-body bg-white">
                         
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Nombres:</strong>
-                                    {{ $donante->nombres }}
+                                    <strong>Id Categoria:</strong>
+                                    {{ $producto->id_categoria }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Apellido Paterno:</strong>
-                                    {{ $donante->apellido_paterno }}
+                                    <strong>Nombre:</strong>
+                                    {{ $producto->nombre }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Apellido Materno:</strong>
-                                    {{ $donante->apellido_materno }}
+                                    <strong>Descripcion:</strong>
+                                    {{ $producto->descripcion }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Correo:</strong>
-                                    {{ $donante->correo }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Telefono:</strong>
-                                    {{ $donante->telefono }}
+                                    <strong>Unidad Medida:</strong>
+                                    {{ $producto->unidad_medida }}
                                 </div>
 
                     </div>

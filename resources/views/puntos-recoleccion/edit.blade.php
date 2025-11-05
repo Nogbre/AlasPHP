@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('template_title')
-    {{ __('Update') }} Donante
+    {{ __('Update') }} Puntos Recoleccion
 @endsection
 
 @section('content')
@@ -11,14 +11,14 @@
 
                 <div class="card card-default">
                     <div class="card-header">
-                        <span class="card-title">{{ __('Update') }} Donante</span>
+                        <span class="card-title">{{ __('Update') }} Puntos Recoleccion</span>
                     </div>
                     <div class="card-body bg-white">
-                        <form method="POST" action="{{ route('donantes.update', $donante->id) }}"  role="form" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('puntos-recoleccion.update', $puntosRecoleccion->id_punto) }}"  role="form" enctype="multipart/form-data">
                             {{ method_field('PATCH') }}
                             @csrf
 
-                            @include('donante.form')
+                            @include('puntos-recoleccion.form')
 
                         </form>
                     </div>
