@@ -1,14 +1,10 @@
-@extends('adminlte::page')
+@extends('layouts.app')
+
 @section('template_title')
     Usuarios
 @endsection
 
 @section('content')
-<div class="mb-3">
-    <a href="{{ route('home') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Volver al inicio
-    </a>
-</div>
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
@@ -40,17 +36,23 @@
                                     <tr>
                                         <th>No</th>
                                         
+									<th >Id Usuario</th>
 									<th >Nombres</th>
-									<th >Apellido Paterno</th>
-									<th >Apellido Materno</th>
-									<th >Fecha Nacimiento</th>
-									<th >Direccion Domiciliaria</th>
-									<th >Correo Electronico</th>
-									<th >Contrasena</th>
-									<th >Telefono</th>
+									<th >Apellidos</th>
 									<th >Ci</th>
+									<th >Foto Ci</th>
+									<th >Licencia Conducir</th>
+									<th >Foto Licencia</th>
+									<th >Genero</th>
+									<th >Correo</th>
+									<th >Telefono</th>
+									<th >Direccion Domicilio</th>
+									<th >Contrasena</th>
 									<th >Estado</th>
-									<th >Rol</th>
+									<th >Entidad Pertenencia</th>
+									<th >Tipo Sangre</th>
+									<th >Id Rol</th>
+									<th >Fecha Registro</th>
 
                                         <th></th>
                                     </tr>
@@ -60,17 +62,23 @@
                                         <tr>
                                             <td>{{ ++$i }}</td>
                                             
+										<td >{{ $usuario->id_usuario }}</td>
 										<td >{{ $usuario->nombres }}</td>
-										<td >{{ $usuario->apellido_paterno }}</td>
-										<td >{{ $usuario->apellido_materno }}</td>
-										<td >{{ $usuario->fecha_nacimiento }}</td>
-										<td >{{ $usuario->direccion_domiciliaria }}</td>
-										<td >{{ $usuario->correo_electronico }}</td>
-										<td >{{ $usuario->contrasena }}</td>
-										<td >{{ $usuario->telefono }}</td>
+										<td >{{ $usuario->apellidos }}</td>
 										<td >{{ $usuario->ci }}</td>
+										<td >{{ $usuario->foto_ci }}</td>
+										<td >{{ $usuario->licencia_conducir }}</td>
+										<td >{{ $usuario->foto_licencia }}</td>
+										<td >{{ $usuario->genero }}</td>
+										<td >{{ $usuario->correo }}</td>
+										<td >{{ $usuario->telefono }}</td>
+										<td >{{ $usuario->direccion_domicilio }}</td>
+										<td >{{ $usuario->contrasena }}</td>
 										<td >{{ $usuario->estado }}</td>
-										<td >{{ $usuario->rol }}</td>
+										<td >{{ $usuario->entidad_pertenencia }}</td>
+										<td >{{ $usuario->tipo_sangre }}</td>
+										<td >{{ $usuario->id_rol }}</td>
+										<td >{{ $usuario->fecha_registro }}</td>
 
                                             <td>
                                                 <form action="{{ route('usuarios.destroy', $usuario->id) }}" method="POST">

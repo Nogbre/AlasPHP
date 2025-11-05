@@ -22,16 +22,21 @@ class UsuarioRequest extends FormRequest
     public function rules(): array
     {
         return [
+			'id_usuario' => 'required',
 			'nombres' => 'required|string',
-			'apellido_paterno' => 'required|string',
-			'apellido_materno' => 'string',
-			'direccion_domiciliaria' => 'string',
-			'correo_electronico' => 'required|string',
-			'contrasena' => 'required|string',
+			'apellidos' => 'required|string',
+			'ci' => 'required|string',
+			'foto_ci' => 'string',
+			'licencia_conducir' => 'string',
+			'foto_licencia' => 'string',
+			'genero' => 'string',
+			'correo' => 'required|string',
 			'telefono' => 'string',
-			'ci' => 'string',
-			'estado' => 'required|string',
-			'rol' => 'required|string',
+			'direccion_domicilio' => 'string',
+			'contrasena' => 'required|string',
+			'estado' => 'string',
+			'entidad_pertenencia' => 'string',
+			'tipo_sangre' => 'string',
         ];
     }
 }
