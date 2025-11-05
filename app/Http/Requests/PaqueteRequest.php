@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DonanteRequest extends FormRequest
+class PaqueteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,16 +22,16 @@ class DonanteRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-			'nombre' => 'required|string|max:150',
-			'tipo' => 'nullable|string|in:persona,empresa',
-			'email' => 'nullable|email|max:100',
-			'telefono' => 'nullable|string|max:20',
-			'direccion' => 'nullable|string',
+			'codigo_paquete' => 'nullable|string',
+			'id_usuario' => 'nullable|integer|exists:usuarios,id_usuario',
+			'id_solicitud' => 'nullable|integer',
+			'estado' => 'nullable|string',
+			'codigo_solicitud_externa' => 'nullable|string',
         ];
         
-        // Solo requerir id_donante cuando se está actualizando
+        // Solo requerir id_paquete cuando se está actualizando
         if ($this->isMethod('patch') || $this->isMethod('put')) {
-            $rules['id_donante'] = 'required';
+            $rules['id_paquete'] = 'required';
         }
         
         return $rules;

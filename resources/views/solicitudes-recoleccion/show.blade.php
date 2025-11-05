@@ -1,7 +1,7 @@
-@extends('layouts.app')
+@extends('adminlte::page')
 
 @section('template_title')
-    {{ $donante->name ?? __('Show') . " " . __('Donante') }}
+    {{ $solicitudesRecoleccion->name ?? __('Show') . " " . __('Solicitudes Recoleccion') }}
 @endsection
 
 @section('content')
@@ -11,46 +11,46 @@
                 <div class="card">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="float-left">
-                            <span class="card-title">{{ __('Show') }} Donante</span>
+                            <span class="card-title">{{ __('Show') }} Solicitudes Recoleccion</span>
                         </div>
                         <div class="float-right">
-                            <a class="btn btn-primary btn-sm" href="{{ route('donante.index') }}"> {{ __('Back') }}</a>
+                            <a class="btn btn-primary btn-sm" href="{{ route('solicitudes-recoleccions.index') }}"> {{ __('Back') }}</a>
                         </div>
                     </div>
 
                     <div class="card-body bg-white">
                         
                                 <div class="form-group mb-2 mb20">
+                                    <strong>Id Solicitud:</strong>
+                                    {{ $solicitudesRecoleccion->id_solicitud }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
                                     <strong>Id Donante:</strong>
-                                    {{ $donante->id_donante }}
+                                    {{ $solicitudesRecoleccion->id_donante }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Nombre:</strong>
-                                    {{ $donante->nombre }}
+                                    <strong>Id Recolector:</strong>
+                                    {{ $solicitudesRecoleccion->id_recolector }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Tipo:</strong>
-                                    {{ $donante->tipo }}
+                                    <strong>Direccion Recoleccion:</strong>
+                                    {{ $solicitudesRecoleccion->direccion_recoleccion }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Email:</strong>
-                                    {{ $donante->email }}
+                                    <strong>Fecha Programada:</strong>
+                                    {{ $solicitudesRecoleccion->fecha_programada }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Telefono:</strong>
-                                    {{ $donante->telefono }}
+                                    <strong>Observaciones:</strong>
+                                    {{ $solicitudesRecoleccion->observaciones }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Direccion:</strong>
-                                    {{ $donante->direccion }}
+                                    <strong>Estado:</strong>
+                                    {{ $solicitudesRecoleccion->estado }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Fecha Registro:</strong>
-                                    {{ $donante->fecha_registro }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Deleted By:</strong>
-                                    {{ $donante->deleted_by }}
+                                    <strong>Fecha Creacion:</strong>
+                                    {{ $solicitudesRecoleccion->fecha_creacion }}
                                 </div>
 
                     </div>

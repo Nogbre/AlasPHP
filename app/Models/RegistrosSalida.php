@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * Class RegistrosSalida
+ *
+ * @property $id_salida
+ * @property $id_paquete
+ * @property $id_almacen
+ * @property $fecha_salida
+ * @property $destino
+ * @property $observaciones
+ *
+ * @property Almacene $almacene
+ * @property Paquete $paquete
+ * @package App
+ * @mixin \Illuminate\Database\Eloquent\Builder
+ */
+class RegistrosSalida extends Model
+{
+    protected $table = 'registros_salida';
+    protected $primaryKey = 'id_salida';
+    public $timestamps = false;
+    public $incrementing = true;
+    protected $keyType = 'int';
+    
+    protected $perPage = 20;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = ['id_paquete', 'id_almacen', 'fecha_salida', 'destino', 'observaciones'];
+
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function almacene()
+    {
+        return $this->belongsTo(\App\Models\Almacene::class, 'id_almacen', 'id_almacen');
+    }
+    
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function paquete()
+    {
+        return $this->belongsTo(\App\Models\Paquete::class, 'id_paquete', 'id_paquete');
+    }
+    
+}

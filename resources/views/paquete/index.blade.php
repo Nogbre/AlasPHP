@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('template_title')
-    Usuarios
+    Paquetes
 @endsection
 
 @section('content')
@@ -13,11 +13,11 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
 
                             <span id="card_title">
-                                {{ __('Usuarios') }}
+                                {{ __('Paquetes') }}
                             </span>
 
                              <div class="float-right">
-                                <a href="{{ route('usuario.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
+                                <a href="{{ route('paquete.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
                                   {{ __('Create New') }}
                                 </a>
                               </div>
@@ -36,54 +36,36 @@
                                     <tr>
                                         <th>No</th>
                                         
+									<th >Id Paquete</th>
+									<th >Codigo Paquete</th>
+									<th >Fecha Creacion</th>
 									<th >Id Usuario</th>
-									<th >Nombres</th>
-									<th >Apellidos</th>
-									<th >Ci</th>
-									<th >Foto Ci</th>
-									<th >Licencia Conducir</th>
-									<th >Foto Licencia</th>
-									<th >Genero</th>
-									<th >Correo</th>
-									<th >Telefono</th>
-									<th >Direccion Domicilio</th>
-									<th >Contrasena</th>
+									<th >Id Solicitud</th>
 									<th >Estado</th>
-									<th >Entidad Pertenencia</th>
-									<th >Tipo Sangre</th>
-									<th >Id Rol</th>
-									<th >Fecha Registro</th>
+									<th >Deleted By</th>
+									<th >Codigo Solicitud Externa</th>
 
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($usuarios as $usuario)
+                                    @foreach ($paquetes as $paquete)
                                         <tr>
                                             <td>{{ ++$i }}</td>
                                             
-										<td >{{ $usuario->id_usuario }}</td>
-										<td >{{ $usuario->nombres }}</td>
-										<td >{{ $usuario->apellidos }}</td>
-										<td >{{ $usuario->ci }}</td>
-										<td >{{ $usuario->foto_ci }}</td>
-										<td >{{ $usuario->licencia_conducir }}</td>
-										<td >{{ $usuario->foto_licencia }}</td>
-										<td >{{ $usuario->genero }}</td>
-										<td >{{ $usuario->correo }}</td>
-										<td >{{ $usuario->telefono }}</td>
-										<td >{{ $usuario->direccion_domicilio }}</td>
-										<td >{{ $usuario->contrasena }}</td>
-										<td >{{ $usuario->estado }}</td>
-										<td >{{ $usuario->entidad_pertenencia }}</td>
-										<td >{{ $usuario->tipo_sangre }}</td>
-										<td >{{ $usuario->id_rol }}</td>
-										<td >{{ $usuario->fecha_registro }}</td>
+										<td >{{ $paquete->id_paquete }}</td>
+										<td >{{ $paquete->codigo_paquete }}</td>
+										<td >{{ $paquete->fecha_creacion }}</td>
+										<td >{{ $paquete->id_usuario }}</td>
+										<td >{{ $paquete->id_solicitud }}</td>
+										<td >{{ $paquete->estado }}</td>
+										<td >{{ $paquete->deleted_by }}</td>
+										<td >{{ $paquete->codigo_solicitud_externa }}</td>
 
                                             <td>
-                                                <form action="{{ route('usuario.destroy', $usuario->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('usuario.show', $usuario->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('usuario.edit', $usuario->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                <form action="{{ route('paquete.destroy', $paquete->id) }}" method="POST">
+                                                    <a class="btn btn-sm btn-primary " href="{{ route('paquete.show', $paquete->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                    <a class="btn btn-sm btn-success" href="{{ route('paquete.edit', $paquete->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
@@ -96,7 +78,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $usuarios->withQueryString()->links() !!}
+                {!! $paquetes->withQueryString()->links() !!}
             </div>
         </div>
     </div>
