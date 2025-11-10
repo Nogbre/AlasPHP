@@ -29,7 +29,10 @@ class EspacioController extends Controller
     {
         $espacio = new Espacio();
 
-        return view('espacio.create', compact('espacio'));
+        // load estantes for FK select
+        $estantes = \App\Models\Estante::pluck('codigo_estante', 'id_estante');
+
+        return view('espacio.create', compact('espacio', 'estantes'));
     }
 
     /**
@@ -60,7 +63,10 @@ class EspacioController extends Controller
     {
         $espacio = Espacio::find($id);
 
-        return view('espacio.edit', compact('espacio'));
+        // load estantes for FK select
+        $estantes = \App\Models\Estante::pluck('codigo_estante', 'id_estante');
+
+        return view('espacio.edit', compact('espacio', 'estantes'));
     }
 
     /**

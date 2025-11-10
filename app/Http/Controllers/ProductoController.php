@@ -29,7 +29,10 @@ class ProductoController extends Controller
     {
         $producto = new Producto();
 
-        return view('producto.create', compact('producto'));
+        // load categories for FK select
+        $categorias = \App\Models\CategoriasProducto::pluck('nombre', 'id_categoria');
+
+        return view('producto.create', compact('producto', 'categorias'));
     }
 
     /**
@@ -60,7 +63,10 @@ class ProductoController extends Controller
     {
         $producto = Producto::find($id);
 
-        return view('producto.edit', compact('producto'));
+        // load categories for FK select
+        $categorias = \App\Models\CategoriasProducto::pluck('nombre', 'id_categoria');
+
+        return view('producto.edit', compact('producto', 'categorias'));
     }
 
     /**

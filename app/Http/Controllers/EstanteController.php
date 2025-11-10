@@ -29,7 +29,10 @@ class EstanteController extends Controller
     {
         $estante = new Estante();
 
-        return view('estante.create', compact('estante'));
+        // load almacenes for FK select
+        $almacenes = \App\Models\Almacene::pluck('nombre', 'id_almacen');
+
+        return view('estante.create', compact('estante', 'almacenes'));
     }
 
     /**
@@ -60,7 +63,10 @@ class EstanteController extends Controller
     {
         $estante = Estante::find($id);
 
-        return view('estante.edit', compact('estante'));
+        // load almacenes for FK select
+        $almacenes = \App\Models\Almacene::pluck('nombre', 'id_almacen');
+
+        return view('estante.edit', compact('estante', 'almacenes'));
     }
 
     /**

@@ -22,6 +22,15 @@ class PuntosRecoleccion extends Model
     protected $perPage = 20;
 
     /**
+     * The table associated with the model.
+     * Laravel's pluralizer previously generated `puntos_recoleccions` which is incorrect
+     * for this project's table name; set it explicitly to avoid queries to the wrong table.
+     *
+     * @var string
+     */
+    protected $table = 'puntos_recoleccion';
+
+    /**
      * The primary key associated with the table.
      *
      * @var string
@@ -50,7 +59,7 @@ class PuntosRecoleccion extends Model
     {
         // The foreign key on Donacione is assumed to be 'id_punto_recoleccion'
         // local key is 'id_punto' in this model.
-        return $this->hasMany(\App\Models\Donacione::class, 'id_punto', 'id_punto');
+        return $this->hasMany(\App\Models\Donacione::class, 'id_punto_recoleccion', 'id_punto');
     }
     
 }
