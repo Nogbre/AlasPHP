@@ -329,16 +329,6 @@ return [
         ],
         ['header' => 'account_settings'],
         [
-            'text' => 'profile',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-user',
-        ],
-        [
-            'text' => 'change_password',
-            'url' => 'admin/settings',
-            'icon' => 'fas fa-fw fa-lock',
-        ],
-        [
             'text' => 'Almacenes',
             'url' => '/almacene',
             'icon' => 'fas fa-fw fa-store',
@@ -374,11 +364,6 @@ return [
             'icon' => 'fas fa-fw fa-box-open',
         ],
         ['header' => 'GESTIÓN'],
-        [
-            'text' => 'Usuarios',
-            'url' => '/usuario',
-            'icon' => 'fas fa-fw fa-users',
-        ],
         [
             'text' => 'Donantes',
             'url' => '/donante',
