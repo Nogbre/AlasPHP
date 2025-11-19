@@ -35,22 +35,7 @@
                 </span>
             @enderror
         </div>
-        <div class="form-group mb-2 mb20">
-            <label for="id_almacen" class="form-label">{{ __('Id Almacen') }}</label>
-            <select name="id_almacen" class="form-control @error('id_almacen') is-invalid @enderror" id="id_almacen">
-                <option value="">Seleccione un almacén</option>
-                @foreach($almacenes ?? [] as $almacen)
-                    <option value="{{ $almacen->id_almacen }}" {{ old('id_almacen', $registrosSalida?->id_almacen) == $almacen->id_almacen ? 'selected' : '' }}>
-                        {{ $almacen->nombre }}
-                    </option>
-                @endforeach
-            </select>
-            @error('id_almacen')
-                <span class="invalid-feedback d-block" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-            @enderror
-        </div>
+        
         <div class="form-group mb-2 mb20">
             <label for="fecha_salida" class="form-label">{{ __('Fecha Salida') }}</label>
             <input type="datetime-local" name="fecha_salida" class="form-control @error('fecha_salida') is-invalid @enderror" value="{{ old('fecha_salida', $registrosSalida?->fecha_salida ? \Carbon\Carbon::parse($registrosSalida->fecha_salida)->format('Y-m-d\TH:i') : '') }}" id="fecha_salida">

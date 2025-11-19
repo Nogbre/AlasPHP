@@ -28,10 +28,7 @@
                                     <strong>Id Paquete:</strong>
                                     {{ $registrosSalida->id_paquete }}
                                 </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Id Almacen:</strong>
-                                    {{ $registrosSalida->id_almacen }}
-                                </div>
+                                
                                 <div class="form-group mb-2 mb20">
                                     <strong>Fecha Salida:</strong>
                                     {{ $registrosSalida->fecha_salida }}

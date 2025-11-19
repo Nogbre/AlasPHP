@@ -9,12 +9,11 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property $id_salida
  * @property $id_paquete
- * @property $id_almacen
  * @property $fecha_salida
  * @property $destino
  * @property $observaciones
  *
- * @property Almacene $almacene
+ *
  * @property Paquete $paquete
  * @package App
  * @mixin \Illuminate\Database\Eloquent\Builder
@@ -34,16 +33,9 @@ class RegistrosSalida extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['id_paquete', 'id_almacen', 'fecha_salida', 'destino', 'observaciones'];
+    protected $fillable = ['id_paquete', 'fecha_salida', 'destino', 'observaciones'];
 
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function almacene()
-    {
-        return $this->belongsTo(\App\Models\Almacene::class, 'id_almacen', 'id_almacen');
-    }
     
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

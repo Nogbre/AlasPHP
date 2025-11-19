@@ -48,9 +48,5 @@ class Almacene extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function registrosSalidas()
-    {
-        return $this->hasMany(\App\Models\RegistrosSalida::class, 'id_almacen', 'id_almacen');
-    }
     
 }

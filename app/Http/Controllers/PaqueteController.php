@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Paquete;
-use App\Models\Usuario;
 use App\Models\SolicitudesRecoleccion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,10 +29,9 @@ class PaqueteController extends Controller
     public function create(): View
     {
         $paquete = new Paquete();
-        $usuarios = Usuario::all();
         $solicitudes = SolicitudesRecoleccion::all();
 
-        return view('paquete.create', compact('paquete', 'usuarios', 'solicitudes'));
+        return view('paquete.create', compact('paquete', 'solicitudes'));
     }
 
     /**
@@ -63,10 +61,9 @@ class PaqueteController extends Controller
     public function edit($id): View
     {
         $paquete = Paquete::find($id);
-        $usuarios = Usuario::all();
         $solicitudes = SolicitudesRecoleccion::all();
 
-        return view('paquete.edit', compact('paquete', 'usuarios', 'solicitudes'));
+        return view('paquete.edit', compact('paquete', 'solicitudes'));
     }
 
     /**

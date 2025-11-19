@@ -344,6 +344,11 @@ return [
             'icon' => 'fas fa-fw fa-box',
         ],
         [
+            'text' => 'Donaciones',
+            'url' => '/donaciones',
+            'icon' => 'fas fa-fw fa-box',
+        ],
+        [
             'text' => 'Campañas',
             'url' => '/campana',
             'icon' => 'fas fa-fw fa-bullhorn',

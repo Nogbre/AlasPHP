@@ -36,31 +36,29 @@
                                     <tr>
                                         <th>No</th>
                                         
-									<th >Id Paquete</th>
-									<th >Codigo Paquete</th>
-									<th >Fecha Creacion</th>
-									<th >Id Usuario</th>
-									<th >Id Solicitud</th>
-									<th >Estado</th>
-									<th >Deleted By</th>
-									<th >Codigo Solicitud Externa</th>
+                                    <th >Id Paquete</th>
+                                    <th >Codigo Paquete</th>
+                                    <th >Fecha Creacion</th>
+                                    <th >Id Solicitud</th>
+                                    <th >Estado</th>
+                                    <th >Deleted By</th>
+                                    <th >Codigo Solicitud Externa</th>
 
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($paquetes as $paquete)
-                                        <tr>
-                                            <td>{{ ++$i }}</td>
-                                            
-										<td >{{ $paquete->id_paquete }}</td>
-										<td >{{ $paquete->codigo_paquete }}</td>
-										<td >{{ $paquete->fecha_creacion }}</td>
-										<td >{{ $paquete->id_usuario }}</td>
-										<td >{{ $paquete->id_solicitud }}</td>
-										<td >{{ $paquete->estado }}</td>
-										<td >{{ $paquete->deleted_by }}</td>
-										<td >{{ $paquete->codigo_solicitud_externa }}</td>
+                    <tr>
+                        <td>{{ ++$i }}</td>
+						
+                        <td >{{ $paquete->id_paquete }}</td>
+                        <td >{{ $paquete->codigo_paquete }}</td>
+                        <td >{{ $paquete->fecha_creacion }}</td>
+                        <td >{{ $paquete->id_solicitud }}</td>
+                        <td >{{ $paquete->estado }}</td>
+                        <td >{{ $paquete->deleted_by }}</td>
+                        <td >{{ $paquete->codigo_solicitud_externa }}</td>
 
                                             <td>
                                                 <form action="{{ route('paquete.destroy', $paquete->id) }}" method="POST">

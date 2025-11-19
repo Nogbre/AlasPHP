@@ -38,7 +38,7 @@
                                         
 									<th >Id Salida</th>
 									<th >Id Paquete</th>
-									<th >Id Almacen</th>
+				
 									<th >Fecha Salida</th>
 									<th >Destino</th>
 									<th >Observaciones</th>
@@ -53,7 +53,7 @@
                                             
 										<td >{{ $registrosSalida->id_salida }}</td>
 										<td >{{ $registrosSalida->id_paquete }}</td>
-										<td >{{ $registrosSalida->id_almacen }}</td>
+						
 										<td >{{ $registrosSalida->fecha_salida }}</td>
 										<td >{{ $registrosSalida->destino }}</td>
 										<td >{{ $registrosSalida->observaciones }}</td>

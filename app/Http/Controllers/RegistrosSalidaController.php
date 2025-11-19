@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\RegistrosSalida;
 use App\Models\Paquete;
-use App\Models\Almacene;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\RegistrosSalidaRequest;
@@ -31,9 +30,7 @@ class RegistrosSalidaController extends Controller
     {
         $registrosSalida = new RegistrosSalida();
         $paquetes = Paquete::all();
-        $almacenes = Almacene::all();
-
-        return view('registros-salida.create', compact('registrosSalida', 'paquetes', 'almacenes'));
+        return view('registros-salida.create', compact('registrosSalida', 'paquetes'));
     }
 
     /**
@@ -64,9 +61,7 @@ class RegistrosSalidaController extends Controller
     {
         $registrosSalida = RegistrosSalida::find($id);
         $paquetes = Paquete::all();
-        $almacenes = Almacene::all();
-
-        return view('registros-salida.edit', compact('registrosSalida', 'paquetes', 'almacenes'));
+        return view('registros-salida.edit', compact('registrosSalida', 'paquetes'));
     }
 
     /**

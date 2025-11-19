@@ -22,11 +22,10 @@ class RegistrosSalidaRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-			'id_paquete' => 'nullable|integer|exists:paquetes,id_paquete',
-			'id_almacen' => 'nullable|integer|exists:almacenes,id_almacen',
-			'fecha_salida' => 'nullable|date',
-			'destino' => 'nullable|string',
-			'observaciones' => 'nullable|string',
+            'id_paquete' => 'nullable|integer|exists:paquetes,id_paquete',
+            'fecha_salida' => 'nullable|date',
+            'destino' => 'nullable|string',
+            'observaciones' => 'nullable|string',
         ];
         
         // Solo requerir id_salida cuando se está actualizando

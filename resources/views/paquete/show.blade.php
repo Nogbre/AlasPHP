@@ -33,13 +33,11 @@
                                     {{ $paquete->fecha_creacion }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Id Usuario:</strong>
-                                    {{ $paquete->id_usuario }}
-                                </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Id Solicitud:</strong>
                                     {{ $paquete->id_solicitud }}
                                 </div>
+                                
                                 <div class="form-group mb-2 mb20">
                                     <strong>Estado:</strong>
                                     {{ $paquete->estado }}

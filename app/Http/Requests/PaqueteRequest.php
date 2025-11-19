@@ -22,11 +22,10 @@ class PaqueteRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-			'codigo_paquete' => 'nullable|string',
-			'id_usuario' => 'nullable|integer|exists:usuarios,id_usuario',
-			'id_solicitud' => 'nullable|integer',
-			'estado' => 'nullable|string',
-			'codigo_solicitud_externa' => 'nullable|string',
+            'codigo_paquete' => 'nullable|string',
+            'id_solicitud' => 'nullable|integer',
+            'estado' => 'nullable|string',
+            'codigo_solicitud_externa' => 'nullable|string',
         ];
         
         // Solo requerir id_paquete cuando se está actualizando

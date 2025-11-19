@@ -42,7 +42,7 @@ class Paquete extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['codigo_paquete', 'fecha_creacion', 'id_usuario', 'id_solicitud', 'estado', 'deleted_by', 'codigo_solicitud_externa'];
+    protected $fillable = ['codigo_paquete', 'fecha_creacion', 'id_solicitud', 'estado', 'deleted_by', 'codigo_solicitud_externa'];
 
 
     /**
@@ -51,14 +51,6 @@ class Paquete extends Model
     public function solicitudesAyuda()
     {
         return $this->belongsTo(\App\Models\SolicitudesAyuda::class, 'id_solicitud', 'id_solicitud');
-    }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function usuario()
-    {
-        return $this->belongsTo(\App\Models\Usuario::class, 'id_usuario', 'id_usuario');
     }
     
     /**

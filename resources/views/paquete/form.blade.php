@@ -28,22 +28,7 @@
                 </span>
             @enderror
         </div>
-        <div class="form-group mb-2 mb20">
-            <label for="id_usuario" class="form-label">{{ __('Id Usuario') }}</label>
-            <select name="id_usuario" class="form-control @error('id_usuario') is-invalid @enderror" id="id_usuario">
-                <option value="">Seleccione un usuario</option>
-                @foreach($usuarios ?? [] as $usuario)
-                    <option value="{{ $usuario->id_usuario }}" {{ old('id_usuario', $paquete?->id_usuario) == $usuario->id_usuario ? 'selected' : '' }}>
-                        {{ $usuario->nombres }} {{ $usuario->apellidos }}
-                    </option>
-                @endforeach
-            </select>
-            @error('id_usuario')
-                <span class="invalid-feedback d-block" role="alert">
-                    <strong>{{ $message }}</strong>
-                </span>
-            @enderror
-        </div>
+        {{-- Paquetes no tienen asociado id_usuario en el esquema actual --}}
         <div class="form-group mb-2 mb20">
             <label for="id_solicitud" class="form-label">{{ __('Id Solicitud') }}</label>
             <select name="id_solicitud" class="form-control @error('id_solicitud') is-invalid @enderror" id="id_solicitud">
