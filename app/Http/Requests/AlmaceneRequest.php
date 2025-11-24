@@ -25,6 +25,8 @@ class AlmaceneRequest extends FormRequest
             // id_almacen es autogenerado por la BD. No debe validarse aquí.
             'nombre' => 'required|string|max:255',
             'direccion' => 'nullable|string|max:255',
+            'latitud' => 'nullable|numeric|between:-90,90',
+            'longitud' => 'nullable|numeric|between:-180,180',
         ];
     }
 }

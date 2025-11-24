@@ -13,8 +13,103 @@
             {!! $errors->first('direccion', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
 
+        <div class="form-group mb-2 mb20">
+            <label class="form-label">{{ __('Ubicación en el Mapa') }}</label>
+            <p class="text-muted small">Haz clic en el mapa para seleccionar la ubicación del almacén</p>
+            <div id="map" style="height: 400px; width: 100%; border: 1px solid #ddd; border-radius: 4px;"></div>
+            <input type="hidden" name="latitud" id="latitud" value="{{ old('latitud', $almacene?->latitud) }}">
+            <input type="hidden" name="longitud" id="longitud" value="{{ old('longitud', $almacene?->longitud) }}">
+            <small class="form-text text-muted mt-2">
+                <strong>Coordenadas seleccionadas:</strong> 
+                <span id="coords-display">
+                    @if(old('latitud', $almacene?->latitud) && old('longitud', $almacene?->longitud))
+                        Lat: {{ old('latitud', $almacene?->latitud) }}, Lng: {{ old('longitud', $almacene?->longitud) }}
+                    @else
+                        No seleccionadas
+                    @endif
+                </span>
+            </small>
+        </div>
+
     </div>
     <div class="col-md-12 mt20 mt-2">
         <button type="submit" class="btn btn-primary">{{ __('Submit') }}</button>
     </div>
 </div>
+
+@push('css')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+      crossorigin=""/>
+@endpush
+
+@push('js')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+        crossorigin=""></script>
+<script>
+    // Coordinates for Santa Cruz de la Sierra, Bolivia
+    const santaCruzCoords = [-17.8145819, -63.1560853];
+    
+    // Get saved coordinates or use Santa Cruz as default
+    let savedLat = document.getElementById('latitud').value;
+    let savedLng = document.getElementById('longitud').value;
+    let hasSavedCoords = savedLat && savedLng && savedLat !== '' && savedLng !== '';
+    let initialCoords = hasSavedCoords 
+        ? [parseFloat(savedLat), parseFloat(savedLng)] 
+        : santaCruzCoords;
+    
+    // Initialize the map
+    const map = L.map('map').setView(initialCoords, 13);
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+    }).addTo(map);
+    
+    // Create a marker
+    let marker = null;
+    if (hasSavedCoords) {
+        marker = L.marker(initialCoords, {draggable: true}).addTo(map);
+        marker.bindPopup('Ubicación del almacén').openPopup();
+        
+        // Update coordinates when marker is dragged
+        marker.on('dragend', function(e) {
+            const position = marker.getLatLng();
+            updateCoordinates(position.lat, position.lng);
+        });
+    }
+    
+    // Add click event to map
+    map.on('click', function(e) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+        
+        // Update or create marker
+        if (marker) {
+            marker.setLatLng(e.latlng);
+        } else {
+            marker = L.marker(e.latlng, {draggable: true}).addTo(map);
+            marker.bindPopup('Ubicación del almacén').openPopup();
+            
+            // Update coordinates when marker is dragged
+            marker.on('dragend', function(e) {
+                const position = marker.getLatLng();
+                updateCoordinates(position.lat, position.lng);
+            });
+        }
+        
+        // Update hidden inputs and display
+        updateCoordinates(lat, lng);
+    });
+    
+    // Function to update coordinate fields
+    function updateCoordinates(lat, lng) {
+        document.getElementById('latitud').value = lat.toFixed(7);
+        document.getElementById('longitud').value = lng.toFixed(7);
+        document.getElementById('coords-display').textContent = 
+            'Lat: ' + lat.toFixed(7) + ', Lng: ' + lng.toFixed(7);
+    }
+</script>
+@endpush

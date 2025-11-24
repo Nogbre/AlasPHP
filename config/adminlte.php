@@ -327,7 +327,7 @@ return [
             'label' => 4,
             'label_color' => 'success',
         ],
-        ['header' => 'account_settings'],
+        ['header' => 'AJUSTES INTERNOS'],
         [
             'text' => 'Almacenes',
             'url' => '/almacene',
@@ -344,7 +344,7 @@ return [
             'icon' => 'fas fa-fw fa-box',
         ],
         [
-            'text' => 'Donaciones',
+            'text' => 'Inventario',
             'url' => '/donaciones',
             'icon' => 'fas fa-fw fa-box',
         ],
