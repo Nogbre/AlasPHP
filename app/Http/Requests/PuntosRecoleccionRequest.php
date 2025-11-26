@@ -22,10 +22,11 @@ class PuntosRecoleccionRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'id_punto' => 'required',
-			'nombre' => 'string',
-			'direccion' => 'string',
-			'contacto' => 'string',
+            'nombre' => 'required|string|max:255',
+            'direccion' => 'required|string|max:255',
+            'contacto' => 'nullable|string|max:255',
+            'latitud' => 'nullable|numeric|between:-90,90',
+            'longitud' => 'nullable|numeric|between:-180,180',
         ];
     }
 }

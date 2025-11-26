@@ -24,7 +24,26 @@ class DonacioneController extends Controller
     {
         $donaciones = Donacione::with(['donante'])->paginate();
 
-        return view('donaciones.index', compact('donaciones'))
+        // Calculate statistics
+        $totalDonaciones = Donacione::count();
+        $donacionesDinero = Donacione::where('tipo', 'dinero')->count();
+        $donacionesEspecie = Donacione::where('tipo', 'especie')->count();
+
+        // Calculate total money amount
+        $montoTotal = DB::table('donaciones_dinero')
+            ->join('donaciones', 'donaciones_dinero.id_donacion', '=', 'donaciones.id_donacion')
+            ->sum('donaciones_dinero.monto');
+
+        // Calculate clothing donations (donations with products in 'Ropa' category)
+        $donacionesRopa = DB::table('donaciones')
+            ->join('donacion_detalles', 'donaciones.id_donacion', '=', 'donacion_detalles.id_donacion')
+            ->join('productos', 'donacion_detalles.id_producto', '=', 'productos.id_producto')
+            ->join('categorias_productos', 'productos.id_categoria', '=', 'categorias_productos.id_categoria')
+            ->where('categorias_productos.nombre', 'LIKE', '%Ropa%')
+            ->distinct('donaciones.id_donacion')
+            ->count('donaciones.id_donacion');
+
+        return view('donaciones.index', compact('donaciones', 'totalDonaciones', 'donacionesDinero', 'donacionesEspecie', 'montoTotal', 'donacionesRopa'))
             ->with('i', ($request->input('page', 1) - 1) * $donaciones->perPage());
     }
 
@@ -36,23 +55,27 @@ class DonacioneController extends Controller
         $productos = Producto::pluck('nombre', 'id_producto');
         $espacios = Espacio::pluck('codigo_espacio', 'id_espacio');
 
+        // Get products with their unit measurements for auto-fill
+        $productosData = Producto::select('id_producto', 'nombre', 'unidad_medida')->get();
+        $productosUnidades = $productosData->pluck('unidad_medida', 'id_producto')->toArray();
+
         // Provide an empty model instance so the form can safely access $donacion
         $donacion = new Donacione();
 
-        return view('donaciones.create', compact('donacion','donantes','campanas','puntos','productos','espacios'));
+        return view('donaciones.create', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades'));
     }
 
     public function store(DonacioneRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        
+
         \Log::info('=== INICIO STORE DONACION ===');
         \Log::info('Datos validados:', $data);
 
         try {
-            DB::transaction(function() use ($data) {
+            DB::transaction(function () use ($data) {
                 \Log::info('Iniciando transacción...');
-                
+
                 $donacion = Donacione::create([
                     'id_donante' => $data['id_donante'],
                     'tipo' => $data['tipo'],
@@ -61,7 +84,7 @@ class DonacioneController extends Controller
                     'observaciones' => $data['observaciones'] ?? null,
                     'fecha' => now(),
                 ]);
-                
+
                 \Log::info('Donación creada:', ['id' => $donacion->id_donacion, 'tipo' => $donacion->tipo]);
 
                 if ($data['tipo'] === 'dinero') {
@@ -73,7 +96,7 @@ class DonacioneController extends Controller
                         'metodo_pago' => $data['metodo_pago'] ?? 'NULL',
                         'referencia_pago' => $data['referencia_pago'] ?? 'NULL',
                     ]);
-                    
+
                     DonacionesDinero::create([
                         'id_donacion' => $donacion->id_donacion,
                         'monto' => $data['monto'],
@@ -81,24 +104,24 @@ class DonacioneController extends Controller
                         'metodo_pago' => $data['metodo_pago'] ?? null,
                         'referencia_pago' => $data['referencia_pago'] ?? null,
                     ]);
-                    
+
                     \Log::info('Registro de dinero creado exitosamente');
                 } else {
                     \Log::info('Creando detalles de productos...', ['cantidad_detalles' => count($data['detalles'] ?? [])]);
-                    
+
                     foreach ($data['detalles'] as $index => $det) {
                         \Log::info("Procesando detalle #{$index}:", $det);
-                        
+
                         $detalle = DonacionDetalle::create([
                             'id_donacion' => $donacion->id_donacion,
                             'id_producto' => $det['id_producto'],
-                            'cantidad' => (int)$det['cantidad'],
+                            'cantidad' => (int) $det['cantidad'],
                             'unidad_medida' => $det['unidad_medida'] ?? null,
                             'descripcion' => $det['descripcion'] ?? null,
                             'id_talla' => $det['id_talla'] ?? null,
                             'id_genero' => $det['id_genero'] ?? null,
                         ]);
-                        
+
                         \Log::info("Detalle #{$index} creado:", ['id' => $detalle->id_detalle]);
 
                         UbicacionesDonacione::create([
@@ -106,30 +129,30 @@ class DonacioneController extends Controller
                             'id_espacio' => $det['id_espacio'],
                             'fecha_ingreso' => now(),
                         ]);
-                        
+
                         \Log::info("Ubicación para detalle #{$index} creada");
                     }
                 }
-                
+
                 \Log::info('Transacción completada exitosamente');
             });
 
             \Log::info('=== FIN STORE DONACION (SUCCESS) ===');
             return Redirect::route('donaciones.index')->with('success', 'Donación creada correctamente.');
-            
+
         } catch (\Throwable $e) {
             \Log::error('=== ERROR EN STORE DONACION ===');
             \Log::error('Mensaje: ' . $e->getMessage());
             \Log::error('Archivo: ' . $e->getFile() . ':' . $e->getLine());
             \Log::error('Trace: ' . $e->getTraceAsString());
-            
+
             return back()->withInput()->withErrors(['error' => 'Ocurrió un error al crear la donación: ' . $e->getMessage()]);
         }
     }
 
     public function show($id): View
     {
-        $donacion = Donacione::with(['detalles.producto','dinero','donante'])->find($id);
+        $donacion = Donacione::with(['detalles.producto', 'dinero', 'donante'])->find($id);
         return view('donaciones.show', compact('donacion'));
     }
 
@@ -143,7 +166,11 @@ class DonacioneController extends Controller
         $productos = Producto::pluck('nombre', 'id_producto');
         $espacios = Espacio::pluck('codigo_espacio', 'id_espacio');
 
-        return view('donaciones.edit', compact('donacion','donantes','campanas','puntos','productos','espacios'));
+        // Get products with their unit measurements for auto-fill
+        $productosData = Producto::select('id_producto', 'nombre', 'unidad_medida')->get();
+        $productosUnidades = $productosData->pluck('unidad_medida', 'id_producto')->toArray();
+
+        return view('donaciones.edit', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades'));
     }
 
     public function update(DonacioneRequest $request, Donacione $donacione): RedirectResponse
@@ -151,7 +178,7 @@ class DonacioneController extends Controller
         $data = $request->validated();
 
         try {
-            DB::transaction(function() use ($data, $donacione) {
+            DB::transaction(function () use ($data, $donacione) {
                 $donacione->update([
                     'id_donante' => $data['id_donante'],
                     'tipo' => $data['tipo'],
@@ -185,7 +212,7 @@ class DonacioneController extends Controller
                         $detalle = DonacionDetalle::create([
                             'id_donacion' => $donacione->id_donacion,
                             'id_producto' => $det['id_producto'],
-                            'cantidad' => (int)$det['cantidad'],
+                            'cantidad' => (int) $det['cantidad'],
                             'unidad_medida' => $det['unidad_medida'] ?? null,
                             'descripcion' => $det['descripcion'] ?? null,
                             'id_talla' => $det['id_talla'] ?? null,
@@ -212,7 +239,7 @@ class DonacioneController extends Controller
     {
         $donacion = Donacione::find($id);
         if ($donacion) {
-            DB::transaction(function() use ($donacion) {
+            DB::transaction(function () use ($donacion) {
                 // eliminar ubicaciones, detalles y registros de dinero
                 foreach ($donacion->detalles as $det) {
                     UbicacionesDonacione::where('id_detalle', $det->id_detalle)->delete();

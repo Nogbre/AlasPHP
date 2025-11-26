@@ -1,29 +1,24 @@
 @extends('adminlte::page')
 
-@section('template_title')
-    {{ __('Update') }} Campana
-@endsection
+@section('title', 'Editar Campaña')
+
+@section('content_header')
+<h1>Editar Campaña</h1>
+@stop
 
 @section('content')
-    <section class="content container-fluid">
-        <div class="">
-            <div class="col-md-12">
+    <div class="row">
+        <div class="col-md-12">
+            @includeif('partials.errors')
 
-                <div class="card card-default">
-                    <div class="card-header">
-                        <span class="card-title">{{ __('Update') }} Campana</span>
-                    </div>
-                    <div class="card-body bg-white">
-                        <form method="POST" action="{{ route('campana.update', $campana->id) }}"  role="form" enctype="multipart/form-data">
-                            {{ method_field('PATCH') }}
-                            @csrf
+            <form method="POST" action="{{ route('campana.update', $campana->id_campana) }}" role="form"
+                enctype="multipart/form-data">
+                {{ method_field('PATCH') }}
+                @csrf
 
-                            @include('campana.form')
+                @include('campana.form')
 
-                        </form>
-                    </div>
-                </div>
-            </div>
+            </form>
         </div>
-    </section>
+    </div>
 @endsection

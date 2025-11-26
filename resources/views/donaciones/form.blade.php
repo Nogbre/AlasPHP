@@ -196,11 +196,40 @@
 
 @push('js')
 <script>
+// Product units data from controller
+const productosUnidades = @json($productosUnidades ?? []);
+
 document.addEventListener('DOMContentLoaded', function(){
     const tipoSelect = document.getElementById('tipo');
     const blockDinero = document.getElementById('block-dinero');
     const blockDetalles = document.getElementById('block-detalles');
     let detalleIndex = 1;
+    
+    // Function to setup product change listeners
+    function setupProductListeners() {
+        document.querySelectorAll('select[name*="[id_producto]"]').forEach(function(select) {
+            select.addEventListener('change', function() {
+                const productId = this.value;
+                const row = this.closest('tr');
+                const unidadInput = row.querySelector('input[name*="[unidad_medida]"]');
+                
+                if (unidadInput && productId && productosUnidades[productId]) {
+                    unidadInput.value = productosUnidades[productId];
+                    unidadInput.setAttribute('readonly', 'readonly');
+                    unidadInput.style.backgroundColor = '#e9ecef';
+                } else if (unidadInput) {
+                    unidadInput.value = '';
+                    unidadInput.removeAttribute('readonly');
+                    unidadInput.style.backgroundColor = '';
+                }
+            });
+            
+            // Trigger change event for existing selections
+            if (select.value) {
+                select.dispatchEvent(new Event('change'));
+            }
+        });
+    }
     
     function toggleBlocks(){
         const tipo = tipoSelect.value;
@@ -218,6 +247,9 @@ document.addEventListener('DOMContentLoaded', function(){
             const existingRows = document.querySelectorAll('#detalles-table tbody .detalle-row');
             detalleIndex = existingRows.length;
             console.log('Filas existentes:', detalleIndex);
+            
+            // Setup listeners for existing rows
+            setupProductListeners();
         } else {
             blockDinero.style.display = 'none';
             blockDetalles.style.display = 'none';
@@ -272,12 +304,20 @@ document.addEventListener('DOMContentLoaded', function(){
                     if(input.tagName === 'SELECT'){
                         input.selectedIndex = 0;
                     }
+                    // Remove readonly from cloned unidad_medida input
+                    if(name.includes('[unidad_medida]')){
+                        input.removeAttribute('readonly');
+                        input.style.backgroundColor = '';
+                    }
                 }
             });
             
             tbody.appendChild(newRow);
             detalleIndex++;
             console.log('Fila agregada. Nuevo índice:', detalleIndex);
+            
+            // Setup listener for the new row
+            setupProductListeners();
         }
     });
     

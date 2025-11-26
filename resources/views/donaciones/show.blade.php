@@ -1,56 +1,261 @@
 @extends('adminlte::page')
 
-@section('template_title')
-    {{ $donacion->id_donacion ?? __('Show') }}
-@endsection
+@section('title', 'Detalles de la Donación')
+
+@section('content_header')
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>Detalles de la Donación</h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-secondary float-right" href="{{ route('donaciones.index') }}">
+            Volver al Listado
+        </a>
+    </div>
+</div>
+@stop
 
 @section('content')
-    <section class="content container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <div class="float-left">
-                            <span class="card-title">{{ __('Show') }} Donación</span>
-                        </div>
-                        <div class="float-right">
-                            <a class="btn btn-primary btn-sm" href="{{ route('donaciones.index') }}"> {{ __('Back') }}</a>
-                        </div>
-                    </div>
-
-                    <div class="card-body bg-white">
-                        <div class="form-group mb-2 mb20"><strong>Id Donación:</strong> {{ $donacion->id_donacion }}</div>
-                        <div class="form-group mb-2 mb20"><strong>Donante:</strong> {{ $donacion->donante->nombre ?? 'N/A' }}</div>
-                        <div class="form-group mb-2 mb20"><strong>Tipo:</strong> {{ $donacion->tipo }}</div>
-                        <div class="form-group mb-2 mb20"><strong>Observaciones:</strong> {{ $donacion->observaciones }}</div>
-                        <div class="form-group mb-2 mb20"><strong>Fecha:</strong> {{ $donacion->fecha }}</div>
-
-                        @if($donacion->dinero)
-                            <hr>
-                            <div class="form-group mb-2 mb20"><strong>Monto:</strong> {{ $donacion->dinero->monto }}</div>
-                            <div class="form-group mb-2 mb20"><strong>Método Pago:</strong> {{ $donacion->dinero->metodo_pago }}</div>
-                        @endif
-
-                        @if($donacion->detalles && $donacion->detalles->count())
-                            <hr>
-                            <h5>Detalles</h5>
-                            <table class="table table-striped">
-                                <thead><tr><th>Producto</th><th>Cantidad</th><th>Espacio</th></tr></thead>
-                                <tbody>
-                                    @foreach($donacion->detalles as $det)
-                                        <tr>
-                                            <td>{{ $det->producto->nombre ?? 'N/A' }}</td>
-                                            <td>{{ $det->cantidad }}</td>
-                                            <td>{{ $det->ubicaciones->first()->espacio->codigo_espacio ?? 'N/A' }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        @endif
-
-                    </div>
-                </div>
+{{-- Info Boxes Row --}}
+<div class="row">
+    <div class="col-md-3 col-sm-6 col-12">
+        <div class="info-box">
+            <span class="info-box-icon bg-info"><i class="fas fa-hashtag"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">ID Donación</span>
+                <span class="info-box-number">{{ $donacion->id_donacion }}</span>
             </div>
         </div>
-    </section>
-@endsection
+    </div>
+
+    <div class="col-md-3 col-sm-6 col-12">
+        <div class="info-box">
+            <span class="info-box-icon bg-success"><i class="fas fa-user"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Donante</span>
+                <span class="info-box-number" style="font-size: 1rem;">{{ $donacion->donante->nombre ?? 'N/A' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 col-12">
+        <div class="info-box">
+            <span class="info-box-icon 
+                    @if($donacion->tipo === 'dinero') bg-success
+                    @elseif($donacion->tipo === 'especie') bg-warning
+                    @else bg-purple
+                    @endif">
+                <i class="fas 
+                        @if($donacion->tipo === 'dinero') fa-dollar-sign
+                        @elseif($donacion->tipo === 'especie') fa-box-open
+                        @else fa-tshirt
+                        @endif">
+                </i>
+            </span>
+            <div class="info-box-content">
+                <span class="info-box-text">Tipo de Donación</span>
+                <span class="info-box-number" style="font-size: 1.2rem;">{{ ucfirst($donacion->tipo) }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-sm-6 col-12">
+        <div class="info-box">
+            <span class="info-box-icon bg-primary"><i class="far fa-calendar-alt"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Fecha</span>
+                <span class="info-box-number"
+                    style="font-size: 0.9rem;">{{ \Carbon\Carbon::parse($donacion->fecha)->format('d/m/Y H:i') }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Main Information Card --}}
+<div class="card card-primary card-outline">
+    <div class="card-header">
+        <h3 class="card-title">Información General</h3>
+        <div class="card-tools">
+            <a href="{{ route('donaciones.edit', $donacion->id_donacion) }}" class="btn btn-warning btn-sm">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Tipo de Donación:</dt>
+            <dd class="col-sm-9">
+                @if($donacion->tipo === 'dinero')
+                    <span class="badge badge-success badge-lg">
+                        <i class="fas fa-dollar-sign"></i> Dinero
+                    </span>
+                @elseif($donacion->tipo === 'especie')
+                    <span class="badge badge-warning badge-lg">
+                        <i class="fas fa-box-open"></i> Especie
+                    </span>
+                @else
+                    <span class="badge badge-purple badge-lg">
+                        <i class="fas fa-tshirt"></i> Ropa
+                    </span>
+                @endif
+            </dd>
+
+            <dt class="col-sm-3">Donante:</dt>
+            <dd class="col-sm-9">
+                <strong>{{ $donacion->donante->nombre ?? 'N/A' }}</strong>
+            </dd>
+
+            <dt class="col-sm-3">Fecha y Hora:</dt>
+            <dd class="col-sm-9">
+                {{ \Carbon\Carbon::parse($donacion->fecha)->format('d/m/Y H:i') }}
+            </dd>
+
+            @if($donacion->observaciones)
+                <dt class="col-sm-3">Observaciones:</dt>
+                <dd class="col-sm-9">{{ $donacion->observaciones }}</dd>
+            @endif
+        </dl>
+    </div>
+</div>
+
+{{-- Money Details Card --}}
+@if($donacion->dinero)
+    <div class="card card-success card-outline">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-dollar-sign"></i> Detalles de Donación en Dinero</h3>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Monto:</dt>
+                <dd class="col-sm-9">
+                    <h4 class="text-success">
+                        Bs. {{ number_format($donacion->dinero->monto, 2) }}
+                    </h4>
+                </dd>
+
+                @if($donacion->dinero->moneda)
+                    <dt class="col-sm-3">Moneda:</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge badge-info">{{ $donacion->dinero->moneda }}</span>
+                    </dd>
+                @endif
+
+                @if($donacion->dinero->metodo_pago)
+                    <dt class="col-sm-3">Método de Pago:</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge badge-primary">{{ ucfirst($donacion->dinero->metodo_pago) }}</span>
+                    </dd>
+                @endif
+
+                @if($donacion->dinero->referencia_pago)
+                    <dt class="col-sm-3">Referencia:</dt>
+                    <dd class="col-sm-9">{{ $donacion->dinero->referencia_pago }}</dd>
+                @endif
+            </dl>
+        </div>
+    </div>
+@endif
+
+{{-- Products Details Card --}}
+@if($donacion->detalles && $donacion->detalles->count())
+    <div class="card card-warning card-outline">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-box-open"></i> Detalles de Productos</h3>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Producto</th>
+                            <th width="15%">Cantidad Total</th>
+                            <th width="15%">Unidad</th>
+                            <th width="25%">Espacios</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php
+                            // Group products by id_producto
+                            $productosAgrupados = [];
+                            foreach ($donacion->detalles as $det) {
+                                $idProducto = $det->id_producto;
+                                if (!isset($productosAgrupados[$idProducto])) {
+                                    $productosAgrupados[$idProducto] = [
+                                        'nombre' => $det->producto->nombre ?? 'N/A',
+                                        'cantidad' => 0,
+                                        'unidad_medida' => $det->unidad_medida ?? $det->producto->unidad_medida ?? '',
+                                        'espacios' => []
+                                    ];
+                                }
+                                $productosAgrupados[$idProducto]['cantidad'] += $det->cantidad;
+
+                                // Add space if exists
+                                $espacio = $det->ubicaciones->first()->espacio->codigo_espacio ?? null;
+                                if ($espacio && !in_array($espacio, $productosAgrupados[$idProducto]['espacios'])) {
+                                    $productosAgrupados[$idProducto]['espacios'][] = $espacio;
+                                }
+                            }
+                        @endphp
+
+                        @foreach($productosAgrupados as $producto)
+                            <tr>
+                                <td><strong>{{ $producto['nombre'] }}</strong></td>
+                                <td class="text-center">
+                                    <h5 class="mb-0">{{ $producto['cantidad'] }}</h5>
+                                </td>
+                                <td><span class="badge badge-primary badge-lg">{{ $producto['unidad_medida'] }}</span></td>
+                                <td>
+                                    @foreach($producto['espacios'] as $espacio)
+                                        <span class="badge badge-info mr-1">{{ $espacio }}</span>
+                                    @endforeach
+                                    @if(empty($producto['espacios']))
+                                        <span class="text-muted">N/A</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+@endif
+
+{{-- Action Buttons --}}
+<div class="row mb-3">
+    <div class="col-12">
+        <a href="{{ route('donaciones.index') }}" class="btn btn-secondary">
+            Volver al Listado
+        </a>
+        <a href="{{ route('donaciones.edit', $donacion->id_donacion) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Editar Donación
+        </a>
+        <form action="{{ route('donaciones.destroy', $donacion->id_donacion) }}" method="POST" style="display: inline;"
+            onsubmit="return confirm('¿Está seguro de eliminar esta donación?');">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Eliminar
+            </button>
+        </form>
+    </div>
+</div>
+@stop
+
+@section('css')
+<style>
+    .badge-lg {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .bg-purple {
+        background-color: #6f42c1 !important;
+    }
+
+    .badge-purple {
+        background-color: #6f42c1;
+        color: white;
+    }
+</style>
+@stop

@@ -71,17 +71,17 @@
         <div class="row">
             <div class="col-md-6">
                 <dl class="row">
-                    <dt class="col-sm-4"><i class="fas fa-tag text-info"></i> Nombre:</dt>
+                    <dt class="col-sm-4">Nombre:</dt>
                     <dd class="col-sm-8"><strong>{{ $almacene->nombre }}</strong></dd>
 
-                    <dt class="col-sm-4"><i class="fas fa-map-marker-alt text-success"></i> Dirección:</dt>
+                    <dt class="col-sm-4">Dirección:</dt>
                     <dd class="col-sm-8">{{ $almacene->direccion }}</dd>
 
                     @if($almacene->latitud && $almacene->longitud)
-                        <dt class="col-sm-4"><i class="fas fa-compass text-primary"></i> Latitud:</dt>
+                        <dt class="col-sm-4">Latitud:</dt>
                         <dd class="col-sm-8">{{ $almacene->latitud }}</dd>
 
-                        <dt class="col-sm-4"><i class="fas fa-compass text-primary"></i> Longitud:</dt>
+                        <dt class="col-sm-4">Longitud:</dt>
                         <dd class="col-sm-8">{{ $almacene->longitud }}</dd>
                     @endif
                 </dl>

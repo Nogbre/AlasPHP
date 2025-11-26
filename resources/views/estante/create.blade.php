@@ -14,8 +14,12 @@
                         <span class="card-title">{{ __('Create') }} Estante</span>
                     </div>
                     <div class="card-body bg-white">
-                        <form method="POST" action="{{ route('estante.store') }}"  role="form" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('estante.store') }}" role="form" enctype="multipart/form-data">
                             @csrf
+
+                            @if(isset($returnUrl) && $returnUrl)
+                                <input type="hidden" name="return_url" value="{{ $returnUrl }}">
+                            @endif
 
                             @include('estante.form')
 

@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class PuntosRecoleccion extends Model
 {
-    
+
     protected $perPage = 20;
 
     /**
@@ -49,7 +49,7 @@ class PuntosRecoleccion extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['nombre', 'direccion', 'contacto'];
+    protected $fillable = ['nombre', 'direccion', 'contacto', 'latitud', 'longitud'];
 
 
     /**
@@ -61,5 +61,5 @@ class PuntosRecoleccion extends Model
         // local key is 'id_punto' in this model.
         return $this->hasMany(\App\Models\Donacione::class, 'id_punto_recoleccion', 'id_punto');
     }
-    
+
 }

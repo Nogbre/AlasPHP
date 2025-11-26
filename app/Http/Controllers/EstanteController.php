@@ -25,14 +25,15 @@ class EstanteController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
         $estante = new Estante();
+        $returnUrl = $request->query('return_url');
 
         // load almacenes for FK select
         $almacenes = \App\Models\Almacene::pluck('nombre', 'id_almacen');
 
-        return view('estante.create', compact('estante', 'almacenes'));
+        return view('estante.create', compact('estante', 'almacenes', 'returnUrl'));
     }
 
     /**
@@ -51,7 +52,14 @@ class EstanteController extends Controller
         // Generate code like: ALM1-EST001, ALM1-EST002, etc.
         $data['codigo_estante'] = 'ALM' . $idAlmacen . '-EST' . str_pad($count, 3, '0', STR_PAD_LEFT);
 
-        Estante::create($data);
+        $estante = Estante::create($data);
+
+        // Check if there's a return URL
+        if ($request->has('return_url') && $request->input('return_url')) {
+            return Redirect::to($request->input('return_url'))
+                ->with('success', 'Estante creado exitosamente.')
+                ->with('new_estante_id', $estante->id_estante);
+        }
 
         return Redirect::route('estante.index')
             ->with('success', 'Estante creado exitosamente.');

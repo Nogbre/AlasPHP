@@ -40,10 +40,21 @@ class EspacioController extends Controller
      */
     public function store(EspacioRequest $request): RedirectResponse
     {
-        Espacio::create($request->validated());
+        $data = $request->validated();
+
+        // Auto-generate codigo_espacio
+        $idEstante = $data['id_estante'];
+
+        // Get the count of existing espacios for this estante
+        $count = Espacio::where('id_estante', $idEstante)->count() + 1;
+
+        // Generate code like: EST1-ESP001, EST1-ESP002, etc.
+        $data['codigo_espacio'] = 'EST' . $idEstante . '-ESP' . str_pad($count, 3, '0', STR_PAD_LEFT);
+
+        Espacio::create($data);
 
         return Redirect::route('espacio.index')
-            ->with('success', 'Espacio created successfully.');
+            ->with('success', 'Espacio creado exitosamente.');
     }
 
     /**

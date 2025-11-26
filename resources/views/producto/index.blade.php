@@ -1,75 +1,149 @@
 @extends('adminlte::page')
 
-@section('template_title')
-    Productos
-@endsection
+@section('title', 'Inventario de Productos')
+
+@section('content_header')
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>Inventario de Productos</h1>
+    </div>
+    <div class="col-sm-6">
+        <a href="{{ route('producto.create') }}" class="btn btn-primary float-right">
+            Nuevo Producto
+        </a>
+    </div>
+</div>
+@stop
 
 @section('content')
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-
-                            <span id="card_title">
-                                {{ __('Productos') }}
-                            </span>
-
-                             <div class="float-right">
-                                <a href="{{ route('producto.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
-                                  {{ __('Create New') }}
-                                </a>
-                              </div>
-                        </div>
-                    </div>
-                    @if ($message = Session::get('success'))
-                        <div class="alert alert-success m-4">
-                            <p>{{ $message }}</p>
-                        </div>
-                    @endif
-
-                    <div class="card-body bg-white">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover">
-                                <thead class="thead">
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Id Categoria</th>
-                                        <th>Nombre</th>
-                                        <th>Descripcion</th>
-                                        <th>Unidad Medida</th>
-
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($productos as $producto)
-                                        <tr>
-                                            <td>{{ ++$i }}</td>
-                                            <td>{{ $producto->id_categoria }}</td>
-                                            <td>{{ $producto->nombre }}</td>
-                                            <td>{{ $producto->descripcion }}</td>
-                                            <td>{{ $producto->unidad_medida }}</td>
-
-                                            <td>
-                                                <form action="{{ route('producto.destroy', $producto->id_producto) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('producto.show', $producto->id_producto) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('producto.edit', $producto->id_producto) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                {!! $productos->withQueryString()->links() !!}
+{{-- Statistics Row --}}
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>{{ $productos->total() }}</h3>
+                <p>Total de Productos</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-boxes"></i>
             </div>
         </div>
     </div>
-@endsection
+</div>
+
+{{-- Alert Messages --}}
+@if ($message = Session::get('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ $message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+@endif
+
+{{-- Main Card --}}
+<div class="card card-primary card-outline">
+    <div class="card-header">
+        <h3 class="card-title">Listado de Productos</h3>
+    </div>
+    <div class="card-body">
+        <table id="productosTable" class="table table-bordered table-striped table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th width="60px">#</th>
+                    <th>Categoría</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Unidad de Medida</th>
+                    <th width="200px" class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($productos as $producto)
+                    <tr>
+                        <td class="text-center"><strong>{{ ++$i }}</strong></td>
+                        <td>
+                            @if($producto->categoriasProducto)
+                                <span class="badge badge-info">
+                                    {{ $producto->categoriasProducto->nombre }}
+                                </span>
+                            @else
+                                <span class="badge badge-secondary">Sin categoría</span>
+                            @endif
+                        </td>
+                        <td><strong>{{ $producto->nombre }}</strong></td>
+                        <td>{{ $producto->descripcion }}</td>
+                        <td>
+                            <span class="badge badge-primary">
+                                {{ $producto->unidad_medida }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+                                <a class="btn btn-info btn-sm" href="{{ route('producto.show', $producto->id_producto) }}"
+                                    title="Ver detalles">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a class="btn btn-warning btn-sm"
+                                    href="{{ route('producto.edit', $producto->id_producto) }}" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('producto.destroy', $producto->id_producto) }}" method="POST"
+                                    style="display: inline;"
+                                    onsubmit="return confirm('¿Está seguro de eliminar este producto?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer">
+        <div class="float-right">
+            {!! $productos->withQueryString()->links() !!}
+        </div>
+    </div>
+</div>
+@stop
+
+@section('css')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css">
+<style>
+    .small-box {
+        border-radius: 0.25rem;
+        box-shadow: 0 0 1px rgba(0, 0, 0, .125), 0 1px 3px rgba(0, 0, 0, .2);
+    }
+
+    .btn-group .btn {
+        margin: 0 2px;
+    }
+</style>
+@stop
+
+@section('js')
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#productosTable').DataTable({
+            "paging": false,
+            "searching": true,
+            "ordering": true,
+            "info": false,
+            "autoWidth": false,
+            "responsive": true,
+            "language": {
+                "search": "Buscar:",
+                "zeroRecords": "No se encontraron resultados",
+                "emptyTable": "No hay datos disponibles en la tabla"
+            }
+        });
+    });
+</script>
+@stop
