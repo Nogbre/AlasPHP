@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * Class Usuario
@@ -29,8 +31,10 @@ use Illuminate\Database\Eloquent\Model;
  * @package App
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
-class Usuario extends Model
+class Usuario extends Authenticatable
 {
+    use HasApiTokens;
+
     /** 👇 CLAVE: nombre de tabla y PK personalizada */
     protected $table = 'usuarios';
     protected $primaryKey = 'id_usuario';
@@ -62,6 +66,19 @@ class Usuario extends Model
         'id_rol',
         'fecha_registro'
     ];
+
+    /**
+     * Campos ocultos en serialización JSON
+     */
+    protected $hidden = ['contrasena'];
+
+    /**
+     * Método requerido por Authenticatable para obtener la contraseña
+     */
+    public function getAuthPassword()
+    {
+        return $this->contrasena;
+    }
 
     /**
      * Relación con roles

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * Class Donante
@@ -25,7 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Donante extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasApiTokens;
 
     protected $perPage = 20;
 
@@ -40,8 +41,20 @@ class Donante extends Model
     public $incrementing = true;
     protected $keyType = 'int';
     
-    protected $fillable = ['nombre', 'tipo', 'email', 'telefono', 'direccion', 'fecha_registro', 'deleted_by'];
+    protected $fillable = ['nombre', 'tipo', 'email', 'telefono', 'direccion', 'fecha_registro', 'deleted_by', 'password'];
 
+    /**
+     * Campos ocultos en serialización JSON
+     */
+    protected $hidden = ['password'];
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName()
+    {
+        return 'id_donante';
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

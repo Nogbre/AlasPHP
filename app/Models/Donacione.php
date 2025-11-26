@@ -50,4 +50,9 @@ class Donacione extends Model
     {
         return $this->belongsTo(Donante::class, 'id_donante', 'id_donante');
     }
+
+    public function campana()
+    {
+        return $this->belongsTo(Campana::class, 'id_campana', 'id_campana');
+    }
 }
