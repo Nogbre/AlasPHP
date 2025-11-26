@@ -320,13 +320,6 @@ return [
             'url' => 'admin/blog',
             'can' => 'manage-blog',
         ],
-        [
-            'text' => 'pages',
-            'url' => 'admin/pages',
-            'icon' => 'far fa-fw fa-file',
-            'label' => 4,
-            'label_color' => 'success',
-        ],
         ['header' => 'AJUSTES INTERNOS'],
         [
             'text' => 'Almacenes',
@@ -375,6 +368,11 @@ return [
             'icon' => 'fas fa-fw fa-hand-holding-heart',
         ],
         [
+            'text' => 'Recolectores',
+            'url' => '/recolectores',
+            'icon' => 'fas fa-fw fa-user-tie',
+        ],
+        [
             'text' => 'Solicitudes de Recolección',
             'url' => '/solicitudes-recoleccions',
             'icon' => 'fas fa-fw fa-clipboard-list',
@@ -389,61 +387,8 @@ return [
             'url' => '/registros-salida',
             'icon' => 'fas fa-fw fa-sign-out-alt',
         ],
-        [
-            'text' => 'multilevel',
-            'icon' => 'fas fa-fw fa-share',
-            'submenu' => [
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                ],
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                    'submenu' => [
-                        [
-                            'text' => 'level_two',
-                            'url' => '#',
-                        ],
-                        [
-                            'text' => 'level_two',
-                            'url' => '#',
-                            'submenu' => [
-                                [
-                                    'text' => 'level_three',
-                                    'url' => '#',
-                                ],
-                                [
-                                    'text' => 'level_three',
-                                    'url' => '#',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-                [
-                    'text' => 'level_one',
-                    'url' => '#',
-                ],
-            ],
-        ],
-        ['header' => 'labels'],
-        [
-            'text' => 'important',
-            'icon_color' => 'red',
-            'url' => '#',
-        ],
-        [
-            'text' => 'warning',
-            'icon_color' => 'yellow',
-            'url' => '#',
-        ],
-        [
-            'text' => 'information',
-            'icon_color' => 'cyan',
-            'url' => '#',
-        ],
     ],
+
 
     /*
     |--------------------------------------------------------------------------

@@ -1,83 +1,151 @@
 @extends('adminlte::page')
 
-@section('template_title')
-    Paquetes
-@endsection
+@section('title', 'Paquetes')
+
+@section('content_header')
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>Gestión de Paquetes</h1>
+    </div>
+    <div class="col-sm-6">
+        <a href="{{ route('paquete.create') }}" class="btn btn-primary float-right">
+            Nuevo Paquete
+        </a>
+    </div>
+</div>
+@stop
 
 @section('content')
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-
-                            <span id="card_title">
-                                {{ __('Paquetes') }}
-                            </span>
-
-                             <div class="float-right">
-                                <a href="{{ route('paquete.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
-                                  {{ __('Create New') }}
-                                </a>
-                              </div>
-                        </div>
-                    </div>
-                    @if ($message = Session::get('success'))
-                        <div class="alert alert-success m-4">
-                            <p>{{ $message }}</p>
-                        </div>
-                    @endif
-
-                    <div class="card-body bg-white">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover">
-                                <thead class="thead">
-                                    <tr>
-                                        <th>No</th>
-                                        
-                                    <th >Id Paquete</th>
-                                    <th >Codigo Paquete</th>
-                                    <th >Fecha Creacion</th>
-                                    <th >Id Solicitud</th>
-                                    <th >Estado</th>
-                                    <th >Deleted By</th>
-                                    <th >Codigo Solicitud Externa</th>
-
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($paquetes as $paquete)
-                    <tr>
-                        <td>{{ ++$i }}</td>
-						
-                        <td >{{ $paquete->id_paquete }}</td>
-                        <td >{{ $paquete->codigo_paquete }}</td>
-                        <td >{{ $paquete->fecha_creacion }}</td>
-                        <td >{{ $paquete->id_solicitud }}</td>
-                        <td >{{ $paquete->estado }}</td>
-                        <td >{{ $paquete->deleted_by }}</td>
-                        <td >{{ $paquete->codigo_solicitud_externa }}</td>
-
-                                            <td>
-                                                <form action="{{ route('paquete.destroy', $paquete->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('paquete.show', $paquete->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('paquete.edit', $paquete->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                {!! $paquetes->withQueryString()->links() !!}
+{{-- Statistics Row --}}
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>{{ $paquetes->total() }}</h3>
+                <p>Total de Paquetes</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-box"></i>
             </div>
         </div>
     </div>
-@endsection
+</div>
+
+{{-- Alert Messages --}}
+@if ($message = Session::get('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ $message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+@endif
+
+{{-- Main Card --}}
+<div class="card card-primary card-outline">
+    <div class="card-header">
+        <h3 class="card-title">Listado de Paquetes</h3>
+    </div>
+    <div class="card-body">
+        <table id="paquetesTable" class="table table-bordered table-striped table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th width="60px">#</th>
+                    <th>Código</th>
+                    <th>Fecha de Creación</th>
+                    <th>Estado</th>
+                    <th width="200px" class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($paquetes as $paquete)
+                    <tr>
+                        <td class="text-center"><strong>{{ ++$i }}</strong></td>
+                        <td>
+                            <strong>{{ $paquete->codigo_paquete ?? 'N/A' }}</strong>
+                        </td>
+                        <td>
+                            {{ $paquete->fecha_creacion ? \Carbon\Carbon::parse($paquete->fecha_creacion)->format('d/m/Y H:i') : 'N/A' }}
+                        </td>
+                        <td class="text-center">
+                            @php
+                                $badgeClass = match ($paquete->estado) {
+                                    'despachado' => 'success',
+                                    'en_proceso' => 'primary',
+                                    'cancelado' => 'danger',
+                                    default => 'warning'
+                                };
+                            @endphp
+                            <span class="badge badge-{{ $badgeClass }}">
+                                {{ ucfirst(str_replace('_', ' ', $paquete->estado ?? 'Pendiente')) }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group" role="group">
+                                <a class="btn btn-info btn-sm" href="{{ route('paquete.show', $paquete->id_paquete) }}"
+                                    title="Ver detalles">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a class="btn btn-warning btn-sm" href="{{ route('paquete.edit', $paquete->id_paquete) }}"
+                                    title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('paquete.destroy', $paquete->id_paquete) }}" method="POST"
+                                    style="display: inline;"
+                                    onsubmit="return confirm('¿Está seguro de eliminar este paquete?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer">
+        <div class="float-right">
+            {!! $paquetes->withQueryString()->links() !!}
+        </div>
+    </div>
+</div>
+@stop
+
+@section('css')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css">
+<style>
+    .small-box {
+        border-radius: 0.25rem;
+        box-shadow: 0 0 1px rgba(0, 0, 0, .125), 0 1px 3px rgba(0, 0, 0, .2);
+    }
+
+    .btn-group .btn {
+        margin: 0 2px;
+    }
+</style>
+@stop
+
+@section('js')
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#paquetesTable').DataTable({
+            "paging": false,
+            "searching": true,
+            "ordering": true,
+            "info": false,
+            "autoWidth": false,
+            "responsive": true,
+            "language": {
+                "search": "Buscar:",
+                "zeroRecords": "No se encontraron resultados",
+                "emptyTable": "No hay paquetes registrados"
+            }
+        });
+    });
+</script>
+@stop

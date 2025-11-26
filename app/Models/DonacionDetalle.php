@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Donacione;
+use App\Models\PaqueteDetalle;
 
 /**
  * Class DonacionDetalle
@@ -42,8 +44,18 @@ class DonacionDetalle extends Model
         return $this->belongsTo(Producto::class, 'id_producto', 'id_producto');
     }
 
+    public function donacion()
+    {
+        return $this->belongsTo(Donacione::class, 'id_donacion', 'id_donacion');
+    }
+
     public function ubicaciones()
     {
         return $this->hasMany(UbicacionesDonacione::class, 'id_detalle', 'id_detalle');
+    }
+
+    public function paqueteDetalles()
+    {
+        return $this->hasMany(PaqueteDetalle::class, 'id_detalle_donacion', 'id_detalle');
     }
 }

@@ -1,28 +1,23 @@
 @extends('adminlte::page')
 
-@section('template_title')
-    {{ __('Create') }} Solicitudes Recoleccion
-@endsection
+@section('title', 'Nueva Solicitud de Recolección')
+
+@section('content_header')
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>Nueva Solicitud de Recolección</h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-secondary float-right" href="{{ route('solicitudes-recoleccions.index') }}">
+            Volver al Listado
+        </a>
+    </div>
+</div>
+@stop
 
 @section('content')
-    <section class="content container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-
-                <div class="card card-default">
-                    <div class="card-header">
-                        <span class="card-title">{{ __('Create') }} Solicitudes Recoleccion</span>
-                    </div>
-                    <div class="card-body bg-white">
-                        <form method="POST" action="{{ route('solicitudes-recoleccions.store') }}"  role="form" enctype="multipart/form-data">
-                            @csrf
-
-                            @include('solicitudes-recoleccion.form')
-
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-@endsection
+<form method="POST" action="{{ route('solicitudes-recoleccions.store') }}" role="form" enctype="multipart/form-data">
+    @csrf
+    @include('solicitudes-recoleccion.form')
+</form>
+@stop

@@ -4,37 +4,48 @@
         {{-- Nombre Field --}}
         <div class="form-group mb-3">
             <label for="nombre" class="form-label">
-                {{ __('Nombre del Almacén') }}
+                <i class="fas fa-tag text-info"></i> {{ __('Nombre del Almacén') }}
                 <span class="text-danger">*</span>
             </label>
-            <input type="text" name="nombre" class="form-control @error('nombre') is-invalid @enderror"
-                value="{{ old('nombre', $almacene?->nombre) }}" id="nombre" placeholder="Ej: Almacén Central" required>
-            @error('nombre')
-                <div class="invalid-feedback">
-                    {{ $message }}
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-warehouse"></i></span>
                 </div>
-            @enderror
+                <input type="text" name="nombre" class="form-control @error('nombre') is-invalid @enderror"
+                    value="{{ old('nombre', $almacene?->nombre) }}" id="nombre" placeholder="Ej: Almacén Central"
+                    required>
+                @error('nombre')
+                    <div class="invalid-feedback">
+                        <i class="fas fa-exclamation-circle"></i> {{ $message }}
+                    </div>
+                @enderror
+            </div>
             <small class="form-text text-muted">
-                Ingrese un nombre descriptivo para identificar el almacén
+                <i class="fas fa-info-circle"></i> Ingrese un nombre descriptivo para identificar el almacén
             </small>
         </div>
 
         {{-- Direccion Field --}}
         <div class="form-group mb-3">
             <label for="direccion" class="form-label">
-                {{ __('Dirección') }}
+                <i class="fas fa-map-marker-alt text-success"></i> {{ __('Dirección') }}
                 <span class="text-danger">*</span>
             </label>
-            <input type="text" name="direccion" class="form-control @error('direccion') is-invalid @enderror"
-                value="{{ old('direccion', $almacene?->direccion) }}" id="direccion"
-                placeholder="Ej: Av. Cristo Redentor #123" required>
-            @error('direccion')
-                <div class="invalid-feedback">
-                    {{ $message }}
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-building"></i></span>
                 </div>
-            @enderror
+                <input type="text" name="direccion" class="form-control @error('direccion') is-invalid @enderror"
+                    value="{{ old('direccion', $almacene?->direccion) }}" id="direccion"
+                    placeholder="Ej: Av. Cristo Redentor #123" required>
+                @error('direccion')
+                    <div class="invalid-feedback">
+                        <i class="fas fa-exclamation-circle"></i> {{ $message }}
+                    </div>
+                @enderror
+            </div>
             <small class="form-text text-muted">
-                Ingrese la dirección completa del almacén
+                <i class="fas fa-info-circle"></i> Ingrese la dirección completa del almacén
             </small>
         </div>
 
@@ -42,7 +53,7 @@
         <div class="card card-primary card-outline mb-3">
             <div class="card-header">
                 <h3 class="card-title">
-                    {{ __('Ubicación en el Mapa') }}
+                    <i class="fas fa-map-marked-alt text-primary"></i> {{ __('Ubicación en el Mapa') }}
                 </h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse">

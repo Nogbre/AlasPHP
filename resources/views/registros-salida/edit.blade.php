@@ -1,29 +1,27 @@
 @extends('adminlte::page')
 
-@section('template_title')
-    {{ __('Update') }} Registros Salida
-@endsection
+@section('title', 'Editar Salida')
+
+@section('content_header')
+<h1>Editar Registro de Salida</h1>
+@stop
 
 @section('content')
-    <section class="content container-fluid">
-        <div class="">
+    <div class="container-fluid">
+        <div class="row">
             <div class="col-md-12">
-
-                <div class="card card-default">
-                    <div class="card-header">
-                        <span class="card-title">{{ __('Update') }} Registros Salida</span>
-                    </div>
-                    <div class="card-body bg-white">
-                        <form method="POST" action="{{ route('registros-salida.update', $registrosSalida->id) }}"  role="form" enctype="multipart/form-data">
-                            {{ method_field('PATCH') }}
-                            @csrf
-
-                            @include('registros-salida.form')
-
-                        </form>
-                    </div>
-                </div>
+                @includeif('partials.errors')
+                <form method="POST" action="{{ route('registros-salida.update', $registrosSalida->id_salida) }}" role="form"
+                    enctype="multipart/form-data">
+                    {{ method_field('PATCH') }}
+                    @csrf
+                    @include('registros-salida.form')
+                </form>
             </div>
         </div>
-    </section>
+    </div>
 @endsection
+
+@section('css')
+<link rel="stylesheet" href="/css/admin_custom.css">
+@stop

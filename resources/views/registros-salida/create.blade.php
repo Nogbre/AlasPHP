@@ -1,28 +1,26 @@
 @extends('adminlte::page')
 
-@section('template_title')
-    {{ __('Create') }} Registros Salida
-@endsection
+@section('title', 'Nueva Salida')
+
+@section('content_header')
+<h1>Registrar Nueva Salida</h1>
+@stop
 
 @section('content')
-    <section class="content container-fluid">
+    <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-
-                <div class="card card-default">
-                    <div class="card-header">
-                        <span class="card-title">{{ __('Create') }} Registros Salida</span>
-                    </div>
-                    <div class="card-body bg-white">
-                        <form method="POST" action="{{ route('registros-salida.store') }}"  role="form" enctype="multipart/form-data">
-                            @csrf
-
-                            @include('registros-salida.form')
-
-                        </form>
-                    </div>
-                </div>
+                @includeif('partials.errors')
+                <form method="POST" action="{{ route('registros-salida.store') }}" role="form"
+                    enctype="multipart/form-data">
+                    @csrf
+                    @include('registros-salida.form')
+                </form>
             </div>
         </div>
-    </section>
+    </div>
 @endsection
+
+@section('css')
+<link rel="stylesheet" href="/css/admin_custom.css">
+@stop

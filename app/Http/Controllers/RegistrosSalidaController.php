@@ -17,7 +17,7 @@ class RegistrosSalidaController extends Controller
      */
     public function index(Request $request): View
     {
-        $registrosSalidas = RegistrosSalida::paginate();
+        $registrosSalidas = RegistrosSalida::with('paquete')->orderBy('fecha_salida', 'desc')->paginate();
 
         return view('registros-salida.index', compact('registrosSalidas'))
             ->with('i', ($request->input('page', 1) - 1) * $registrosSalidas->perPage());
@@ -29,7 +29,7 @@ class RegistrosSalidaController extends Controller
     public function create(): View
     {
         $registrosSalida = new RegistrosSalida();
-        $paquetes = Paquete::all();
+        $paquetes = Paquete::where('estado', '!=', 'Entregado')->get(); // Solo paquetes no entregados
         return view('registros-salida.create', compact('registrosSalida', 'paquetes'));
     }
 
@@ -41,7 +41,7 @@ class RegistrosSalidaController extends Controller
         RegistrosSalida::create($request->validated());
 
         return Redirect::route('registros-salida.index')
-            ->with('success', 'RegistrosSalida created successfully.');
+            ->with('success', 'Registro de salida creado exitosamente.');
     }
 
     /**
@@ -49,7 +49,7 @@ class RegistrosSalidaController extends Controller
      */
     public function show($id): View
     {
-        $registrosSalida = RegistrosSalida::find($id);
+        $registrosSalida = RegistrosSalida::with('paquete')->find($id);
 
         return view('registros-salida.show', compact('registrosSalida'));
     }

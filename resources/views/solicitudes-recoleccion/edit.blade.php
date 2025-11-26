@@ -1,29 +1,25 @@
 @extends('adminlte::page')
 
-@section('template_title')
-    {{ __('Update') }} Solicitudes Recoleccion
-@endsection
+@section('title', 'Editar Solicitud de Recolección')
+
+@section('content_header')
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1>Editar Solicitud de Recolección</h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-secondary float-right" href="{{ route('solicitudes-recoleccions.index') }}">
+            Volver al Listado
+        </a>
+    </div>
+</div>
+@stop
 
 @section('content')
-    <section class="content container-fluid">
-        <div class="">
-            <div class="col-md-12">
-
-                <div class="card card-default">
-                    <div class="card-header">
-                        <span class="card-title">{{ __('Update') }} Solicitudes Recoleccion</span>
-                    </div>
-                    <div class="card-body bg-white">
-                        <form method="POST" action="{{ route('solicitudes-recoleccions.update', $solicitudesRecoleccion->id) }}"  role="form" enctype="multipart/form-data">
-                            {{ method_field('PATCH') }}
-                            @csrf
-
-                            @include('solicitudes-recoleccion.form')
-
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-@endsection
+<form method="POST" action="{{ route('solicitudes-recoleccions.update', $solicitudesRecoleccion->id_solicitud) }}"
+    role="form" enctype="multipart/form-data">
+    @method('PATCH')
+    @csrf
+    @include('solicitudes-recoleccion.form')
+</form>
+@stop

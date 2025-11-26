@@ -1,15 +1,15 @@
 @extends('adminlte::page')
 
-@section('title', 'Solicitudes de Recolección')
+@section('title', 'Recolectores')
 
 @section('content_header')
 <div class="row mb-2">
     <div class="col-sm-6">
-        <h1>Solicitudes de Recolección</h1>
+        <h1>Gestión de Recolectores</h1>
     </div>
     <div class="col-sm-6">
-        <a href="{{ route('solicitudes-recoleccions.create') }}" class="btn btn-primary float-right">
-            Nueva Solicitud
+        <a href="{{ route('recolectores.create') }}" class="btn btn-primary float-right">
+            Nuevo Recolector
         </a>
     </div>
 </div>
@@ -21,11 +21,11 @@
     <div class="col-lg-3 col-6">
         <div class="small-box bg-info">
             <div class="inner">
-                <h3>{{ $solicitudesRecoleccions->total() }}</h3>
-                <p>Total de Solicitudes</p>
+                <h3>{{ $recolectores->total() }}</h3>
+                <p>Total de Recolectores</p>
             </div>
             <div class="icon">
-                <i class="fas fa-clipboard-list"></i>
+                <i class="fas fa-user-tie"></i>
             </div>
         </div>
     </div>
@@ -44,64 +44,51 @@
 {{-- Main Card --}}
 <div class="card card-primary card-outline">
     <div class="card-header">
-        <h3 class="card-title">Listado de Solicitudes</h3>
+        <h3 class="card-title">Listado de Recolectores</h3>
     </div>
     <div class="card-body">
-        <table id="solicitudesTable" class="table table-bordered table-striped table-hover">
+        <table id="recolectoresTable" class="table table-bordered table-striped table-hover">
             <thead class="thead-light">
                 <tr>
                     <th width="60px">#</th>
-                    <th>Donante</th>
-                    <th>Dirección</th>
-                    <th>Fecha Programada</th>
+                    <th>Nombre Completo</th>
+                    <th>CI</th>
+                    <th>Teléfono</th>
+                    <th>Correo</th>
                     <th>Estado</th>
                     <th width="200px" class="text-center">Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($solicitudesRecoleccions as $solicitud)
+                @foreach ($recolectores as $recolector)
                     <tr>
                         <td class="text-center"><strong>{{ ++$i }}</strong></td>
                         <td>
-                            @if($solicitud->donante)
-                                <strong>{{ $solicitud->donante->nombre }}</strong>
-                                <br><small class="text-muted">{{ $solicitud->donante->tipo ?? 'N/A' }}</small>
-                            @else
-                                <span class="text-muted">N/A</span>
-                            @endif
+                            <strong>{{ $recolector->nombres }} {{ $recolector->apellidos }}</strong>
                         </td>
-                        <td>{{ $solicitud->direccion_recoleccion }}</td>
-                        <td>
-                            {{ \Carbon\Carbon::parse($solicitud->fecha_programada)->format('d/m/Y H:i') }}
-                        </td>
+                        <td>{{ $recolector->ci }}</td>
+                        <td>{{ $recolector->telefono ?? 'N/A' }}</td>
+                        <td>{{ $recolector->correo }}</td>
                         <td class="text-center">
-                            @php
-                                $badgeClass = match ($solicitud->estado) {
-                                    'completada' => 'success',
-                                    'en_proceso' => 'primary',
-                                    'cancelada' => 'danger',
-                                    default => 'warning'
-                                };
-                            @endphp
-                            <span class="badge badge-{{ $badgeClass }}">
-                                {{ ucfirst(str_replace('_', ' ', $solicitud->estado ?? 'pendiente')) }}
-                            </span>
+                            @if($recolector->estado === 'Activo')
+                                <span class="badge badge-success">Activo</span>
+                            @else
+                                <span class="badge badge-secondary">Inactivo</span>
+                            @endif
                         </td>
                         <td class="text-center">
                             <div class="btn-group" role="group">
                                 <a class="btn btn-info btn-sm"
-                                    href="{{ route('solicitudes-recoleccions.show', $solicitud->id_solicitud) }}"
-                                    title="Ver detalles">
+                                    href="{{ route('recolectores.show', $recolector->id_usuario) }}" title="Ver detalles">
                                     <i class="fas fa-eye"></i>
                                 </a>
                                 <a class="btn btn-warning btn-sm"
-                                    href="{{ route('solicitudes-recoleccions.edit', $solicitud->id_solicitud) }}"
-                                    title="Editar">
+                                    href="{{ route('recolectores.edit', $recolector->id_usuario) }}" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('solicitudes-recoleccions.destroy', $solicitud->id_solicitud) }}"
-                                    method="POST" style="display: inline;"
-                                    onsubmit="return confirm('¿Está seguro de eliminar esta solicitud?');">
+                                <form action="{{ route('recolectores.destroy', $recolector->id_usuario) }}" method="POST"
+                                    style="display: inline;"
+                                    onsubmit="return confirm('¿Está seguro de eliminar este recolector?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
@@ -117,7 +104,7 @@
     </div>
     <div class="card-footer">
         <div class="float-right">
-            {!! $solicitudesRecoleccions->withQueryString()->links() !!}
+            {!! $recolectores->withQueryString()->links() !!}
         </div>
     </div>
 </div>
@@ -142,7 +129,7 @@
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
 <script>
     $(document).ready(function () {
-        $('#solicitudesTable').DataTable({
+        $('#recolectoresTable').DataTable({
             "paging": false,
             "searching": true,
             "ordering": true,
@@ -152,7 +139,7 @@
             "language": {
                 "search": "Buscar:",
                 "zeroRecords": "No se encontraron resultados",
-                "emptyTable": "No hay solicitudes registradas"
+                "emptyTable": "No hay recolectores registrados"
             }
         });
     });

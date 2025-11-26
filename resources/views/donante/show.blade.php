@@ -19,39 +19,39 @@
                     </div>
 
                     <div class="card-body bg-white">
-                        
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Id Donante:</strong>
-                                    {{ $donante->id_donante }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Nombre:</strong>
-                                    {{ $donante->nombre }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Tipo:</strong>
-                                    {{ $donante->tipo }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Email:</strong>
-                                    {{ $donante->email }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Telefono:</strong>
-                                    {{ $donante->telefono }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Direccion:</strong>
-                                    {{ $donante->direccion }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Fecha Registro:</strong>
-                                    {{ $donante->fecha_registro }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Deleted By:</strong>
-                                    {{ $donante->deleted_by }}
-                                </div>
+
+                        <div class="form-group mb-2 mb20">
+                            <strong>Id Donante:</strong>
+                            {{ $donante->id_donante }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Nombre:</strong>
+                            {{ $donante->nombre }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Tipo:</strong>
+                            {{ $donante->tipo }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Email:</strong>
+                            {{ $donante->email }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Telefono:</strong>
+                            {{ $donante->telefono }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Direccion:</strong>
+                            {{ $donante->direccion }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Fecha Registro:</strong>
+                            {{ $donante->fecha_registro }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Deleted By:</strong>
+                            {{ $donante->deleted_by }}
+                        </div>
 
                     </div>
                 </div>

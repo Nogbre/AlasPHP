@@ -16,11 +16,12 @@
                                 {{ __('Donantes') }}
                             </span>
 
-                             <div class="float-right">
-                                <a href="{{ route('donante.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
-                                  {{ __('Create New') }}
+                            <div class="float-right">
+                                <a href="{{ route('donante.create') }}" class="btn btn-primary btn-sm float-right"
+                                    data-placement="left">
+                                    {{ __('Create New') }}
                                 </a>
-                              </div>
+                            </div>
                         </div>
                     </div>
                     @if ($message = Session::get('success'))
@@ -35,15 +36,15 @@
                                 <thead class="thead">
                                     <tr>
                                         <th>No</th>
-                                        
-									<th >Id Donante</th>
-									<th >Nombre</th>
-									<th >Tipo</th>
-									<th >Email</th>
-									<th >Telefono</th>
-									<th >Direccion</th>
-									<th >Fecha Registro</th>
-									<th >Deleted By</th>
+
+                                        <th>Id Donante</th>
+                                        <th>Nombre</th>
+                                        <th>Tipo</th>
+                                        <th>Email</th>
+                                        <th>Telefono</th>
+                                        <th>Direccion</th>
+                                        <th>Fecha Registro</th>
+                                        <th>Deleted By</th>
 
                                         <th></th>
                                     </tr>
@@ -52,23 +53,30 @@
                                     @foreach ($donantes as $donante)
                                         <tr>
                                             <td>{{ ++$i }}</td>
-                                            
-										<td >{{ $donante->id_donante }}</td>
-										<td >{{ $donante->nombre }}</td>
-										<td >{{ $donante->tipo }}</td>
-										<td >{{ $donante->email }}</td>
-										<td >{{ $donante->telefono }}</td>
-										<td >{{ $donante->direccion }}</td>
-										<td >{{ $donante->fecha_registro }}</td>
-										<td >{{ $donante->deleted_by }}</td>
+
+                                            <td>{{ $donante->id_donante }}</td>
+                                            <td>{{ $donante->nombre }}</td>
+                                            <td>{{ $donante->tipo }}</td>
+                                            <td>{{ $donante->email }}</td>
+                                            <td>{{ $donante->telefono }}</td>
+                                            <td>{{ $donante->direccion }}</td>
+                                            <td>{{ $donante->fecha_registro }}</td>
+                                            <td>{{ $donante->deleted_by }}</td>
 
                                             <td>
-                                                <form action="{{ route('donante.destroy', $donante->id_donante) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('donante.show', $donante->id_donante) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('donante.edit', $donante->id_donante) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                <form action="{{ route('donante.destroy', $donante->id_donante) }}"
+                                                    method="POST">
+                                                    <a class="btn btn-sm btn-primary "
+                                                        href="{{ route('donante.show', $donante->id_donante) }}"><i
+                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                    <a class="btn btn-sm btn-success"
+                                                        href="{{ route('donante.edit', $donante->id_donante) }}"><i
+                                                            class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                        onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
+                                                            class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
                                                 </form>
                                             </td>
                                         </tr>

@@ -23,5 +23,7 @@ Route::resource('paquete', App\Http\Controllers\PaqueteController::class)->middl
 Route::resource('registros-salida', App\Http\Controllers\RegistrosSalidaController::class)->middleware('auth');
 
 Route::resource('donaciones', App\Http\Controllers\DonacioneController::class)->middleware('auth');
+Route::resource('recolectores', App\Http\Controllers\RecolectoresController::class)->middleware('auth');
+
 
 
