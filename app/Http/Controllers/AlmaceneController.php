@@ -25,11 +25,12 @@ class AlmaceneController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
         $almacene = new Almacene();
+        $returnUrl = $request->query('return_url');
 
-        return view('almacene.create', compact('almacene'));
+        return view('almacene.create', compact('almacene', 'returnUrl'));
     }
 
     /**
@@ -37,10 +38,17 @@ class AlmaceneController extends Controller
      */
     public function store(AlmaceneRequest $request): RedirectResponse
     {
-        Almacene::create($request->validated());
+        $almacene = Almacene::create($request->validated());
+
+        // Check if there's a return URL
+        if ($request->has('return_url') && $request->input('return_url')) {
+            return Redirect::to($request->input('return_url'))
+                ->with('success', 'Almacén creado exitosamente.')
+                ->with('new_almacen_id', $almacene->id_almacen);
+        }
 
         return Redirect::route('almacene.index')
-            ->with('success', 'Almacene created successfully.');
+            ->with('success', 'Almacén creado exitosamente.');
     }
 
     /**

@@ -40,10 +40,21 @@ class EstanteController extends Controller
      */
     public function store(EstanteRequest $request): RedirectResponse
     {
-        Estante::create($request->validated());
+        $data = $request->validated();
+
+        // Auto-generate codigo_estante
+        $idAlmacen = $data['id_almacen'];
+
+        // Get the count of existing estantes for this almacen
+        $count = Estante::where('id_almacen', $idAlmacen)->count() + 1;
+
+        // Generate code like: ALM1-EST001, ALM1-EST002, etc.
+        $data['codigo_estante'] = 'ALM' . $idAlmacen . '-EST' . str_pad($count, 3, '0', STR_PAD_LEFT);
+
+        Estante::create($data);
 
         return Redirect::route('estante.index')
-            ->with('success', 'Estante created successfully.');
+            ->with('success', 'Estante creado exitosamente.');
     }
 
     /**

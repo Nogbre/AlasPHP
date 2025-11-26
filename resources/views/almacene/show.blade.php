@@ -1,80 +1,223 @@
 @extends('adminlte::page')
 
-@section('template_title')
-    {{ __('Show') }} Almacene
-@endsection
+@section('title', 'Detalles del Almacén')
+
+@section('content_header')
+<div class="row mb-2">
+    <div class="col-sm-6">
+        <h1><i class="fas fa-warehouse"></i> Detalles del Almacén</h1>
+    </div>
+    <div class="col-sm-6">
+        <a class="btn btn-secondary float-right" href="{{ route('almacene.index') }}">
+            <i class="fas fa-arrow-left"></i> Volver al Listado
+        </a>
+    </div>
+</div>
+@stop
 
 @section('content')
-    <section class="content container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <div class="float-left">
-                            <span class="card-title">{{ __('Show') }} Almacene</span>
-                        </div>
-                        <div class="float-right">
-                            <a class="btn btn-primary btn-sm" href="{{ route('almacene.index') }}"> {{ __('Back') }}</a>
-                        </div>
-                    </div>
-
-                    <div class="card-body bg-white">
-                        
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Nombre:</strong>
-                                    {{ $almacene->nombre }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Direccion:</strong>
-                                    {{ $almacene->direccion }}
-                                </div>
-
-                                @if($almacene->latitud && $almacene->longitud)
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Ubicación:</strong>
-                                    <p>Latitud: {{ $almacene->latitud }}, Longitud: {{ $almacene->longitud }}</p>
-                                    <div id="map" style="height: 400px; width: 100%; border: 1px solid #ddd; border-radius: 4px;"></div>
-                                </div>
-                                @else
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Ubicación:</strong>
-                                    <p class="text-muted">No se ha registrado una ubicación para este almacén</p>
-                                </div>
-                                @endif
-
-                    </div>
-                </div>
+{{-- Info Boxes Row --}}
+<div class="row">
+    <div class="col-md-3 col-sm-6 col-12">
+        <div class="info-box">
+            <span class="info-box-icon bg-info"><i class="fas fa-warehouse"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Nombre</span>
+                <span class="info-box-number">{{ $almacene->nombre }}</span>
             </div>
         </div>
-    </section>
-@endsection
+    </div>
+
+    <div class="col-md-5 col-sm-6 col-12">
+        <div class="info-box">
+            <span class="info-box-icon bg-success"><i class="fas fa-map-marker-alt"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Dirección</span>
+                <span class="info-box-number" style="font-size: 1rem;">{{ $almacene->direccion }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-sm-6 col-12">
+        <div class="info-box">
+            <span class="info-box-icon {{ $almacene->latitud && $almacene->longitud ? 'bg-primary' : 'bg-secondary' }}">
+                <i class="fas fa-globe"></i>
+            </span>
+            <div class="info-box-content">
+                <span class="info-box-text">Ubicación GPS</span>
+                <span class="info-box-number" style="font-size: 0.9rem;">
+                    @if($almacene->latitud && $almacene->longitud)
+                        {{ number_format($almacene->latitud, 6) }}, {{ number_format($almacene->longitud, 6) }}
+                    @else
+                        Sin registro
+                    @endif
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Main Content Card --}}
+<div class="card card-primary card-outline">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-info-circle"></i> Información Completa</h3>
+        <div class="card-tools">
+            <a href="{{ route('almacene.edit', $almacene->id_almacen) }}" class="btn btn-warning btn-sm">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4"><i class="fas fa-tag text-info"></i> Nombre:</dt>
+                    <dd class="col-sm-8"><strong>{{ $almacene->nombre }}</strong></dd>
+
+                    <dt class="col-sm-4"><i class="fas fa-map-marker-alt text-success"></i> Dirección:</dt>
+                    <dd class="col-sm-8">{{ $almacene->direccion }}</dd>
+
+                    @if($almacene->latitud && $almacene->longitud)
+                        <dt class="col-sm-4"><i class="fas fa-compass text-primary"></i> Latitud:</dt>
+                        <dd class="col-sm-8">{{ $almacene->latitud }}</dd>
+
+                        <dt class="col-sm-4"><i class="fas fa-compass text-primary"></i> Longitud:</dt>
+                        <dd class="col-sm-8">{{ $almacene->longitud }}</dd>
+                    @endif
+                </dl>
+            </div>
+
+            <div class="col-md-6">
+                @if($almacene->latitud && $almacene->longitud)
+                    <div class="callout callout-info">
+                        <h5><i class="fas fa-map"></i> Vista Rápida</h5>
+                        <p>Este almacén tiene su ubicación GPS registrada. Puedes verlo en el mapa completo abajo.</p>
+                        <a href="https://www.google.com/maps?q={{ $almacene->latitud }},{{ $almacene->longitud }}"
+                            target="_blank" class="btn btn-sm btn-primary">
+                            <i class="fas fa-external-link-alt"></i> Abrir en Google Maps
+                        </a>
+                    </div>
+                @else
+                    <div class="callout callout-warning">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Sin Ubicación GPS</h5>
+                        <p>Este almacén no tiene registrada su ubicación GPS.</p>
+                        <a href="{{ route('almacene.edit', $almacene->id_almacen) }}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i> Agregar Ubicación
+                        </a>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
 
 @if($almacene->latitud && $almacene->longitud)
-@push('css')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
-      crossorigin=""/>
-@endpush
+    {{-- Map Card --}}
+    <div class="card card-success card-outline">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-map-marked-alt"></i> Ubicación en el Mapa</h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div id="map" style="height: 500px; width: 100%;"></div>
+        </div>
+        <div class="card-footer">
+            <div class="text-muted">
+                <i class="fas fa-info-circle"></i>
+                Coordenadas: {{ $almacene->latitud }}, {{ $almacene->longitud }}
+            </div>
+        </div>
+    </div>
+@endif
 
-@push('js')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
-        crossorigin=""></script>
+{{-- Action Buttons --}}
+<div class="row mb-3">
+    <div class="col-12">
+        <a href="{{ route('almacene.index') }}" class="btn btn-secondary">
+            <i class="fas fa-list"></i> Volver al Listado
+        </a>
+        <a href="{{ route('almacene.edit', $almacene->id_almacen) }}" class="btn btn-warning">
+            <i class="fas fa-edit"></i> Editar Almacén
+        </a>
+        <form action="{{ route('almacene.destroy', $almacene->id_almacen) }}" method="POST" style="display: inline;"
+            onsubmit="return confirm('¿Está seguro de eliminar este almacén?');">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Eliminar
+            </button>
+        </form>
+    </div>
+</div>
+@stop
+
+@if($almacene->latitud && $almacene->longitud)
+@section('css')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<style>
+    .info-box-number {
+        font-size: 1.2rem;
+    }
+
+    .leaflet-popup-content {
+        text-align: center;
+    }
+</style>
+@stop
+
+@section('js')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
     const almacenCoords = [{{ $almacene->latitud }}, {{ $almacene->longitud }}];
-    
+
     // Initialize the map
     const map = L.map('map').setView(almacenCoords, 15);
-    
+
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19
     }).addTo(map);
-    
-    // Add marker
-    const marker = L.marker(almacenCoords).addTo(map);
-    marker.bindPopup('<strong>{{ $almacene->nombre }}</strong><br>{{ $almacene->direccion }}').openPopup();
+
+    // Custom icon
+    const warehouseIcon = L.divIcon({
+        html: '<i class="fas fa-warehouse fa-2x text-primary"></i>',
+        className: 'custom-div-icon',
+        iconSize: [30, 42],
+        iconAnchor: [15, 42],
+        popupAnchor: [0, -42]
+    });
+
+    // Add marker with custom icon
+    const marker = L.marker(almacenCoords, { icon: warehouseIcon }).addTo(map);
+
+    // Popup content
+    const popupContent = `
+            <div style="text-align: center;">
+                <h6><i class="fas fa-warehouse"></i> <strong>{{ $almacene->nombre }}</strong></h6>
+                <p class="mb-1"><i class="fas fa-map-marker-alt"></i> {{ $almacene->direccion }}</p>
+                <small class="text-muted">Lat: {{ $almacene->latitud }}, Lng: {{ $almacene->longitud }}</small>
+            </div>
+        `;
+
+    marker.bindPopup(popupContent).openPopup();
+
+    // Add circle around the warehouse
+    L.circle(almacenCoords, {
+        color: '#007bff',
+        fillColor: '#007bff',
+        fillOpacity: 0.1,
+        radius: 100
+    }).addTo(map);
 </script>
-@endpush
+@stop
 @endif
