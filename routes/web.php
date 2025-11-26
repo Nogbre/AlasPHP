@@ -25,5 +25,9 @@ Route::resource('registros-salida', App\Http\Controllers\RegistrosSalidaControll
 Route::resource('donaciones', App\Http\Controllers\DonacioneController::class)->middleware('auth');
 Route::resource('recolectores', App\Http\Controllers\RecolectoresController::class)->middleware('auth');
 
+// API routes for cascading dropdowns
+Route::get('api/almacenes/{id}/estantes', [App\Http\Controllers\AlmaceneController::class, 'getEstantes'])->middleware('auth');
+Route::get('api/estantes/{id}/espacios', [App\Http\Controllers\EstanteController::class, 'getEspacios'])->middleware('auth');
+
 
 

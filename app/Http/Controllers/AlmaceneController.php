@@ -89,4 +89,9 @@ class AlmaceneController extends Controller
         return Redirect::route('almacene.index')
             ->with('success', 'Almacene deleted successfully');
     }
+
+    public function getEstantes($id)
+    {
+        return response()->json(Almacene::find($id)->estantes()->select('id_estante', 'codigo_estante', 'descripcion')->get());
+    }
 }

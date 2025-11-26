@@ -4,7 +4,7 @@
         {{-- Nombre Field --}}
         <div class="form-group mb-3">
             <label for="nombre" class="form-label">
-                <i class="fas fa-tag text-info"></i> {{ __('Nombre del Almacén') }}
+                <i class="fas text-info"></i> {{ __('Nombre del Almacén') }}
                 <span class="text-danger">*</span>
             </label>
             <div class="input-group">
@@ -28,7 +28,7 @@
         {{-- Direccion Field --}}
         <div class="form-group mb-3">
             <label for="direccion" class="form-label">
-                <i class="fas fa-map-marker-alt text-success"></i> {{ __('Dirección') }}
+                <i class="fas alt text-success"></i> {{ __('Dirección') }}
                 <span class="text-danger">*</span>
             </label>
             <div class="input-group">
@@ -53,7 +53,7 @@
         <div class="card card-primary card-outline mb-3">
             <div class="card-header">
                 <h3 class="card-title">
-                    <i class="fas fa-map-marked-alt text-primary"></i> {{ __('Ubicación en el Mapa') }}
+                    <i class="fas text-primary"></i> {{ __('Ubicación en el Mapa') }}
                 </h3>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse">

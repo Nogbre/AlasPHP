@@ -65,18 +65,6 @@
             </div>
         </div>
     </div>
-
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-purple">
-            <div class="inner">
-                <h3>{{ $donacionesRopa }}</h3>
-                <p>Donaciones de Ropa</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-tshirt"></i>
-            </div>
-        </div>
-    </div>
 </div>
 
 {{-- Alert Messages --}}

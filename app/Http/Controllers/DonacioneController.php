@@ -34,16 +34,7 @@ class DonacioneController extends Controller
             ->join('donaciones', 'donaciones_dinero.id_donacion', '=', 'donaciones.id_donacion')
             ->sum('donaciones_dinero.monto');
 
-        // Calculate clothing donations (donations with products in 'Ropa' category)
-        $donacionesRopa = DB::table('donaciones')
-            ->join('donacion_detalles', 'donaciones.id_donacion', '=', 'donacion_detalles.id_donacion')
-            ->join('productos', 'donacion_detalles.id_producto', '=', 'productos.id_producto')
-            ->join('categorias_productos', 'productos.id_categoria', '=', 'categorias_productos.id_categoria')
-            ->where('categorias_productos.nombre', 'LIKE', '%Ropa%')
-            ->distinct('donaciones.id_donacion')
-            ->count('donaciones.id_donacion');
-
-        return view('donaciones.index', compact('donaciones', 'totalDonaciones', 'donacionesDinero', 'donacionesEspecie', 'montoTotal', 'donacionesRopa'))
+        return view('donaciones.index', compact('donaciones', 'totalDonaciones', 'donacionesDinero', 'donacionesEspecie', 'montoTotal'))
             ->with('i', ($request->input('page', 1) - 1) * $donaciones->perPage());
     }
 
@@ -61,8 +52,9 @@ class DonacioneController extends Controller
 
         // Provide an empty model instance so the form can safely access $donacion
         $donacion = new Donacione();
+        $almacenes = \App\Models\Almacene::pluck('nombre', 'id_almacen');
 
-        return view('donaciones.create', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades'));
+        return view('donaciones.create', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades', 'almacenes'));
     }
 
     public function store(DonacioneRequest $request): RedirectResponse
@@ -169,8 +161,9 @@ class DonacioneController extends Controller
         // Get products with their unit measurements for auto-fill
         $productosData = Producto::select('id_producto', 'nombre', 'unidad_medida')->get();
         $productosUnidades = $productosData->pluck('unidad_medida', 'id_producto')->toArray();
+        $almacenes = \App\Models\Almacene::pluck('nombre', 'id_almacen');
 
-        return view('donaciones.edit', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades'));
+        return view('donaciones.edit', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades', 'almacenes'));
     }
 
     public function update(DonacioneRequest $request, Donacione $donacione): RedirectResponse

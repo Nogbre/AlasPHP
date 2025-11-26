@@ -106,4 +106,9 @@ class EstanteController extends Controller
         return Redirect::route('estante.index')
             ->with('success', 'Estante deleted successfully');
     }
+
+    public function getEspacios($id)
+    {
+        return response()->json(Estante::find($id)->espacios()->select('id_espacio', 'codigo_espacio')->get());
+    }
 }

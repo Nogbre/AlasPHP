@@ -26,13 +26,16 @@ class PaqueteRequest extends FormRequest
             'id_solicitud' => 'nullable|integer',
             'estado' => 'nullable|string',
             'codigo_solicitud_externa' => 'nullable|string',
+            'detalles' => 'required|array|min:1',
+            'detalles.*.id_producto' => 'required|integer|exists:productos,id_producto',
+            'detalles.*.cantidad_usada' => 'required|integer|min:1',
         ];
-        
+
         // Solo requerir id_paquete cuando se está actualizando
         if ($this->isMethod('patch') || $this->isMethod('put')) {
             $rules['id_paquete'] = 'required';
         }
-        
+
         return $rules;
     }
 }

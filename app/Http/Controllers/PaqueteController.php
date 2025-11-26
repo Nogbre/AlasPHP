@@ -80,9 +80,15 @@ class PaqueteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(PaqueteRequest $request): RedirectResponse
     {
         $data = $request->validated();
+
+        \Log::info('=== INICIO STORE PAQUETE ===');
+        \Log::info('Datos validados:', $data);
 
         if (empty($data['codigo_paquete'])) {
             $data['codigo_paquete'] = $this->generarCodigoPaquete();
@@ -90,21 +96,29 @@ class PaqueteController extends Controller
         $data['fecha_creacion'] = now();
 
         try {
-            DB::beginTransaction();
+            DB::transaction(function () use ($data, $request) {
+                \Log::info('Iniciando transacción...');
 
-            $paquete = Paquete::create($data);
+                $paquete = Paquete::create($data);
+                \Log::info('Paquete creado:', ['id' => $paquete->id_paquete, 'codigo' => $paquete->codigo_paquete]);
 
-            if ($request->has('detalles')) {
-                $this->procesarDetallesPaquete($paquete, $request->detalles);
-            }
+                if ($request->has('detalles')) {
+                    \Log::info('Procesando detalles del paquete...', ['cantidad_detalles' => count($request->detalles)]);
+                    $this->procesarDetallesPaquete($paquete, $request->detalles);
+                }
 
-            DB::commit();
+                \Log::info('Transacción completada exitosamente');
+            });
 
+            \Log::info('=== FIN STORE PAQUETE (SUCCESS) ===');
             return Redirect::route('paquete.index')
                 ->with('success', 'Paquete creado exitosamente.');
 
         } catch (\Exception $e) {
-            DB::rollBack();
+            \Log::error('=== ERROR EN STORE PAQUETE ===');
+            \Log::error('Mensaje: ' . $e->getMessage());
+            \Log::error('Trace: ' . $e->getTraceAsString());
+
             return Redirect::back()
                 ->withInput()
                 ->withErrors(['error' => 'Error al guardar el paquete: ' . $e->getMessage()]);
@@ -116,7 +130,7 @@ class PaqueteController extends Controller
      */
     private function procesarDetallesPaquete($paquete, $detallesSolicitados)
     {
-        foreach ($detallesSolicitados as $solicitud) {
+        foreach ($detallesSolicitados as $index => $solicitud) {
             if (empty($solicitud['id_producto']) || empty($solicitud['cantidad_usada'])) {
                 continue;
             }
@@ -124,9 +138,9 @@ class PaqueteController extends Controller
             $cantidadRequerida = $solicitud['cantidad_usada'];
             $idProducto = $solicitud['id_producto'];
 
+            \Log::info("Procesando detalle #{$index}: Producto ID {$idProducto}, Cantidad {$cantidadRequerida}");
+
             // Buscar lotes disponibles ordenados por fecha (FIFO)
-            // Nota: Ordenamos por ID de donación como proxy de fecha si no hacemos join complejo, 
-            // o hacemos join con donaciones para ordenar por fecha real.
             $lotes = DonacionDetalle::where('id_producto', $idProducto)
                 ->whereHas('donacion', function ($q) {
                     $q->where('tipo', 'especie');
@@ -147,11 +161,13 @@ class PaqueteController extends Controller
                 if ($disponibleEnLote > 0) {
                     $cantidadATomar = min($cantidadRequerida, $disponibleEnLote);
 
-                    PaqueteDetalle::create([
+                    $detalle = PaqueteDetalle::create([
                         'id_paquete' => $paquete->id_paquete,
                         'id_detalle_donacion' => $lote->id_detalle,
                         'cantidad_usada' => $cantidadATomar
                     ]);
+
+                    \Log::info("Asignado del lote {$lote->id_detalle}: {$cantidadATomar} unidades. Detalle ID: {$detalle->id_paquete_detalle}");
 
                     $cantidadRequerida -= $cantidadATomar;
                 }
@@ -220,27 +236,37 @@ class PaqueteController extends Controller
      */
     public function update(PaqueteRequest $request, Paquete $paquete): RedirectResponse
     {
+        $data = $request->validated();
+
+        \Log::info('=== INICIO UPDATE PAQUETE ===');
+        \Log::info('ID Paquete:', ['id' => $paquete->id_paquete]);
+
         try {
-            DB::beginTransaction();
+            DB::transaction(function () use ($data, $request, $paquete) {
+                \Log::info('Iniciando transacción de actualización...');
 
-            $paquete->update($request->validated());
+                $paquete->update($data);
 
-            // Liberar stock anterior (borrar detalles previos)
-            // Nota: Esto es simplificado. En un sistema real de inventario querrías ajustar diferencias,
-            // pero borrar y recrear es válido para recalcular FIFO.
-            $paquete->paqueteDetalles()->delete();
+                // Liberar stock anterior (borrar detalles previos)
+                \Log::info('Eliminando detalles anteriores...');
+                $paquete->paqueteDetalles()->delete();
 
-            if ($request->has('detalles')) {
-                $this->procesarDetallesPaquete($paquete, $request->detalles);
-            }
+                if ($request->has('detalles')) {
+                    \Log::info('Procesando nuevos detalles...');
+                    $this->procesarDetallesPaquete($paquete, $request->detalles);
+                }
 
-            DB::commit();
+                \Log::info('Transacción de actualización completada');
+            });
 
+            \Log::info('=== FIN UPDATE PAQUETE (SUCCESS) ===');
             return Redirect::route('paquete.index')
                 ->with('success', 'Paquete actualizado exitosamente');
 
         } catch (\Exception $e) {
-            DB::rollBack();
+            \Log::error('=== ERROR EN UPDATE PAQUETE ===');
+            \Log::error('Mensaje: ' . $e->getMessage());
+
             return Redirect::back()
                 ->withInput()
                 ->withErrors(['error' => 'Error al actualizar el paquete: ' . $e->getMessage()]);
@@ -249,9 +275,21 @@ class PaqueteController extends Controller
 
     public function destroy($id): RedirectResponse
     {
-        Paquete::find($id)->delete();
+        $paquete = Paquete::find($id);
 
-        return Redirect::route('paquete.index')
-            ->with('success', 'Paquete eliminado exitosamente');
+        if ($paquete) {
+            try {
+                DB::transaction(function () use ($paquete) {
+                    // Primero eliminamos los detalles para mantener integridad si no hay cascade
+                    $paquete->paqueteDetalles()->delete();
+                    $paquete->delete();
+                });
+                return Redirect::route('paquete.index')->with('success', 'Paquete eliminado exitosamente');
+            } catch (\Exception $e) {
+                return Redirect::back()->withErrors(['error' => 'Error al eliminar el paquete: ' . $e->getMessage()]);
+            }
+        }
+
+        return Redirect::route('paquete.index')->withErrors(['error' => 'Paquete no encontrado']);
     }
 }

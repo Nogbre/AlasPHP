@@ -35,7 +35,6 @@
                 <option value="">-- Seleccione --</option>
                 <option value="dinero" {{ old('tipo', $donacion?->tipo) === 'dinero' ? 'selected' : '' }}>Dinero</option>
                 <option value="especie" {{ old('tipo', $donacion?->tipo) === 'especie' ? 'selected' : '' }}>Especie</option>
-                <option value="ropa" {{ old('tipo', $donacion?->tipo) === 'ropa' ? 'selected' : '' }}>Ropa</option>
             </select>
             @error('tipo')
                 <span class="invalid-feedback d-block" role="alert"><strong>{{ $message }}</strong></span>
@@ -111,10 +110,12 @@
                 <table class="table table-bordered table-hover" id="detalles-table">
                     <thead class="bg-light">
                         <tr>
-                            <th width="35%">Producto <span class="text-danger">*</span></th>
-                            <th width="15%">Cantidad <span class="text-danger">*</span></th>
-                            <th width="15%">Unidad</th>
-                            <th width="25%">Espacio <span class="text-danger">*</span></th>
+                            <th width="20%">Producto <span class="text-danger">*</span></th>
+                            <th width="10%">Cantidad <span class="text-danger">*</span></th>
+                            <th width="10%">Unidad</th>
+                            <th width="15%">Almacén <span class="text-danger">*</span></th>
+                            <th width="15%">Estante <span class="text-danger">*</span></th>
+                            <th width="20%">Espacio <span class="text-danger">*</span></th>
                             <th width="10%"></th>
                         </tr>
                     </thead>
@@ -127,9 +128,25 @@
                         
                         @if($hasDetalles)
                             @foreach(($oldDetalles ?? $existingDetalles) as $idx => $det)
+                                @php
+                                    // Para edición, intentamos obtener almacén y estante desde las relaciones
+                                    $ubicacion = null;
+                                    $espacioActual = null;
+                                    $estanteActual = null;
+                                    $almacenActual = null;
+                                    
+                                    if(is_object($det) && $det->ubicaciones && $det->ubicaciones->first()) {
+                                        $ubicacion = $det->ubicaciones->first();
+                                        $espacioActual = $ubicacion->espacio;
+                                        if($espacioActual && $espacioActual->estante) {
+                                            $estanteActual = $espacioActual->estante;
+                                            $almacenActual = $estanteActual->almacene;
+                                        }
+                                    }
+                                @endphp
                                 <tr class="detalle-row">
                                     <td>
-                                        <select name="detalles[{{ $idx }}][id_producto]" class="form-control form-control-sm">
+                                        <select name="detalles[{{ $idx }}][id_producto]" class="form-control form-control-sm producto-select">
                                             <option value="">-- Seleccione --</option>
                                             @foreach($productos ?? [] as $pId => $pName)
                                                 <option value="{{ $pId }}" {{ (string) ($det['id_producto'] ?? $det->id_producto ?? '') === (string) $pId ? 'selected' : '' }}>{{ $pName }}</option>
@@ -137,13 +154,29 @@
                                         </select>
                                     </td>
                                     <td><input name="detalles[{{ $idx }}][cantidad]" type="number" class="form-control form-control-sm" value="{{ $det['cantidad'] ?? $det->cantidad ?? '' }}" placeholder="1"></td>
-                                    <td><input name="detalles[{{ $idx }}][unidad_medida]" class="form-control form-control-sm" value="{{ $det['unidad_medida'] ?? $det->unidad_medida ?? '' }}" placeholder="Ej: kg, unidad"></td>
+                                    <td><input name="detalles[{{ $idx }}][unidad_medida]" class="form-control form-control-sm unidad-input" value="{{ $det['unidad_medida'] ?? $det->unidad_medida ?? '' }}" placeholder="Ej: kg, unidad"></td>
                                     <td>
-                                        <select name="detalles[{{ $idx }}][id_espacio]" class="form-control form-control-sm">
+                                        <select class="form-control form-control-sm almacen-select" data-row="{{ $idx }}">
                                             <option value="">-- Seleccione --</option>
-                                            @foreach($espacios ?? [] as $espId => $espCode)
-                                                <option value="{{ $espId }}" {{ (string) ($det['id_espacio'] ?? '') === (string) $espId ? 'selected' : '' }}>{{ $espCode }}</option>
+                                            @foreach($almacenes ?? [] as $almId => $almName)
+                                                <option value="{{ $almId }}" {{ $almacenActual && $almacenActual->id_almacen == $almId ? 'selected' : '' }}>{{ $almName }}</option>
                                             @endforeach
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select class="form-control form-control-sm estante-select" data-row="{{ $idx }}">
+                                            <option value="">-- Seleccione Almacén --</option>
+                                            @if($estanteActual)
+                                                <option value="{{ $estanteActual->id_estante }}" selected>{{ $estanteActual->codigo_estante }}</option>
+                                            @endif
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="detalles[{{ $idx }}][id_espacio]" class="form-control form-control-sm espacio-select" data-row="{{ $idx }}">
+                                            <option value="">-- Seleccione Estante --</option>
+                                            @if($espacioActual)
+                                                <option value="{{ $espacioActual->id_espacio }}" selected>{{ $espacioActual->codigo_espacio }}</option>
+                                            @endif
                                         </select>
                                     </td>
                                     <td><button class="btn btn-danger btn-sm remove-row" type="button"><i class="fas fa-trash"></i></button></td>
@@ -153,7 +186,7 @@
                             {{-- Fila inicial para create --}}
                             <tr class="detalle-row">
                                 <td>
-                                    <select name="detalles[0][id_producto]" class="form-control form-control-sm">
+                                    <select name="detalles[0][id_producto]" class="form-control form-control-sm producto-select">
                                         <option value="">-- Seleccione --</option>
                                         @foreach($productos ?? [] as $pId => $pName)
                                             <option value="{{ $pId }}">{{ $pName }}</option>
@@ -161,13 +194,23 @@
                                     </select>
                                 </td>
                                 <td><input name="detalles[0][cantidad]" type="number" class="form-control form-control-sm" placeholder="1"></td>
-                                <td><input name="detalles[0][unidad_medida]" class="form-control form-control-sm" placeholder="Ej: kg, unidad"></td>
+                                <td><input name="detalles[0][unidad_medida]" class="form-control form-control-sm unidad-input" placeholder="Ej: kg, unidad"></td>
                                 <td>
-                                    <select name="detalles[0][id_espacio]" class="form-control form-control-sm">
+                                    <select class="form-control form-control-sm almacen-select" data-row="0">
                                         <option value="">-- Seleccione --</option>
-                                        @foreach($espacios ?? [] as $espId => $espCode)
-                                            <option value="{{ $espId }}">{{ $espCode }}</option>
+                                        @foreach($almacenes ?? [] as $almId => $almName)
+                                            <option value="{{ $almId }}">{{ $almName }}</option>
                                         @endforeach
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-control form-control-sm estante-select" data-row="0">
+                                        <option value="">-- Seleccione Almacén --</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="detalles[0][id_espacio]" class="form-control form-control-sm espacio-select" data-row="0">
+                                        <option value="">-- Seleccione Estante --</option>
                                     </select>
                                 </td>
                                 <td><button class="btn btn-danger btn-sm remove-row" type="button"><i class="fas fa-trash"></i></button></td>
@@ -198,6 +241,7 @@
 <script>
 // Product units data from controller
 const productosUnidades = @json($productosUnidades ?? []);
+const almacenesData = @json($almacenes ?? []);
 
 document.addEventListener('DOMContentLoaded', function(){
     const tipoSelect = document.getElementById('tipo');
@@ -230,6 +274,77 @@ document.addEventListener('DOMContentLoaded', function(){
             }
         });
     }
+
+    // Function to setup cascading dropdowns
+    function setupCascadingDropdowns() {
+        // Almacen change -> load Estantes
+        document.querySelectorAll('.almacen-select').forEach(function(almacenSelect) {
+            almacenSelect.addEventListener('change', function() {
+                const almacenId = this.value;
+                const rowId = this.getAttribute('data-row');
+                const estanteSelect = document.querySelector(`.estante-select[data-row="${rowId}"]`);
+                const espacioSelect = document.querySelector(`.espacio-select[data-row="${rowId}"]`);
+                
+                // Reset estante and espacio
+                estanteSelect.innerHTML = '<option value="">-- Seleccione Almacén --</option>';
+                espacioSelect.innerHTML = '<option value="">-- Seleccione Estante --</option>';
+                
+                if (almacenId) {
+                    // Fetch estantes for this almacen
+                    fetch(`/api/almacenes/${almacenId}/estantes`)
+                        .then(response => response.json())
+                        .then(estantes => {
+                            estanteSelect.innerHTML = '<option value="">-- Seleccione --</option>';
+                            estantes.forEach(estante => {
+                                const option = document.createElement('option');
+                                option.value = estante.id_estante;
+                                option.textContent = `${estante.codigo_estante} - ${estante.descripcion || ''}`;
+                                estanteSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => console.error('Error loading estantes:', error));
+                }
+            });
+            
+            // Trigger on page load if value exists
+            if (almacenSelect.value) {
+                almacenSelect.dispatchEvent(new Event('change'));
+            }
+        });
+        
+        // Estante change -> load Espacios
+        document.querySelectorAll('.estante-select').forEach(function(estanteSelect) {
+            estanteSelect.addEventListener('change', function() {
+                const estanteId = this.value;
+                const rowId = this.getAttribute('data-row');
+                const espacioSelect = document.querySelector(`.espacio-select[data-row="${rowId}"]`);
+                
+                // Reset espacio
+                espacioSelect.innerHTML = '<option value="">-- Seleccione Estante --</option>';
+                
+                if (estanteId) {
+                    // Fetch espacios for this estante
+                    fetch(`/api/estantes/${estanteId}/espacios`)
+                        .then(response => response.json())
+                        .then(espacios => {
+                            espacioSelect.innerHTML = '<option value="">-- Seleccione --</option>';
+                            espacios.forEach(espacio => {
+                                const option = document.createElement('option');
+                                option.value = espacio.id_espacio;
+                                option.textContent = espacio.codigo_espacio;
+                                espacioSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => console.error('Error loading espacios:', error));
+                }
+            });
+            
+            // Trigger on page load if value exists
+            if (estanteSelect.value) {
+                estanteSelect.dispatchEvent(new Event('change'));
+            }
+        });
+    }
     
     function toggleBlocks(){
         const tipo = tipoSelect.value;
@@ -239,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function(){
         if(tipo === 'dinero'){
             blockDinero.style.display = 'block';
             blockDetalles.style.display = 'none';
-        } else if(tipo === 'especie' || tipo === 'ropa'){
+        } else if(tipo === 'especie'){
             blockDinero.style.display = 'none';
             blockDetalles.style.display = 'block';
             
@@ -250,6 +365,7 @@ document.addEventListener('DOMContentLoaded', function(){
             
             // Setup listeners for existing rows
             setupProductListeners();
+            setupCascadingDropdowns();
         } else {
             blockDinero.style.display = 'none';
             blockDetalles.style.display = 'none';
@@ -294,9 +410,11 @@ document.addEventListener('DOMContentLoaded', function(){
             const templateRow = allRows[0];
             const newRow = templateRow.cloneNode(true);
             
-            // Actualizar índices
+            // Actualizar índices y limpiar valores
             newRow.querySelectorAll('input, select, textarea').forEach(function(input){
                 const name = input.getAttribute('name');
+                const dataRow = input.getAttribute('data-row');
+                
                 if(name){
                     const newName = name.replace(/detalles\[\d+\]/, 'detalles[' + detalleIndex + ']');
                     input.setAttribute('name', newName);
@@ -310,14 +428,19 @@ document.addEventListener('DOMContentLoaded', function(){
                         input.style.backgroundColor = '';
                     }
                 }
+                
+                if(dataRow !== null){
+                    input.setAttribute('data-row', detalleIndex);
+                }
             });
             
             tbody.appendChild(newRow);
             detalleIndex++;
             console.log('Fila agregada. Nuevo índice:', detalleIndex);
             
-            // Setup listener for the new row
+            // Setup listeners for the new row
             setupProductListeners();
+            setupCascadingDropdowns();
         }
     });
     
