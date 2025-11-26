@@ -36,7 +36,7 @@ class SolicitudesRecoleccion extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['id_donante', 'id_recolector', 'direccion_recoleccion', 'fecha_programada', 'observaciones', 'estado', 'fecha_creacion'];
+    protected $fillable = ['id_donante', 'id_recolector', 'id_campana', 'direccion_recoleccion', 'fecha_programada', 'observaciones', 'estado', 'fecha_creacion'];
 
 
     /**
@@ -54,5 +54,14 @@ class SolicitudesRecoleccion extends Model
     {
         return $this->belongsTo(\App\Models\Usuario::class, 'id_recolector', 'id_usuario');
     }
-    
+
+    public function campana()
+    {
+        return $this->belongsTo(\App\Models\Campana::class, 'id_campana', 'id_campana');
+    }
+
+    public function imagenes()
+    {
+        return $this->hasMany(\App\Models\ImagenesSolicitudRecogida::class, 'id_solicitud', 'id_solicitud');
+    }
 }

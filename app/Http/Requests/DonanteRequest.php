@@ -32,6 +32,10 @@ class DonanteRequest extends FormRequest
         // Solo requerir id_donante cuando se está actualizando
         if ($this->isMethod('patch') || $this->isMethod('put')) {
             $rules['id_donante'] = 'required';
+            $rules['password'] = 'nullable|string|min:6';
+        } else {
+            // En creación, password es requerido
+            $rules['password'] = 'required|string|min:6';
         }
         
         return $rules;

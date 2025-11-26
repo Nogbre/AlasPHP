@@ -44,6 +44,11 @@ class Estante extends Model
     {
         return $this->belongsTo(\App\Models\Almacene::class, 'id_almacen', 'id_almacen');
     }
+
+    public function almacen()
+    {
+        return $this->belongsTo(\App\Models\Almacene::class, 'id_almacen', 'id_almacen');
+    }
     
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

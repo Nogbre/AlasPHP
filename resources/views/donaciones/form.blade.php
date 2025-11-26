@@ -35,7 +35,6 @@
                 <option value="">-- Seleccione --</option>
                 <option value="dinero" {{ old('tipo', $donacion?->tipo) === 'dinero' ? 'selected' : '' }}>Dinero</option>
                 <option value="especie" {{ old('tipo', $donacion?->tipo) === 'especie' ? 'selected' : '' }}>Especie</option>
-                <option value="ropa" {{ old('tipo', $donacion?->tipo) === 'ropa' ? 'selected' : '' }}>Ropa</option>
             </select>
             @error('tipo')
                 <span class="invalid-feedback d-block" role="alert"><strong>{{ $message }}</strong></span>

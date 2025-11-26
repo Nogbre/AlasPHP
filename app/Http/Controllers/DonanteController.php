@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\DonanteRequest;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class DonanteController extends Controller
@@ -37,7 +38,13 @@ class DonanteController extends Controller
      */
     public function store(DonanteRequest $request): RedirectResponse
     {
-        Donante::create($request->validated());
+        $data = $request->validated();
+        
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        }
+        
+        Donante::create($data);
 
         return Redirect::route('donante.index')
             ->with('success', 'Donante created successfully.');
@@ -66,9 +73,18 @@ class DonanteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(DonanteRequest $request, Donante $donante): RedirectResponse
+    public function update(DonanteRequest $request, $id): RedirectResponse
     {
-        $donante->update($request->validated());
+        $donante = Donante::findOrFail($id);
+        $data = $request->validated();
+        
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+        
+        $donante->update($data);
 
         return Redirect::route('donante.index')
             ->with('success', 'Donante updated successfully');

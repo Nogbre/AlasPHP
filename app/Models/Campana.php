@@ -44,5 +44,9 @@ class Campana extends Model
     {
         return $this->hasMany(\App\Models\Donacione::class, 'id_campana', 'id_campana');
     }
-    
+
+    public function puntosRecoleccion()
+    {
+        return $this->hasMany(\App\Models\PuntosRecoleccion::class, 'id_campana', 'id_campana');
+    }
 }

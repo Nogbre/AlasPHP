@@ -54,6 +54,18 @@
             @enderror
         </div>
         <div class="form-group mb-2 mb20">
+            <label for="password" class="form-label">{{ __('Contraseña') }} @if(!isset($donante) || !$donante->id_donante)<span class="text-danger">*</span>@endif</label>
+            <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" id="password" placeholder="Contraseña" minlength="6">
+            @if(isset($donante) && $donante->id_donante)
+                <small class="form-text text-muted">Dejar en blanco para no cambiar la contraseña</small>
+            @endif
+            @error('password')
+                <span class="invalid-feedback d-block" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
+        <div class="form-group mb-2 mb20">
             <label for="telefono" class="form-label">{{ __('Telefono') }}</label>
             <input type="text" name="telefono" class="form-control @error('telefono') is-invalid @enderror" value="{{ old('telefono', $donante?->telefono) }}" id="telefono" placeholder="Telefono" maxlength="20">
             @error('telefono')
