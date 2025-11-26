@@ -1,61 +1,92 @@
 @extends('adminlte::page')
 
 @section('template_title')
-    {{ $donante->name ?? __('Show') . " " . __('Donante') }}
+    Detalle del Donante
 @endsection
 
 @section('content')
-    <section class="content container-fluid">
+    <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <div class="float-left">
-                            <span class="card-title">{{ __('Show') }} Donante</span>
-                        </div>
-                        <div class="float-right">
-                            <a class="btn btn-primary btn-sm" href="{{ route('donante.index') }}"> {{ __('Back') }}</a>
+            <div class="col-md-8 offset-md-2">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title">Información del Donante</h3>
+                        <div class="card-tools">
+                            <a class="btn btn-sm btn-primary" href="{{ route('donante.index') }}">
+                                <i class="fas fa-arrow-left"></i> Volver
+                            </a>
                         </div>
                     </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-info"><i class="fas fa-user"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Nombre</span>
+                                        <span class="info-box-number">{{ $donante->nombre }}</span>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div class="card-body bg-white">
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span
+                                        class="info-box-icon {{ $donante->tipo === 'persona' ? 'bg-primary' : 'bg-success' }}">
+                                        <i class="fas {{ $donante->tipo === 'persona' ? 'fa-user' : 'fa-building' }}"></i>
+                                    </span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Tipo</span>
+                                        <span class="info-box-number">{{ ucfirst($donante->tipo) }}</span>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div class="form-group mb-2 mb20">
-                            <strong>Id Donante:</strong>
-                            {{ $donante->id_donante }}
-                        </div>
-                        <div class="form-group mb-2 mb20">
-                            <strong>Nombre:</strong>
-                            {{ $donante->nombre }}
-                        </div>
-                        <div class="form-group mb-2 mb20">
-                            <strong>Tipo:</strong>
-                            {{ $donante->tipo }}
-                        </div>
-                        <div class="form-group mb-2 mb20">
-                            <strong>Email:</strong>
-                            {{ $donante->email }}
-                        </div>
-                        <div class="form-group mb-2 mb20">
-                            <strong>Telefono:</strong>
-                            {{ $donante->telefono }}
-                        </div>
-                        <div class="form-group mb-2 mb20">
-                            <strong>Direccion:</strong>
-                            {{ $donante->direccion }}
-                        </div>
-                        <div class="form-group mb-2 mb20">
-                            <strong>Fecha Registro:</strong>
-                            {{ $donante->fecha_registro }}
-                        </div>
-                        <div class="form-group mb-2 mb20">
-                            <strong>Deleted By:</strong>
-                            {{ $donante->deleted_by }}
-                        </div>
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-warning"><i class="fas fa-envelope"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Email</span>
+                                        <span class="info-box-number text-break">{{ $donante->email ?? 'N/A' }}</span>
+                                    </div>
+                                </div>
+                            </div>
 
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-success"><i class="fas fa-phone"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Teléfono</span>
+                                        <span class="info-box-number">{{ $donante->telefono ?? 'N/A' }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="callout callout-info">
+                                    <h5><i class="fas fa-map-marker-alt"></i> Dirección</h5>
+                                    <p>{{ $donante->direccion ?? 'No especificada' }}</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="callout callout-secondary">
+                                    <h5><i class="far fa-calendar-alt"></i> Fecha de Registro</h5>
+                                    <p>{{ \Carbon\Carbon::parse($donante->fecha_registro)->format('d/m/Y H:i') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ route('donante.edit', $donante->id_donante) }}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a href="{{ route('donante.index') }}" class="btn btn-secondary float-right">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 @endsection
