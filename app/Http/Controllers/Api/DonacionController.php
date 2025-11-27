@@ -168,6 +168,25 @@ class DonacionController extends Controller
         }
     }
 
+    /**
+     * GET /api/donaciones/dinero
+     */
+    public function getAllMoneyDonations()
+    {
+        try {
+            $donaciones = Donacione::where('tipo', 'dinero')
+                ->with(['dinero', 'donante', 'campana'])
+                ->orderBy('fecha', 'desc')
+                ->get();
+
+            return response()->json($donaciones, 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error obteniendo donaciones en dinero: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener donaciones en dinero'], 500);
+        }
+    }
+
     public function index()
     {
         return Donacione::with(['donante', 'campana'])->paginate(20);
