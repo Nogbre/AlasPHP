@@ -73,6 +73,44 @@ class InventarioController extends Controller
         }
     }
 
+    /**
+     * GET /api/inventario/por-producto
+     * Retorna todo el inventario agrupado y ordenado por producto
+     */
+    public function getInventoryByProduct()
+    {
+        try {
+            $inventario = DB::table('ubicaciones_donaciones')
+                ->join('donacion_detalles', 'ubicaciones_donaciones.id_detalle', '=', 'donacion_detalles.id_detalle')
+                ->join('productos', 'donacion_detalles.id_producto', '=', 'productos.id_producto')
+                ->select(
+                    'productos.id_producto',
+                    'productos.nombre',
+                    'productos.descripcion',
+                    'productos.id_categoria',
+                    'productos.unidad_medida',
+                    DB::raw('COALESCE(SUM(ubicaciones_donaciones.cantidad_ubicada), 0) as stock_total')
+                )
+                ->groupBy(
+                    'productos.id_producto',
+                    'productos.nombre',
+                    'productos.descripcion',
+                    'productos.id_categoria',
+                    'productos.unidad_medida'
+                )
+                ->orderBy('productos.nombre', 'asc')
+                ->get();
+
+            return response()->json($inventario, 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al obtener inventario por producto',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function index()
     {
         return UbicacionesDonacione::with(['detalle.producto', 'espacio.estante'])->get();

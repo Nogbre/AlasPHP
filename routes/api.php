@@ -19,6 +19,9 @@ use App\Http\Controllers\Api\UserController;
 Route::post('/donante-auth/login', [DonanteAuthController::class, 'login']);
 Route::post('/auth/login', [VoluntarioAuthController::class, 'login']);
 
+// Ruta pública de inventario
+Route::get('/inventario/por-producto', [InventarioController::class, 'getInventoryByProduct']);
+
 // Rutas protegidas con autenticación Sanctum
 Route::middleware('auth:sanctum')->group(function () {
     
