@@ -12,14 +12,17 @@
                     <div class="card-header">
                         <span class="card-title">{{ __('Create Donación') }}</span>
                     </div>
-                    <form method="POST" action="{{ route('donaciones.store') }}" role="form" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('donaciones.guardar_manual') }}" role="form"
+                        enctype="multipart/form-data">
                         @csrf
                         <div class="card-body">
                             @include('donaciones.form')
                         </div>
                         <div class="card-footer">
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {{ __('Guardar Donación') }}</button>
-                            <a href="{{ route('donaciones.index') }}" class="btn btn-secondary"><i class="fas fa-times"></i> {{ __('Cancelar') }}</a>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>
+                                {{ __('Guardar Donación') }}</button>
+                            <a href="{{ route('donaciones.index') }}" class="btn btn-secondary"><i class="fas fa-times"></i>
+                                {{ __('Cancelar') }}</a>
                         </div>
                     </form>
                 </div>

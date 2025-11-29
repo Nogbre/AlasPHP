@@ -229,7 +229,7 @@
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-sticky-note"></i> Paso 3: Información Adicional (Opcional)</h3>
     </div>
-    <div class="card-body">>
+    <div class="card-body">
         <div class="form-group">
             <label for="observaciones">Observaciones</label>
             <textarea name="observaciones" class="form-control" rows="3" placeholder="Ingrese cualquier observación adicional...">{{ old('observaciones', $donacion?->observaciones ?? '') }}</textarea>
@@ -250,8 +250,10 @@ document.addEventListener('DOMContentLoaded', function(){
     let detalleIndex = 1;
     
     // Function to setup product change listeners
-    function setupProductListeners() {
-        document.querySelectorAll('select[name*="[id_producto]"]').forEach(function(select) {
+    function setupProductListeners(container = document, triggerChange = true) {
+        container.querySelectorAll('select[name*="[id_producto]"]:not(.js-listener-attached)').forEach(function(select) {
+            select.classList.add('js-listener-attached');
+            
             select.addEventListener('change', function() {
                 const productId = this.value;
                 const row = this.closest('tr');
@@ -268,17 +270,19 @@ document.addEventListener('DOMContentLoaded', function(){
                 }
             });
             
-            // Trigger change event for existing selections
-            if (select.value) {
+            // Trigger change event for existing selections if requested
+            if (triggerChange && select.value) {
                 select.dispatchEvent(new Event('change'));
             }
         });
     }
 
     // Function to setup cascading dropdowns
-    function setupCascadingDropdowns() {
+    function setupCascadingDropdowns(container = document, triggerChange = true) {
         // Almacen change -> load Estantes
-        document.querySelectorAll('.almacen-select').forEach(function(almacenSelect) {
+        container.querySelectorAll('.almacen-select:not(.js-listener-attached)').forEach(function(almacenSelect) {
+            almacenSelect.classList.add('js-listener-attached');
+            
             almacenSelect.addEventListener('change', function() {
                 const almacenId = this.value;
                 const rowId = this.getAttribute('data-row');
@@ -306,14 +310,16 @@ document.addEventListener('DOMContentLoaded', function(){
                 }
             });
             
-            // Trigger on page load if value exists
-            if (almacenSelect.value) {
+            // Trigger on page load if value exists and requested
+            if (triggerChange && almacenSelect.value) {
                 almacenSelect.dispatchEvent(new Event('change'));
             }
         });
         
         // Estante change -> load Espacios
-        document.querySelectorAll('.estante-select').forEach(function(estanteSelect) {
+        container.querySelectorAll('.estante-select:not(.js-listener-attached)').forEach(function(estanteSelect) {
+            estanteSelect.classList.add('js-listener-attached');
+            
             estanteSelect.addEventListener('change', function() {
                 const estanteId = this.value;
                 const rowId = this.getAttribute('data-row');
@@ -339,8 +345,8 @@ document.addEventListener('DOMContentLoaded', function(){
                 }
             });
             
-            // Trigger on page load if value exists
-            if (estanteSelect.value) {
+            // Trigger on page load if value exists and requested
+            if (triggerChange && estanteSelect.value) {
                 estanteSelect.dispatchEvent(new Event('change'));
             }
         });
@@ -358,9 +364,16 @@ document.addEventListener('DOMContentLoaded', function(){
             blockDinero.style.display = 'none';
             blockDetalles.style.display = 'block';
             
-            // Contar filas existentes
-            const existingRows = document.querySelectorAll('#detalles-table tbody .detalle-row');
-            detalleIndex = existingRows.length;
+            // Calculate next index based on max existing index to avoid collisions
+            let maxIndex = -1;
+            document.querySelectorAll('[name^="detalles["]').forEach(el => {
+                const match = el.getAttribute('name').match(/detalles\[(\d+)\]/);
+                if(match){
+                    const idx = parseInt(match[1]);
+                    if(idx > maxIndex) maxIndex = idx;
+                }
+            });
+            detalleIndex = maxIndex + 1;
             console.log('Filas existentes:', detalleIndex);
             
             // Setup listeners for existing rows
@@ -407,9 +420,34 @@ document.addEventListener('DOMContentLoaded', function(){
                 return;
             }
             
-            const templateRow = allRows[0];
+            const templateRow = allRows[allRows.length - 1]; // Use last row instead of first
             const newRow = templateRow.cloneNode(true);
             
+            // Store previous row's warehouse, shelf AND space values
+            const prevAlmacenSelect = templateRow.querySelector('.almacen-select');
+            const prevEstanteSelect = templateRow.querySelector('.estante-select');
+            const prevEspacioSelect = templateRow.querySelector('.espacio-select');
+            
+            const prevAlmacenValue = prevAlmacenSelect ? prevAlmacenSelect.value : '';
+            const prevEstanteValue = prevEstanteSelect ? prevEstanteSelect.value : '';
+            const prevEstanteOptions = prevEstanteSelect ? prevEstanteSelect.innerHTML : '';
+            const prevEspacioValue = prevEspacioSelect ? prevEspacioSelect.value : '';
+            const prevEspacioOptions = prevEspacioSelect ? prevEspacioSelect.innerHTML : '';
+            
+            // Remove js-listener-attached class from all elements in newRow
+            newRow.querySelectorAll('.js-listener-attached').forEach(el => el.classList.remove('js-listener-attached'));
+
+            // Calculate next index based on max existing index to avoid collisions
+            let maxIndex = -1;
+            document.querySelectorAll('[name^="detalles["]').forEach(el => {
+                const match = el.getAttribute('name').match(/detalles\[(\d+)\]/);
+                if(match){
+                    const idx = parseInt(match[1]);
+                    if(idx > maxIndex) maxIndex = idx;
+                }
+            });
+            let detalleIndex = maxIndex + 1;
+
             // Actualizar índices y limpiar valores
             newRow.querySelectorAll('input, select, textarea').forEach(function(input){
                 const name = input.getAttribute('name');
@@ -418,14 +456,25 @@ document.addEventListener('DOMContentLoaded', function(){
                 if(name){
                     const newName = name.replace(/detalles\[\d+\]/, 'detalles[' + detalleIndex + ']');
                     input.setAttribute('name', newName);
-                    input.value = '';
-                    if(input.tagName === 'SELECT'){
-                        input.selectedIndex = 0;
+                    
+                    // Update data-row attribute if present
+                    if(dataRow !== null){
+                        input.setAttribute('data-row', detalleIndex);
                     }
-                    // Remove readonly from cloned unidad_medida input
+                    
+                    // Clear values for product and cantidad only. Keep almacen, estante AND espacio.
+                    if(name.includes('[id_producto]') || name.includes('[cantidad]')) {
+                        input.value = '';
+                        if(input.tagName === 'SELECT'){
+                            input.selectedIndex = 0;
+                        }
+                    }
+                    
+                    // Remove readonly from cloned unidad_medida input and clear it
                     if(name.includes('[unidad_medida]')){
                         input.removeAttribute('readonly');
                         input.style.backgroundColor = '';
+                        input.value = '';
                     }
                 }
                 
@@ -434,13 +483,36 @@ document.addEventListener('DOMContentLoaded', function(){
                 }
             });
             
+            // Restore almacen, estante and espacio values in the new row
+            const newAlmacenSelect = newRow.querySelector('.almacen-select');
+            const newEstanteSelect = newRow.querySelector('.estante-select');
+            const newEspacioSelect = newRow.querySelector('.espacio-select');
+            
+            if(newAlmacenSelect && prevAlmacenValue) {
+                newAlmacenSelect.value = prevAlmacenValue;
+            }
+            
+            if(newEstanteSelect && prevEstanteOptions) {
+                newEstanteSelect.innerHTML = prevEstanteOptions;
+                if(prevEstanteValue) {
+                    newEstanteSelect.value = prevEstanteValue;
+                }
+            }
+            
+            if(newEspacioSelect && prevEspacioOptions) {
+                newEspacioSelect.innerHTML = prevEspacioOptions;
+                if(prevEspacioValue) {
+                    newEspacioSelect.value = prevEspacioValue;
+                }
+            }
+            
             tbody.appendChild(newRow);
             detalleIndex++;
             console.log('Fila agregada. Nuevo índice:', detalleIndex);
             
-            // Setup listeners for the new row
-            setupProductListeners();
-            setupCascadingDropdowns();
+            // Setup listeners for the new row - DO NOT trigger change events as we manually set values
+            setupProductListeners(newRow, false);
+            setupCascadingDropdowns(newRow, false);
         }
     });
     

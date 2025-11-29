@@ -8,8 +8,8 @@
         <h1>Detalles del Estante</h1>
     </div>
     <div class="col-sm-6">
-        <a class="btn btn-secondary float-right" href="{{ route('estante.index') }}">
-            Volver al Listado
+        <a class="btn btn-secondary float-right" href="{{ route('almacene.show', $estante->id_almacen) }}">
+            <i class="fas fa-arrow-left"></i> Volver al Almacén
         </a>
     </div>
 </div>
@@ -82,11 +82,201 @@
     </div>
 </div>
 
+{{-- Espacios e Inventario Card --}}
+<div class="card card-success card-outline">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-boxes"></i> Espacios e Inventario del Estante</h3>
+        <div class="card-tools">
+            <span class="badge badge-info">
+                {{ $estante->espacios->count() }} espacios totales
+            </span>
+        </div>
+    </div>
+    <div class="card-body">
+        @if($estante->espacios->count() > 0)
+            @foreach($estante->espacios as $espacio)
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="fas fa-box"></i>
+                            Espacio: <strong>{{ $espacio->codigo_espacio }}</strong>
+                            @if($espacio->productosAgrupados && count($espacio->productosAgrupados) > 0)
+                                <span class="badge badge-success ml-2">
+                                    {{ array_sum(array_column($espacio->productosAgrupados, 'cantidad_total')) }} unidades
+                                </span>
+                            @else
+                                <span class="badge badge-secondary ml-2">Vacío</span>
+                            @endif
+                        </h5>
+                    </div>
+                    @if($espacio->productosAgrupados && count($espacio->productosAgrupados) > 0)
+                        <div class="card-body p-0">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th><i class="fas fa-tag"></i> Producto</th>
+                                        <th class="text-center"><i class="fas fa-boxes"></i> Cantidad</th>
+                                        <th class="text-center"><i class="fas fa-ruler"></i> Unidad</th>
+                                        <th><i class="fas fa-info-circle"></i> Descripción</th>
+                                        <th class="text-center"><i class="fas fa-hand-holding-heart"></i> Donaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($espacio->productosAgrupados as $nombreProducto => $data)
+                                        <tr>
+                                            <td>
+                                                <strong>{{ $nombreProducto }}</strong>
+                                                <br>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-barcode"></i> ID: {{ $data['producto']->id_producto }}
+                                                </small>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge badge-primary badge-lg">
+                                                    {{ $data['cantidad_total'] }}
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                {{ $data['unidad_medida'] ?? 'N/A' }}
+                                            </td>
+                                            <td>
+                                                <small>{{ $data['producto']->descripcion ?? 'Sin descripción' }}</small>
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-sm btn-info" data-toggle="modal"
+                                                    data-target="#donacionesModal{{ $espacio->id_espacio }}_{{ $data['producto']->id_producto }}">
+                                                    <i class="fas fa-eye"></i> Ver Donaciones
+                                                    <span class="badge badge-light">{{ count($data['donaciones']) }}</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {{-- Modals for donation details - OUTSIDE the table --}}
+                        @foreach($espacio->productosAgrupados as $nombreProducto => $data)
+                            <div class="modal fade" id="donacionesModal{{ $espacio->id_espacio }}_{{ $data['producto']->id_producto }}"
+                                tabindex="-1" role="dialog">
+                                <div class="modal-dialog modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-info">
+                                            <h5 class="modal-title">
+                                                <i class="fas fa-hand-holding-heart"></i>
+                                                Donaciones de: {{ $nombreProducto }}
+                                            </h5>
+                                            <button type="button" class="close" data-dismiss="modal">
+                                                <span>&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle"></i>
+                                                <strong>Total acumulado:</strong> {{ $data['cantidad_total'] }}
+                                                {{ $data['unidad_medida'] ?? 'unidades' }}
+                                            </div>
+                                            <table class="table table-bordered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th><i class="fas fa-hashtag"></i> Donación</th>
+                                                        <th><i class="fas fa-user"></i> Donante</th>
+                                                        <th class="text-center"><i class="fas fa-boxes"></i> Cantidad</th>
+                                                        <th><i class="fas fa-calendar"></i> Fecha</th>
+                                                        <th><i class="fas fa-comment"></i> Descripción</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($data['donaciones'] as $donacion)
+                                                        <tr>
+                                                            <td>
+                                                                @if($donacion['id_donacion'])
+                                                                    <a href="{{ url('donaciones/' . $donacion['id_donacion']) }}"
+                                                                        target="_blank">
+                                                                        #{{ $donacion['id_donacion'] }}
+                                                                        <i class="fas fa-external-link-alt"></i>
+                                                                    </a>
+                                                                @else
+                                                                    N/A
+                                                                @endif
+                                                            </td>
+                                                            <td>{{ $donacion['donante'] }}</td>
+                                                            <td class="text-center">
+                                                                <span class="badge badge-primary">{{ $donacion['cantidad'] }}</span>
+                                                            </td>
+                                                            <td>
+                                                                @if($donacion['fecha'])
+                                                                    {{ \Carbon\Carbon::parse($donacion['fecha'])->format('d/m/Y') }}
+                                                                @else
+                                                                    -
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                <small>{{ $donacion['descripcion'] ?? 'Sin descripción' }}</small>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                <i class="fas fa-times"></i> Cerrar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="card-body">
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-inbox"></i> Este espacio está vacío
+                            </p>
+                        </div>
+                    @endif
+                </div>
+            @endforeach
+        @else
+            <div class="callout callout-warning">
+                <h5><i class="fas fa-info-circle"></i> Sin Espacios</h5>
+                <p>Este estante no tiene espacios definidos todavía.</p>
+            </div>
+        @endif
+    </div>
+    @if($estante->espacios->count() > 0)
+        <div class="card-footer">
+            @php
+                $totalUnidades = 0;
+                $productosUnicos = [];
+                foreach ($estante->espacios as $espacio) {
+                    foreach ($espacio->ubicacionesDonaciones as $ubicacion) {
+                        $totalUnidades += $ubicacion->cantidad_ubicada;
+                        if ($ubicacion->detalle && $ubicacion->detalle->producto) {
+                            $productosUnicos[$ubicacion->detalle->producto->id_producto] = $ubicacion->detalle->producto->nombre;
+                        }
+                    }
+                }
+            @endphp
+            <div class="row">
+                <div class="col-md-6">
+                    <strong><i class="fas fa-box"></i> Total de productos únicos:</strong>
+                    <span class="badge badge-info">{{ count($productosUnicos) }}</span>
+                </div>
+                <div class="col-md-6 text-right">
+                    <strong><i class="fas fa-cubes"></i> Total de unidades almacenadas:</strong>
+                    <span class="badge badge-success">{{ $totalUnidades }}</span>
+                </div>
+            </div>
+        </div>
+    @endif
+</div>
+
 {{-- Action Buttons --}}
 <div class="row mb-3">
     <div class="col-12">
-        <a href="{{ route('estante.index') }}" class="btn btn-secondary">
-            Volver al Listado
+        <a href="{{ route('almacene.show', $estante->id_almacen) }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver al Almacén
         </a>
         <a href="{{ route('estante.edit', $estante->id_estante) }}" class="btn btn-warning">
             <i class="fas fa-edit"></i> Editar Estante

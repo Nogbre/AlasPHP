@@ -25,7 +25,8 @@ class UbicacionesDonacione extends Model
     protected $fillable = [
         'id_detalle',
         'id_espacio',
-        'fecha_ingreso'
+        'fecha_ingreso',
+        'cantidad_ubicada'
     ];
 
     public function detalle()

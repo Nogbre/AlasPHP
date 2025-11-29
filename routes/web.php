@@ -3,7 +3,10 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        return redirect()->route('home');
+    }
+    return redirect()->route('login');
 });
 
 Auth::routes();
@@ -22,12 +25,10 @@ Route::resource('solicitudes-recoleccions', App\Http\Controllers\SolicitudesReco
 Route::resource('paquete', App\Http\Controllers\PaqueteController::class)->middleware('auth');
 Route::resource('registros-salida', App\Http\Controllers\RegistrosSalidaController::class)->middleware('auth');
 
+Route::post('donaciones/guardar', [App\Http\Controllers\DonacioneController::class, 'store'])->name('donaciones.guardar_manual')->middleware('auth');
 Route::resource('donaciones', App\Http\Controllers\DonacioneController::class)->middleware('auth');
 Route::resource('recolectores', App\Http\Controllers\RecolectoresController::class)->middleware('auth');
 
 // API routes for cascading dropdowns
 Route::get('api/almacenes/{id}/estantes', [App\Http\Controllers\AlmaceneController::class, 'getEstantes'])->middleware('auth');
 Route::get('api/estantes/{id}/espacios', [App\Http\Controllers\EstanteController::class, 'getEspacios'])->middleware('auth');
-
-
-

@@ -57,8 +57,9 @@ class AlmaceneController extends Controller
     public function show($id): View
     {
         $almacene = Almacene::find($id);
+        $estantes = $almacene->estantes()->with('espacios')->get();
 
-        return view('almacene.show', compact('almacene'));
+        return view('almacene.show', compact('almacene', 'estantes'));
     }
 
     /**

@@ -92,6 +92,14 @@
                             @endif
                         </td>
                         <td class="text-center">
+                            <div class="btn-group mb-2" role="group">
+                                <a class="btn btn-success btn-sm"
+                                    href="{{ route('estante.create', ['id_almacen' => $almacene->id_almacen]) }}"
+                                    title="Crear Estante">
+                                    <i class="fas fa-plus"></i> Crear Estante
+                                </a>
+                            </div>
+                            <br>
                             <div class="btn-group" role="group">
                                 <a class="btn btn-info btn-sm" href="{{ route('almacene.show', $almacene->id_almacen) }}"
                                     title="Ver detalles">

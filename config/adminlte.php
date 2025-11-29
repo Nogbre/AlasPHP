@@ -327,11 +327,6 @@ return [
             'icon' => 'fas fa-fw fa-store',
         ],
         [
-            'text' => 'Estantes',
-            'url' => '/estante',
-            'icon' => 'fas fa-fw fa-inbox',
-        ],
-        [
             'text' => 'Espacios',
             'url' => '/espacio',
             'icon' => 'fas fa-fw fa-box',

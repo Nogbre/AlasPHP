@@ -137,6 +137,74 @@
     </div>
 @endif
 
+{{-- Estantes Card --}}
+<div class="card card-info card-outline">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-inbox"></i> Estantes del Almacén</h3>
+        <div class="card-tools">
+            <a href="{{ route('estante.create', ['id_almacen' => $almacene->id_almacen]) }}"
+                class="btn btn-success btn-sm">
+                <i class="fas fa-plus"></i> Nuevo Estante
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        @if($estantes->count() > 0)
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th width="60px">#</th>
+                        <th><i class="fas fa-barcode"></i> Código</th>
+                        <th><i class="fas fa-align-left"></i> Descripción</th>
+                        <th class="text-center"><i class="fas fa-box"></i> Espacios</th>
+                        <th width="180px" class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($estantes as $index => $estante)
+                        <tr>
+                            <td class="text-center"><strong>{{ $index + 1 }}</strong></td>
+                            <td><strong>{{ $estante->codigo_estante }}</strong></td>
+                            <td>{{ $estante->descripcion ?? 'Sin descripción' }}</td>
+                            <td class="text-center">
+                                <span class="badge badge-info">
+                                    {{ $estante->espacios->count() }} espacios
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group" role="group">
+                                    <a class="btn btn-info btn-sm" href="{{ route('estante.show', $estante->id_estante) }}"
+                                        title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a class="btn btn-warning btn-sm" href="{{ route('estante.edit', $estante->id_estante) }}"
+                                        title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('estante.destroy', $estante->id_estante) }}" method="POST"
+                                        style="display: inline;"
+                                        onsubmit="return confirm('¿Está seguro de eliminar este estante?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <div class="callout callout-warning">
+                <h5><i class="fas fa-info-circle"></i> Sin Estantes</h5>
+                <p>Este almacén no tiene estantes registrados todavía. Haz clic en "Nuevo Estante" para crear uno.</p>
+            </div>
+        @endif
+    </div>
+</div>
+
 {{-- Action Buttons --}}
 <div class="row mb-3">
     <div class="col-12">

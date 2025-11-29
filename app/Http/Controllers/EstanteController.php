@@ -29,11 +29,12 @@ class EstanteController extends Controller
     {
         $estante = new Estante();
         $returnUrl = $request->query('return_url');
+        $idAlmacen = $request->query('id_almacen');
 
         // load almacenes for FK select
         $almacenes = \App\Models\Almacene::pluck('nombre', 'id_almacen');
 
-        return view('estante.create', compact('estante', 'almacenes', 'returnUrl'));
+        return view('estante.create', compact('estante', 'almacenes', 'returnUrl', 'idAlmacen'));
     }
 
     /**
@@ -70,7 +71,48 @@ class EstanteController extends Controller
      */
     public function show($id): View
     {
-        $estante = Estante::find($id);
+        $estante = Estante::with([
+            'almacene',
+            'espacios.ubicacionesDonaciones.detalle.producto',
+            'espacios.ubicacionesDonaciones.detalle.donacion'
+        ])->find($id);
+
+        // Group products by name within each space
+        foreach ($estante->espacios as $espacio) {
+            $grouped = [];
+
+            foreach ($espacio->ubicacionesDonaciones as $ubicacion) {
+                if ($ubicacion->detalle && $ubicacion->detalle->producto) {
+                    $producto = $ubicacion->detalle->producto;
+                    $productoNombre = $producto->nombre;
+
+                    // Initialize group if it doesn't exist
+                    if (!isset($grouped[$productoNombre])) {
+                        $grouped[$productoNombre] = [
+                            'producto' => $producto,
+                            'cantidad_total' => 0,
+                            'unidad_medida' => $producto->unidad_medida,
+                            'donaciones' => []
+                        ];
+                    }
+
+                    // Add quantity
+                    $grouped[$productoNombre]['cantidad_total'] += $ubicacion->cantidad_ubicada;
+
+                    // Add donation detail
+                    $grouped[$productoNombre]['donaciones'][] = [
+                        'id_donacion' => $ubicacion->detalle->donacion->id_donacion ?? null,
+                        'cantidad' => $ubicacion->cantidad_ubicada,
+                        'fecha' => $ubicacion->detalle->donacion->fecha ?? null,
+                        'descripcion' => $ubicacion->detalle->descripcion ?? null,
+                        'donante' => $ubicacion->detalle->donacion->donante->nombre ?? 'N/A'
+                    ];
+                }
+            }
+
+            // Attach grouped products to espacio
+            $espacio->productosAgrupados = $grouped;
+        }
 
         return view('estante.show', compact('estante'));
     }

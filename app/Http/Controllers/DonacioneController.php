@@ -120,6 +120,7 @@ class DonacioneController extends Controller
                             'id_detalle' => $detalle->id_detalle,
                             'id_espacio' => $det['id_espacio'],
                             'fecha_ingreso' => now(),
+                            'cantidad_ubicada' => (int) $det['cantidad'],
                         ]);
 
                         \Log::info("Ubicación para detalle #{$index} creada");
@@ -216,6 +217,7 @@ class DonacioneController extends Controller
                             'id_detalle' => $detalle->id_detalle,
                             'id_espacio' => $det['id_espacio'],
                             'fecha_ingreso' => now(),
+                            'cantidad_ubicada' => (int) $det['cantidad'],
                         ]);
                     }
                 }
