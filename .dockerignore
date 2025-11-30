@@ -1,21 +1,31 @@
+/vendor
+/node_modules
+/storage/logs
+/storage/framework/cache/data
+/storage/framework/sessions
+/storage/framework/views
+
+# Archivos de entorno
+.env
+.env.*
+.env.backup
+
+# Archivos del host
 .git
 .gitignore
+.github
+.idea
+.vscode
 
-node_modules
-vendor
+# Cachés
 npm-debug.log
 yarn-error.log
-storage/app/*
-storage/framework/cache/*
-storage/framework/sessions/*
-storage/framework/views/*
-storage/logs/*
-bootstrap/cache/*
-public/storage
-public/hot
-.phpunit.result.cache
-Homestead.json
-Homestead.yaml
-.vscode
-.idea
-*.log
+composer.lock
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Tests
+phpunit.xml
+tests/
