@@ -25,7 +25,7 @@ class SolicitudRecoleccionController extends Controller
                 'direccion_recoleccion' => $validated['ubicacion'] ?? null,
                 'observaciones' => $validated['detalle_solicitud'] ?? null,
                 'id_donante' => $validated['id_donante'],
-                'estado' => 'pendiente',
+                'estado' => 'Pendiente',
                 'fecha_creacion' => now(),
             ]);
 
@@ -50,7 +50,7 @@ class SolicitudRecoleccionController extends Controller
     {
         try {
             $solicitudes = SolicitudesRecoleccion::where('id_donante', $donanteId)
-                ->with(['campana', 'imagenes'])
+                ->with(['campana'])
                 ->orderBy('fecha_creacion', 'desc')
                 ->get();
 
@@ -69,7 +69,7 @@ class SolicitudRecoleccionController extends Controller
 
     public function show(string $id)
     {
-        return SolicitudesRecoleccion::with(['donante', 'imagenes'])->findOrFail($id);
+        return SolicitudesRecoleccion::with(['donante'])->findOrFail($id);
     }
 
     public function update(Request $request, string $id)

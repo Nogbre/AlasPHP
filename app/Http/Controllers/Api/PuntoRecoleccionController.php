@@ -15,7 +15,6 @@ class PuntoRecoleccionController extends Controller
     {
         try {
             $puntos = PuntosRecoleccion::where('id_campana', $idCampana)
-                ->with('campana')
                 ->get();
 
             return response()->json($puntos, 200);
@@ -27,7 +26,7 @@ class PuntoRecoleccionController extends Controller
 
     public function index()
     {
-        return PuntosRecoleccion::with('campana')->get();
+        return PuntosRecoleccion::all();
     }
 
     public function store(Request $request)

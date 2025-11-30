@@ -59,9 +59,4 @@ class SolicitudesRecoleccion extends Model
     {
         return $this->belongsTo(\App\Models\Campana::class, 'id_campana', 'id_campana');
     }
-
-    public function imagenes()
-    {
-        return $this->hasMany(\App\Models\ImagenesSolicitudRecogida::class, 'id_solicitud', 'id_solicitud');
-    }
 }
