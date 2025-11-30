@@ -85,10 +85,33 @@ class AlmaceneController extends Controller
 
     public function destroy($id): RedirectResponse
     {
-        Almacene::find($id)->delete();
+        try {
+            $almacene = Almacene::findOrFail($id);
 
-        return Redirect::route('almacene.index')
-            ->with('success', 'Almacene deleted successfully');
+            // Delete related entities in cascade
+            foreach ($almacene->estantes as $estante) {
+                // Delete espacios and their ubicaciones
+                foreach ($estante->espacios as $espacio) {
+                    // Delete ubicaciones relacionadas
+                    \App\Models\UbicacionesDonacione::where('id_espacio', $espacio->id_espacio)->delete();
+                }
+                // Delete espacios
+                $estante->espacios()->delete();
+            }
+
+            // Delete estantes
+            $almacene->estantes()->delete();
+
+            // Finally delete the almacen
+            $almacene->delete();
+
+            return Redirect::route('almacene.index')
+                ->with('success', 'Almacén eliminado correctamente.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error deleting almacen: ' . $e->getMessage());
+            return Redirect::back()
+                ->with('error', 'Error al eliminar el almacén: ' . $e->getMessage());
+        }
     }
 
     public function getEstantes($id)

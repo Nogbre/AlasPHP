@@ -55,15 +55,28 @@ class EstanteController extends Controller
 
         $estante = Estante::create($data);
 
+        // Create spaces based on rows and columns
+        $filas = (int) $request->input('filas');
+        $columnas = (int) $request->input('columnas');
+
+        for ($i = 1; $i <= $filas; $i++) {
+            for ($j = 1; $j <= $columnas; $j++) {
+                \App\Models\Espacio::create([
+                    'id_estante' => $estante->id_estante,
+                    'codigo_espacio' => 'F' . $i . '-C' . $j,
+                ]);
+            }
+        }
+
         // Check if there's a return URL
         if ($request->has('return_url') && $request->input('return_url')) {
             return Redirect::to($request->input('return_url'))
-                ->with('success', 'Estante creado exitosamente.')
+                ->with('success', 'Estante y espacios creados exitosamente.')
                 ->with('new_estante_id', $estante->id_estante);
         }
 
         return Redirect::route('estante.index')
-            ->with('success', 'Estante creado exitosamente.');
+            ->with('success', 'Estante y ' . ($filas * $columnas) . ' espacios creados exitosamente.');
     }
 
     /**
@@ -79,6 +92,12 @@ class EstanteController extends Controller
 
         // Group products by name within each space
         foreach ($estante->espacios as $espacio) {
+            // Ensure relationships are loaded
+            $espacio->load([
+                'ubicacionesDonaciones.detalle.producto',
+                'ubicacionesDonaciones.detalle.donacion.donante'
+            ]);
+
             $grouped = [];
 
             foreach ($espacio->ubicacionesDonaciones as $ubicacion) {
@@ -151,6 +170,6 @@ class EstanteController extends Controller
 
     public function getEspacios($id)
     {
-        return response()->json(Estante::find($id)->espacios()->select('id_espacio', 'codigo_espacio')->get());
+        return response()->json(Estante::find($id)->espacios()->where('estado', 'disponible')->select('id_espacio', 'codigo_espacio')->get());
     }
 }

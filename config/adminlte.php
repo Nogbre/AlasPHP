@@ -326,11 +326,11 @@ return [
             'url' => '/almacene',
             'icon' => 'fas fa-fw fa-store',
         ],
-        [
+        /*[
             'text' => 'Espacios',
             'url' => '/espacio',
             'icon' => 'fas fa-fw fa-box',
-        ],
+        ],*/
         [
             'text' => 'Inventario',
             'url' => '/donaciones',

@@ -52,6 +52,15 @@
     </div>
 @endif
 
+@if ($message = Session::get('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> {{ $message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+@endif
+
 {{-- Main Card --}}
 <div class="card card-primary card-outline">
     <div class="card-header">
@@ -109,12 +118,13 @@
                                     title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('almacene.destroy', $almacene->id_almacen) }}" method="POST"
-                                    style="display: inline;"
-                                    onsubmit="return confirm('¿Está seguro de eliminar este almacén?');">
+                                <form id="delete-form-{{ $almacene->id_almacen }}"
+                                    action="{{ route('almacene.destroy', $almacene->id_almacen) }}" method="POST"
+                                    style="display: inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
+                                    <button type="button" class="btn btn-danger btn-sm" title="Eliminar"
+                                        onclick="confirmDelete('{{ $almacene->id_almacen }}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
@@ -128,6 +138,30 @@
     <div class="card-footer">
         <div class="float-right">
             {!! $almacenes->withQueryString()->links() !!}
+        </div>
+    </div>
+</div>
+
+{{-- Delete Confirmation Modal --}}
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Está seguro de que desea eliminar este almacén? Esta acción no se puede deshacer.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Eliminar</button>
+            </div>
         </div>
     </div>
 </div>
@@ -165,6 +199,19 @@
                 "emptyTable": "No hay datos disponibles en la tabla"
             }
         });
+    });
+
+    let deleteId;
+
+    function confirmDelete(id) {
+        deleteId = id;
+        $('#deleteModal').modal('show');
+    }
+
+    $('#confirmDeleteBtn').click(function () {
+        if (deleteId) {
+            $('#delete-form-' + deleteId).submit();
+        }
     });
 </script>
 @stop

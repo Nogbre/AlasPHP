@@ -53,6 +53,7 @@
                     <th width="60px">#</th>
                     <th>Estante</th>
                     <th>Código Espacio</th>
+                    <th class="text-center">Estado</th>
                     <th width="200px" class="text-center">Acciones</th>
                 </tr>
             </thead>
@@ -73,6 +74,13 @@
                             @endif
                         </td>
                         <td><strong>{{ $espacio->codigo_espacio }}</strong></td>
+                        <td class="text-center">
+                            @if($espacio->estado === 'lleno')
+                                <span class="badge badge-danger">LLENO</span>
+                            @else
+                                <span class="badge badge-success">DISPONIBLE</span>
+                            @endif
+                        </td>
                         <td class="text-center">
                             <div class="btn-group" role="group">
                                 <a class="btn btn-info btn-sm" href="{{ route('espacio.show', $espacio->id_espacio) }}"

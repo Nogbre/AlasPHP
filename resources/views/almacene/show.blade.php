@@ -156,7 +156,6 @@
                         <th width="60px">#</th>
                         <th><i class="fas fa-barcode"></i> Código</th>
                         <th><i class="fas fa-align-left"></i> Descripción</th>
-                        <th class="text-center"><i class="fas fa-box"></i> Espacios</th>
                         <th width="180px" class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
                     </tr>
                 </thead>
@@ -166,11 +165,6 @@
                             <td class="text-center"><strong>{{ $index + 1 }}</strong></td>
                             <td><strong>{{ $estante->codigo_estante }}</strong></td>
                             <td>{{ $estante->descripcion ?? 'Sin descripción' }}</td>
-                            <td class="text-center">
-                                <span class="badge badge-info">
-                                    {{ $estante->espacios->count() }} espacios
-                                </span>
-                            </td>
                             <td class="text-center">
                                 <div class="btn-group" role="group">
                                     <a class="btn btn-info btn-sm" href="{{ route('estante.show', $estante->id_estante) }}"

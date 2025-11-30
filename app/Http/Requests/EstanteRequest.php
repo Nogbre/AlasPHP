@@ -26,6 +26,8 @@ class EstanteRequest extends FormRequest
             'id_almacen' => 'required|exists:almacenes,id_almacen',
             'codigo_estante' => 'nullable|string|max:255', // Auto-generated, so nullable
             'descripcion' => 'nullable|string|max:255',
+            'filas' => 'required|integer|min:1',
+            'columnas' => 'required|integer|min:1',
         ];
     }
 }

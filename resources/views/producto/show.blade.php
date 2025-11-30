@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('template_title')
-    {{ $producto->name ?? __('Show') . " " . __('Producto') }}
+    {{ $producto->nombre ?? __('Show') . " " . __('Producto') }}
 @endsection
 
 @section('content')
@@ -19,23 +19,23 @@
                     </div>
 
                     <div class="card-body bg-white">
-                        
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Id Categoria:</strong>
-                                    {{ $producto->id_categoria }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Nombre:</strong>
-                                    {{ $producto->nombre }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Descripcion:</strong>
-                                    {{ $producto->descripcion }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Unidad Medida:</strong>
-                                    {{ $producto->unidad_medida }}
-                                </div>
+
+                        <div class="form-group mb-2 mb20">
+                            <strong>Categoría:</strong>
+                            {{ $producto->categoriasProducto->nombre ?? 'Sin Categoría' }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Nombre:</strong>
+                            {{ $producto->nombre }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Descripcion:</strong>
+                            {{ $producto->descripcion }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Unidad Medida:</strong>
+                            {{ $producto->unidad_medida }}
+                        </div>
 
                     </div>
                 </div>

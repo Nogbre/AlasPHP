@@ -3,7 +3,9 @@
 @section('title', 'Dashboard')
 
 @section('content_header')
-<h1>Dashboard Principal</h1>
+<div class="d-flex justify-content-between align-items-center">
+    <h1>Dashboard Principal</h1>
+</div>
 @stop
 
 @section('content')

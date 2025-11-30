@@ -96,21 +96,42 @@
         @if($estante->espacios->count() > 0)
             @foreach($estante->espacios as $espacio)
                 <div class="card mb-3">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0">
-                            <i class="fas fa-box"></i>
-                            Espacio: <strong>{{ $espacio->codigo_espacio }}</strong>
-                            @if($espacio->productosAgrupados && count($espacio->productosAgrupados) > 0)
-                                <span class="badge badge-success ml-2">
-                                    {{ array_sum(array_column($espacio->productosAgrupados, 'cantidad_total')) }} unidades
-                                </span>
-                            @else
-                                <span class="badge badge-secondary ml-2">Vacío</span>
-                            @endif
-                        </h5>
+                    <div class="card-header bg-light" style="cursor: pointer;" data-toggle="collapse"
+                        data-target="#productos-{{ $espacio->id_espacio }}" aria-expanded="true">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-box"></i>
+                                Espacio: <strong>{{ $espacio->codigo_espacio }}</strong>
+                                @if($espacio->estado === 'lleno')
+                                    <span class="badge badge-danger ml-2">LLENO</span>
+                                @else
+                                    <span class="badge badge-success ml-2">DISPONIBLE</span>
+                                @endif
+
+                                @if($espacio->productosAgrupados && count($espacio->productosAgrupados) > 0)
+                                    <span class="badge badge-info ml-2">
+                                        {{ array_sum(array_column($espacio->productosAgrupados, 'cantidad_total')) }} unidades
+                                    </span>
+                                @else
+                                    <span class="badge badge-secondary ml-2">Vacío</span>
+                                @endif
+                            </h5>
+                            <div onclick="event.stopPropagation();">
+                                <form action="{{ route('espacio.toggleStatus', $espacio->id_espacio) }}" method="POST"
+                                    style="display: inline;">
+                                    @csrf
+                                    <button type="submit"
+                                        class="btn btn-sm {{ $espacio->estado === 'lleno' ? 'btn-outline-success' : 'btn-outline-danger' }}"
+                                        title="{{ $espacio->estado === 'lleno' ? 'Marcar como disponible' : 'Marcar como lleno' }}">
+                                        <i class="fas {{ $espacio->estado === 'lleno' ? 'fa-check-circle' : 'fa-ban' }}"></i>
+                                        {{ $espacio->estado === 'lleno' ? 'Marcar Disponible' : 'Marcar Lleno' }}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-                    @if($espacio->productosAgrupados && count($espacio->productosAgrupados) > 0)
-                        <div class="card-body p-0">
+                    <div class="collapse show" id="productos-{{ $espacio->id_espacio }}">
+                        @if($espacio->productosAgrupados && count($espacio->productosAgrupados) > 0)
                             <table class="table table-sm table-hover mb-0">
                                 <thead class="thead-light">
                                     <tr>
@@ -153,88 +174,83 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                        </div>
 
-                        {{-- Modals for donation details - OUTSIDE the table --}}
-                        @foreach($espacio->productosAgrupados as $nombreProducto => $data)
-                            <div class="modal fade" id="donacionesModal{{ $espacio->id_espacio }}_{{ $data['producto']->id_producto }}"
-                                tabindex="-1" role="dialog">
-                                <div class="modal-dialog modal-lg" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header bg-info">
-                                            <h5 class="modal-title">
-                                                <i class="fas fa-hand-holding-heart"></i>
-                                                Donaciones de: {{ $nombreProducto }}
-                                            </h5>
-                                            <button type="button" class="close" data-dismiss="modal">
-                                                <span>&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="alert alert-info">
-                                                <i class="fas fa-info-circle"></i>
-                                                <strong>Total acumulado:</strong> {{ $data['cantidad_total'] }}
-                                                {{ $data['unidad_medida'] ?? 'unidades' }}
+                            {{-- Modals for donation details --}}
+                            @foreach($espacio->productosAgrupados as $nombreProducto => $data)
+                                <div class="modal fade"
+                                    id="donacionesModal{{ $espacio->id_espacio }}_{{ $data['producto']->id_producto }}" tabindex="-1"
+                                    role="dialog">
+                                    <div class="modal-dialog modal-lg" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-info">
+                                                <h5 class="modal-title">
+                                                    <i class="fas fa-hand-holding-heart"></i>
+                                                    Donaciones de: {{ $nombreProducto }}
+                                                </h5>
+                                                <button type="button" class="close" data-dismiss="modal">
+                                                    <span>&times;</span>
+                                                </button>
                                             </div>
-                                            <table class="table table-bordered table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th><i class="fas fa-hashtag"></i> Donación</th>
-                                                        <th><i class="fas fa-user"></i> Donante</th>
-                                                        <th class="text-center"><i class="fas fa-boxes"></i> Cantidad</th>
-                                                        <th><i class="fas fa-calendar"></i> Fecha</th>
-                                                        <th><i class="fas fa-comment"></i> Descripción</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($data['donaciones'] as $donacion)
+                                            <div class="modal-body">
+                                                <div class="alert alert-info">
+                                                    <i class="fas fa-info-circle"></i>
+                                                    <strong>Total acumulado:</strong> {{ $data['cantidad_total'] }}
+                                                    {{ $data['unidad_medida'] ?? 'unidades' }}
+                                                </div>
+                                                <table class="table table-bordered table-striped">
+                                                    <thead>
                                                         <tr>
-                                                            <td>
-                                                                @if($donacion['id_donacion'])
-                                                                    <a href="{{ url('donaciones/' . $donacion['id_donacion']) }}"
-                                                                        target="_blank">
-                                                                        #{{ $donacion['id_donacion'] }}
-                                                                        <i class="fas fa-external-link-alt"></i>
-                                                                    </a>
-                                                                @else
-                                                                    N/A
-                                                                @endif
-                                                            </td>
-                                                            <td>{{ $donacion['donante'] }}</td>
-                                                            <td class="text-center">
-                                                                <span class="badge badge-primary">{{ $donacion['cantidad'] }}</span>
-                                                            </td>
-                                                            <td>
-                                                                @if($donacion['fecha'])
-                                                                    {{ \Carbon\Carbon::parse($donacion['fecha'])->format('d/m/Y') }}
-                                                                @else
-                                                                    -
-                                                                @endif
-                                                            </td>
-                                                            <td>
-                                                                <small>{{ $donacion['descripcion'] ?? 'Sin descripción' }}</small>
-                                                            </td>
+                                                            <th><i class="fas fa-hashtag"></i> Donación</th>
+                                                            <th><i class="fas fa-user"></i> Donante</th>
+                                                            <th class="text-center"><i class="fas fa-boxes"></i> Cantidad</th>
+                                                            <th><i class="fas fa-calendar"></i> Fecha</th>
+                                                            <th><i class="fas fa-comment"></i> Descripción</th>
                                                         </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                                <i class="fas fa-times"></i> Cerrar
-                                            </button>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach($data['donaciones'] as $donacion)
+                                                            <tr>
+                                                                <td>
+                                                                    @if($donacion['id_donacion'])
+                                                                        <a href="{{ url('donaciones/' . $donacion['id_donacion']) }}"
+                                                                            target="_blank">
+                                                                            #{{ $donacion['id_donacion'] }}
+                                                                            <i class="fas fa-external-link-alt"></i>
+                                                                        </a>
+                                                                    @else
+                                                                        N/A
+                                                                    @endif
+                                                                </td>
+                                                                <td>{{ $donacion['donante'] }}</td>
+                                                                <td class="text-center">
+                                                                    <span class="badge badge-primary">{{ $donacion['cantidad'] }}</span>
+                                                                </td>
+                                                                <td>
+                                                                    @if($donacion['fecha'])
+                                                                        {{ \Carbon\Carbon::parse($donacion['fecha'])->format('d/m/Y') }}
+                                                                    @else
+                                                                        -
+                                                                    @endif
+                                                                </td>
+                                                                <td>
+                                                                    <small>{{ $donacion['descripcion'] ?? 'Sin descripción' }}</small>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                    <i class="fas fa-times"></i> Cerrar
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        @endforeach
-                    @else
-                        <div class="card-body">
-                            <p class="text-muted mb-0">
-                                <i class="fas fa-inbox"></i> Este espacio está vacío
-                            </p>
-                        </div>
-                    @endif
+                            @endforeach
+                        @endif
+                    </div>
                 </div>
             @endforeach
         @else
@@ -291,4 +307,8 @@
         </form>
     </div>
 </div>
+@stop
+
+@section('js')
+{{-- Bootstrap collapse works natively with data-toggle="collapse" --}}
 @stop

@@ -58,6 +58,47 @@
             @endif
         </div>
 
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label for="filas" class="form-label">
+                        {{ __('Filas') }}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" name="filas" id="filas"
+                        class="form-control @error('filas') is-invalid @enderror" value="{{ old('filas', 3) }}" min="1"
+                        required placeholder="Ej: 3">
+                    @error('filas')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                    <small class="form-text text-muted">
+                        Número de filas del estante
+                    </small>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label for="columnas" class="form-label">
+                        {{ __('Columnas') }}
+                        <span class="text-danger">*</span>
+                    </label>
+                    <input type="number" name="columnas" id="columnas"
+                        class="form-control @error('columnas') is-invalid @enderror" value="{{ old('columnas', 3) }}"
+                        min="1" required placeholder="Ej: 3">
+                    @error('columnas')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                    <small class="form-text text-muted">
+                        Número de columnas por fila
+                    </small>
+                </div>
+            </div>
+        </div>
+
         {{-- Descripcion Field --}}
         <div class="form-group mb-3">
             <label for="descripcion" class="form-label">
@@ -104,11 +145,11 @@
                     const alertDiv = document.createElement('div');
                     alertDiv.className = 'alert alert-success alert-dismissible fade show';
                     alertDiv.innerHTML = `
-                                    {{ session('success') }}
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                `;
+                                            {{ session('success') }}
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        `;
 
                     const formContainer = selectElement.closest('.col-md-12');
                     if (formContainer) {

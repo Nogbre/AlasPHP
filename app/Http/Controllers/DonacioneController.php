@@ -44,7 +44,7 @@ class DonacioneController extends Controller
         $campanas = Campana::pluck('nombre', 'id_campana');
         $puntos = PuntosRecoleccion::pluck('nombre', 'id_punto');
         $productos = Producto::pluck('nombre', 'id_producto');
-        $espacios = Espacio::pluck('codigo_espacio', 'id_espacio');
+        $espacios = Espacio::where('estado', 'disponible')->pluck('codigo_espacio', 'id_espacio');
 
         // Get products with their unit measurements for auto-fill
         $productosData = Producto::select('id_producto', 'nombre', 'unidad_medida')->get();
@@ -116,6 +116,11 @@ class DonacioneController extends Controller
 
                         \Log::info("Detalle #{$index} creado:", ['id' => $detalle->id_detalle]);
 
+                        $espacio = Espacio::find($det['id_espacio']);
+                        if ($espacio && $espacio->estado === 'lleno') {
+                            throw new \Exception("El espacio {$espacio->codigo_espacio} está marcado como lleno y no puede recibir más productos.");
+                        }
+
                         UbicacionesDonacione::create([
                             'id_detalle' => $detalle->id_detalle,
                             'id_espacio' => $det['id_espacio'],
@@ -157,7 +162,7 @@ class DonacioneController extends Controller
         $campanas = Campana::pluck('nombre', 'id_campana');
         $puntos = PuntosRecoleccion::pluck('nombre', 'id_punto');
         $productos = Producto::pluck('nombre', 'id_producto');
-        $espacios = Espacio::pluck('codigo_espacio', 'id_espacio');
+        $espacios = Espacio::where('estado', 'disponible')->pluck('codigo_espacio', 'id_espacio');
 
         // Get products with their unit measurements for auto-fill
         $productosData = Producto::select('id_producto', 'nombre', 'unidad_medida')->get();
@@ -212,6 +217,11 @@ class DonacioneController extends Controller
                             'id_talla' => $det['id_talla'] ?? null,
                             'id_genero' => $det['id_genero'] ?? null,
                         ]);
+
+                        $espacio = Espacio::find($det['id_espacio']);
+                        if ($espacio && $espacio->estado === 'lleno') {
+                            throw new \Exception("El espacio {$espacio->codigo_espacio} está marcado como lleno y no puede recibir más productos.");
+                        }
 
                         UbicacionesDonacione::create([
                             'id_detalle' => $detalle->id_detalle,

@@ -16,7 +16,11 @@ class EspacioController extends Controller
      */
     public function index(Request $request): View
     {
-        $espacios = Espacio::paginate();
+        $espacios = Espacio::with([
+            'estante.almacene',
+            'ubicacionesDonaciones.detalle.producto',
+            'ubicacionesDonaciones.detalle.donacion'
+        ])->paginate();
 
         return view('espacio.index', compact('espacios'))
             ->with('i', ($request->input('page', 1) - 1) * $espacios->perPage());
@@ -62,7 +66,9 @@ class EspacioController extends Controller
      */
     public function show($id): View
     {
-        $espacio = Espacio::find($id);
+        $espacio = Espacio::with([
+            'estante.almacene'
+        ])->find($id);
 
         return view('espacio.show', compact('espacio'));
     }
@@ -97,5 +103,14 @@ class EspacioController extends Controller
 
         return Redirect::route('espacio.index')
             ->with('success', 'Espacio deleted successfully');
+    }
+
+    public function toggleStatus($id): RedirectResponse
+    {
+        $espacio = Espacio::findOrFail($id);
+        $espacio->estado = $espacio->estado === 'lleno' ? 'disponible' : 'lleno';
+        $espacio->save();
+
+        return back()->with('success', 'Estado del espacio actualizado correctamente.');
     }
 }

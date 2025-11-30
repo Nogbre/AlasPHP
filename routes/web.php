@@ -16,7 +16,6 @@ Route::resource('donante', App\Http\Controllers\DonanteController::class)->middl
 Route::resource('usuario', App\Http\Controllers\UsuarioController::class)->middleware('auth');
 Route::resource('almacene', App\Http\Controllers\AlmaceneController::class)->middleware('auth');
 Route::resource('estante', App\Http\Controllers\EstanteController::class)->middleware('auth');
-Route::resource('espacio', App\Http\Controllers\EspacioController::class)->middleware('auth');
 Route::resource('campana', App\Http\Controllers\CampanaController::class)->middleware('auth');
 Route::resource('puntos-recoleccion', App\Http\Controllers\PuntosRecoleccionController::class)->middleware('auth');
 Route::resource('categorias-producto', App\Http\Controllers\CategoriasProductoController::class)->middleware('auth');
@@ -32,3 +31,5 @@ Route::resource('recolectores', App\Http\Controllers\RecolectoresController::cla
 // API routes for cascading dropdowns
 Route::get('api/almacenes/{id}/estantes', [App\Http\Controllers\AlmaceneController::class, 'getEstantes'])->middleware('auth');
 Route::get('api/estantes/{id}/espacios', [App\Http\Controllers\EstanteController::class, 'getEspacios'])->middleware('auth');
+Route::post('espacio/{id}/toggle-status', [App\Http\Controllers\EspacioController::class, 'toggleStatus'])->name('espacio.toggleStatus')->middleware('auth');
+Route::resource('espacio', App\Http\Controllers\EspacioController::class)->middleware('auth');
