@@ -73,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Solicitudes de recolección
     Route::post('/solicitudesRecoleccion', [SolicitudRecoleccionController::class, 'store']);
+    Route::get('/solicitudesRecoleccion/donante/{id}', [SolicitudRecoleccionController::class, 'getByDonante']);
     Route::apiResource('solicitudesRecoleccion', SolicitudRecoleccionController::class)->except(['store']);
     
     // Imágenes

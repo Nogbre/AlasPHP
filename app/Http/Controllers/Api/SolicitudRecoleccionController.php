@@ -18,7 +18,6 @@ class SolicitudRecoleccionController extends Controller
             'ubicacion' => 'nullable|string|max:500',
             'detalle_solicitud' => 'nullable|string',
             'id_donante' => 'required|exists:donantes,id_donante',
-            'id_campana' => 'nullable|exists:campanas,id_campana',
         ]);
 
         try {
@@ -26,8 +25,8 @@ class SolicitudRecoleccionController extends Controller
                 'direccion_recoleccion' => $validated['ubicacion'] ?? null,
                 'observaciones' => $validated['detalle_solicitud'] ?? null,
                 'id_donante' => $validated['id_donante'],
-                'id_campana' => $validated['id_campana'] ?? null,
                 'estado' => 'pendiente',
+                'fecha_creacion' => now(),
             ]);
 
             return response()->json([
@@ -41,6 +40,25 @@ class SolicitudRecoleccionController extends Controller
                 'error' => 'Error al crear solicitud',
                 'message' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * GET /api/solicitudesRecoleccion/donante/{id}
+     */
+    public function getByDonante($donanteId)
+    {
+        try {
+            $solicitudes = SolicitudesRecoleccion::where('id_donante', $donanteId)
+                ->with(['campana', 'imagenes'])
+                ->orderBy('fecha_creacion', 'desc')
+                ->get();
+
+            return response()->json($solicitudes, 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error obteniendo solicitudes: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener solicitudes'], 500);
         }
     }
 
