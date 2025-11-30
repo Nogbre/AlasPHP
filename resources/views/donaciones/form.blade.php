@@ -17,7 +17,13 @@
     </div>
     <div class="card-body">
         <div class="form-group">
-            <label for="id_donante">Donante <span class="text-danger">*</span></label>
+            <label for="id_donante">
+                Donante <span class="text-danger">*</span>
+                <button type="button" class="btn btn-xs btn-info ml-1" data-toggle="modal" data-target="#createDonorModal"
+                    title="Crear nuevo donante">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </label>
             <select name="id_donante" class="form-control @error('id_donante') is-invalid @enderror" id="id_donante">
                 <option value="">Seleccione un donante</option>
                 @foreach($donantes ?? [] as $id => $name)
@@ -44,7 +50,13 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="id_campana">Campaña (opcional)</label>
+                    <label for="id_campana">
+                        Campaña (opcional)
+                        <button type="button" class="btn btn-xs btn-warning ml-1" data-toggle="modal" data-target="#createCampaignModal"
+                            title="Crear nueva campaña">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </label>
                     <select name="id_campana" class="form-control" id="id_campana">
                         <option value="">-- Ninguna --</option>
                         @foreach($campanas ?? [] as $id => $name)
@@ -55,7 +67,13 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="id_punto_recoleccion">Punto de Recolección (opcional)</label>
+                    <label for="id_punto_recoleccion">
+                        Punto de Recolección (opcional)
+                        <button type="button" class="btn btn-xs btn-secondary ml-1" data-toggle="modal" data-target="#createCollectionPointModal"
+                            title="Crear nuevo punto de recolección">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </label>
                     <select name="id_punto_recoleccion" class="form-control" id="id_punto_recoleccion">
                         <option value="">-- Ninguno --</option>
                         @foreach($puntos ?? [] as $id => $name)
@@ -110,7 +128,12 @@
                 <table class="table table-bordered table-hover" id="detalles-table">
                     <thead class="bg-light">
                         <tr>
-                            <th width="20%">Producto <span class="text-danger">*</span></th>
+                            <th width="20%">
+                                Producto <span class="text-danger">*</span>
+                                <button type="button" class="btn btn-xs btn-success ml-1" data-toggle="modal" data-target="#createProductModal" title="Crear nuevo producto">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </th>
                             <th width="10%">Cantidad <span class="text-danger">*</span></th>
                             <th width="10%">Unidad</th>
                             <th width="15%">Almacén <span class="text-danger">*</span></th>
@@ -153,7 +176,7 @@
                                             @endforeach
                                         </select>
                                     </td>
-                                    <td><input name="detalles[{{ $idx }}][cantidad]" type="number" class="form-control form-control-sm" value="{{ $det['cantidad'] ?? $det->cantidad ?? '' }}" placeholder="1"></td>
+                                    <td><input name="detalles[{{ $idx }}][cantidad]" type="number" class="form-control form-control-sm" value="{{ $det['cantidad'] ?? $det->cantidad ?? '' }}" placeholder="1" min="1" step="1"></td>
                                     <td><input name="detalles[{{ $idx }}][unidad_medida]" class="form-control form-control-sm unidad-input" value="{{ $det['unidad_medida'] ?? $det->unidad_medida ?? '' }}" placeholder="Ej: kg, unidad"></td>
                                     <td>
                                         <select class="form-control form-control-sm almacen-select" data-row="{{ $idx }}">
@@ -193,7 +216,7 @@
                                         @endforeach
                                     </select>
                                 </td>
-                                <td><input name="detalles[0][cantidad]" type="number" class="form-control form-control-sm" placeholder="1"></td>
+                                <td><input name="detalles[0][cantidad]" type="number" class="form-control form-control-sm" placeholder="1" min="1" step="1"></td>
                                 <td><input name="detalles[0][unidad_medida]" class="form-control form-control-sm unidad-input" placeholder="Ej: kg, unidad"></td>
                                 <td>
                                     <select class="form-control form-control-sm almacen-select" data-row="0">
@@ -237,10 +260,13 @@
     </div>
 </div>
 
+
+
 @push('js')
 <script>
 // Product units data from controller
-const productosUnidades = @json($productosUnidades ?? []);
+// Make sure productosUnidades is a let/var so we can update it
+let productosUnidades = @json($productosUnidades ?? []);
 const almacenesData = @json($almacenes ?? []);
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -532,6 +558,397 @@ document.addEventListener('DOMContentLoaded', function(){
             }
         }
     });
+
+    // Quick Product Creation Logic
+    const quickProductForm = document.getElementById('quickProductForm');
+    if(quickProductForm) {
+        quickProductForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando...';
+            
+            fetch('{{ route("producto.store") }}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then(data => {
+                if(data.success) {
+                    // 1. Add new product to all dropdowns
+                    const newOption = new Option(data.producto.nombre, data.producto.id_producto);
+                    document.querySelectorAll('.producto-select').forEach(select => {
+                        select.add(newOption.cloneNode(true));
+                    });
+                    
+                    // 2. Update units data
+                    productosUnidades[data.producto.id_producto] = data.producto.unidad_medida;
+                    
+                    // 3. Select in the last row
+                    const rows = document.querySelectorAll('.detalle-row');
+                    const lastRow = rows[rows.length - 1];
+                    const select = lastRow.querySelector('.producto-select');
+                    select.value = data.producto.id_producto;
+                    select.dispatchEvent(new Event('change'));
+                    
+                    // 4. Close modal and reset form
+                    $('#createProductModal').modal('hide');
+                    quickProductForm.reset();
+                } else {
+                    alert('Error al crear producto: ' + (data.message || 'Error desconocido'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                let errorMessage = 'Ocurrió un error al procesar la solicitud.';
+                
+                if (error.errors) {
+                    errorMessage = 'Errores de validación:\n';
+                    Object.keys(error.errors).forEach(key => {
+                        errorMessage += `- ${error.errors[key].join(', ')}\n`;
+                    });
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                alert(errorMessage);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            });
+        });
+    }
+
+    // Quick Category Creation Logic - Hide product modal while category modal is open
+    const btnOpenCategoryModal = document.getElementById('btnOpenCategoryModal');
+    const closeCategoryModal = document.getElementById('closeCategoryModal');
+    const cancelCategoryModal = document.getElementById('cancelCategoryModal');
+    const quickCategoryForm = document.getElementById('quickCategoryForm');
+
+    // Open category modal
+    if(btnOpenCategoryModal) {
+        btnOpenCategoryModal.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Hide product modal temporarily
+            $('#createProductModal').modal('hide');
+            
+            // Show category modal using Bootstrap modal API
+            setTimeout(function() {
+                $('#createCategoryModal').modal('show');
+                
+                // Focus the first input after modal is shown
+                setTimeout(function() {
+                    $('#category_nombre').focus();
+                }, 300);
+            }, 500); // Wait for product modal to fully hide
+        });
+    }
+
+    // Close category modal function
+    function closeCategoryModalFunc() {
+        // Hide category modal
+        $('#createCategoryModal').modal('hide');
+        
+        // Show product modal again after category modal is hidden
+        setTimeout(function() {
+            $('#createProductModal').modal('show');
+        }, 500);
+        
+        if(quickCategoryForm) {
+            quickCategoryForm.reset();
+        }
+    }
+
+    // Close button handlers
+    if(closeCategoryModal) {
+        closeCategoryModal.addEventListener('click', closeCategoryModalFunc);
+    }
+    if(cancelCategoryModal) {
+        cancelCategoryModal.addEventListener('click', closeCategoryModalFunc);
+    }
+
+    // Category form submission
+    if(quickCategoryForm) {
+        quickCategoryForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando...';
+            
+            fetch('{{ route("categorias-producto.store") }}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then(data => {
+                if(data.success) {
+                    // 1. Add new category to the dropdown in product modal
+                    const categorySelect = document.getElementById('modal_id_categoria');
+                    const newOption = new Option(data.categoria.nombre, data.categoria.id_categoria);
+                    categorySelect.add(newOption);
+                    
+                    // 2. Select the new category
+                    categorySelect.value = data.categoria.id_categoria;
+                    
+                    // 3. Close modal and reset form
+                    closeCategoryModalFunc();
+                } else {
+                    alert('Error al crear categoría: ' + (data.message || 'Error desconocido'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                let errorMessage = 'Ocurrió un error al procesar la solicitud.';
+                
+                if (error.errors) {
+                    errorMessage = 'Errores de validación:\n';
+                    Object.keys(error.errors).forEach(key => {
+                        errorMessage += `- ${error.errors[key].join(', ')}\n`;
+                    });
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                alert(errorMessage);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            });
+        });
+    }
+
+    // Quick Donor Creation Logic
+    const quickDonorForm = document.getElementById('quickDonorForm');
+    if(quickDonorForm) {
+        quickDonorForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando...';
+            
+            fetch('{{ route("donante.store") }}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then(data => {
+                if(data.success) {
+                    // 1. Add new donor to dropdown
+                    const donanteSelect = document.getElementById('id_donante');
+                    const newOption = new Option(data.donante.nombre, data.donante.id_donante);
+                    donanteSelect.add(newOption);
+                    
+                    // 2. Select the new donor
+                    donanteSelect.value = data.donante.id_donante;
+                    
+                    // 3. Close modal and reset form
+                    $('#createDonorModal').modal('hide');
+                    quickDonorForm.reset();
+                } else {
+                    alert('Error al crear donante: ' + (data.message || 'Error desconocido'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                let errorMessage = 'Ocurrió un error al procesar la solicitud.';
+                
+                if (error.errors) {
+                    errorMessage = 'Errores de validación:\n';
+                    Object.keys(error.errors).forEach(key => {
+                        errorMessage += `- ${error.errors[key].join(', ')}\n`;
+                    });
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                alert(errorMessage);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            });
+        });
+    }
+
+    // Quick Campaign Creation Logic
+    const quickCampaignForm = document.getElementById('quickCampaignForm');
+    if(quickCampaignForm) {
+        quickCampaignForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando...';
+
+            fetch('{{ route("campana.store") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then(data => {
+                if(data.success) {
+                    // 1. Add new campaign to dropdown
+                    const campaignSelect = document.getElementById('id_campana');
+                    const newOption = new Option(data.campana.nombre, data.campana.id_campana);
+                    campaignSelect.add(newOption);
+                    
+                    // 2. Select the new campaign
+                    campaignSelect.value = data.campana.id_campana;
+                    
+                    // 3. Close modal and reset form
+                    $('#createCampaignModal').modal('hide');
+                    quickCampaignForm.reset();
+                } else {
+                    alert('Error al crear campaña: ' + (data.message || 'Error desconocido'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                let errorMessage = 'Ocurrió un error al procesar la solicitud.';
+                
+                if (error.errors) {
+                    errorMessage = 'Errores de validación:\n';
+                    Object.keys(error.errors).forEach(key => {
+                        errorMessage += `- ${error.errors[key].join(', ')}\n`;
+                    });
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                alert(errorMessage);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            });
+        });
+    }
+
+    // Quick Collection Point Creation Logic
+    const quickCollectionPointForm = document.getElementById('quickCollectionPointForm');
+    if(quickCollectionPointForm) {
+        quickCollectionPointForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando...';
+
+            fetch('{{ route("puntos-recoleccion.store") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then(data => {
+                if(data.success) {
+                    // 1. Add new point to the dropdown
+                    const pointSelect = document.getElementById('id_punto_recoleccion');
+                    const newOption = document.createElement('option');
+                    newOption.value = data.punto.id_punto_recoleccion;
+                    newOption.text = data.punto.nombre;
+                    newOption.selected = true;
+                    pointSelect.appendChild(newOption);
+                    
+                    // 2. Close modal and reset form
+                    $('#createCollectionPointModal').modal('hide');
+                    quickCollectionPointForm.reset();
+                    
+                    // 3. Show success message (optional)
+                    // alert('Punto de recolección creado exitosamente');
+                } else {
+                    alert('Error al crear punto de recolección: ' + (data.message || 'Error desconocido'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                let errorMessage = 'Ocurrió un error al procesar la solicitud.';
+                
+                if (error.errors) {
+                    // Validation errors
+                    errorMessage = 'Errores de validación:\n';
+                    Object.keys(error.errors).forEach(key => {
+                        errorMessage += `- ${error.errors[key].join(', ')}\n`;
+                    });
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                alert(errorMessage);
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            });
+        });
+    }
 });
 </script>
 @endpush

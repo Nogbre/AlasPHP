@@ -22,7 +22,21 @@ class CategoriasProductoRequest extends FormRequest
     public function rules(): array
     {
         return [
-		'nombre' => 'required|string',
+            'nombre' => 'required|string',
         ];
+    }
+
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        if ($this->expectsJson()) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                response()->json([
+                    'success' => false,
+                    'message' => 'Error de validación',
+                    'errors' => $validator->errors()
+                ], 422)
+            );
+        }
+        parent::failedValidation($validator);
     }
 }

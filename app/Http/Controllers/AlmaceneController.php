@@ -80,7 +80,7 @@ class AlmaceneController extends Controller
         $almacene->update($request->validated());
 
         return Redirect::route('almacene.index')
-            ->with('success', 'Almacene updated successfully');
+            ->with('success', 'Almacén actualizado exitosamente.');
     }
 
     public function destroy($id): RedirectResponse

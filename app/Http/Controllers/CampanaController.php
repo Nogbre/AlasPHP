@@ -35,12 +35,20 @@ class CampanaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CampanaRequest $request): RedirectResponse
+    public function store(CampanaRequest $request)
     {
-        Campana::create($request->validated());
+        $campana = Campana::create($request->validated());
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Campaña creada exitosamente',
+                'campana' => $campana
+            ]);
+        }
 
         return Redirect::route('campana.index')
-            ->with('success', 'Campana created successfully.');
+            ->with('success', 'Campaña creada exitosamente.');
     }
 
     /**
@@ -71,7 +79,7 @@ class CampanaController extends Controller
         $campana->update($request->validated());
 
         return Redirect::route('campana.index')
-            ->with('success', 'Campana updated successfully');
+            ->with('success', 'Campaña actualizada exitosamente.');
     }
 
     public function destroy($id): RedirectResponse
@@ -79,6 +87,6 @@ class CampanaController extends Controller
         Campana::find($id)->delete();
 
         return Redirect::route('campana.index')
-            ->with('success', 'Campana deleted successfully');
+            ->with('success', 'Campaña eliminada exitosamente.');
     }
 }

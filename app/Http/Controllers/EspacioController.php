@@ -94,7 +94,7 @@ class EspacioController extends Controller
         $espacio->update($request->validated());
 
         return Redirect::route('espacio.index')
-            ->with('success', 'Espacio updated successfully');
+            ->with('success', 'Espacio actualizado exitosamente.');
     }
 
     public function destroy($id): RedirectResponse
@@ -102,7 +102,7 @@ class EspacioController extends Controller
         Espacio::find($id)->delete();
 
         return Redirect::route('espacio.index')
-            ->with('success', 'Espacio deleted successfully');
+            ->with('success', 'Espacio eliminado exitosamente.');
     }
 
     public function toggleStatus($id): RedirectResponse

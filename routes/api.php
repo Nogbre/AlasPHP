@@ -26,15 +26,15 @@ Route::get('/donaciones/dinero', [DonacionController::class, 'getAllMoneyDonatio
 
 // Rutas protegidas con autenticación Sanctum
 Route::middleware('auth:sanctum')->group(function () {
-    
+
     // Logout
     Route::post('/donante-auth/logout', [DonanteAuthController::class, 'logout']);
     Route::post('/auth/logout', [VoluntarioAuthController::class, 'logout']);
-    
+
     // Usuarios
     Route::get('/users/{userId}', [UserController::class, 'show']);
     Route::apiResource('users', UserController::class);
-    
+
     // Donaciones
     Route::post('/donaciones', [DonacionController::class, 'store']);
     Route::put('/donaciones-en-dinero/{id}', [DonacionController::class, 'updateMoneyDonation']);
@@ -43,39 +43,39 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/donaciones-en-dinero/getAllById/{id}', [DonacionController::class, 'getMoneyDonationsByDonante']);
     Route::get('/donaciones/dinero/donante/{id}', [DonacionController::class, 'getMoneyDonationsByDonante']); // Alias para compatibilidad
     Route::patch('/donaciones/estado/{id}', [DonacionController::class, 'updateEstado']);
-    Route::apiResource('donaciones', DonacionController::class);
-    
+    Route::apiResource('donaciones', DonacionController::class)->names('api.donaciones');
+
     // Campañas
     Route::apiResource('campanas', CampanaController::class);
-    
+
     // Puntos de recolección
     Route::get('/puntos-de-recoleccion/campana/{id}', [PuntoRecoleccionController::class, 'getByCampana']);
     Route::apiResource('puntos-de-recoleccion', PuntoRecoleccionController::class);
-    
+
     // Almacenes
     Route::get('/almacenes', [AlmacenController::class, 'index']);
     Route::apiResource('almacenes', AlmacenController::class)->except(['index']);
-    
+
     // Estantes
     Route::get('/estantes', [EstanteController::class, 'index']);
     Route::get('/estantes/almacen/{id}', [EstanteController::class, 'getByAlmacen']);
     Route::apiResource('estantes', EstanteController::class)->except(['index']);
-    
+
     // Inventario
     Route::get('/inventario/stock', [InventarioController::class, 'getStock']);
     Route::get('/inventario/stock/articulo/{id}', [InventarioController::class, 'getStockByArticulo']);
     Route::get('/inventario/stock/estante/{id}', [InventarioController::class, 'getStockByEstante']);
     Route::apiResource('inventario', InventarioController::class);
-    
+
     // Dashboard
     Route::get('/dashboard/total-donaciones', [DashboardController::class, 'getTotalDonaciones']);
     Route::get('/dashboard/donaciones-por-mes/{year}', [DashboardController::class, 'getDonacionesPorMes']);
-    
+
     // Solicitudes de recolección
     Route::post('/solicitudesRecoleccion', [SolicitudRecoleccionController::class, 'store']);
     Route::get('/solicitudesRecoleccion/donante/{id}', [SolicitudRecoleccionController::class, 'getByDonante']);
     Route::apiResource('solicitudesRecoleccion', SolicitudRecoleccionController::class)->except(['store']);
-    
+
     // Imágenes
     Route::post('/imagenes-solicitud-recogida', [ImagenController::class, 'upload']);
     Route::apiResource('imagenes-solicitud-recogida', ImagenController::class);
