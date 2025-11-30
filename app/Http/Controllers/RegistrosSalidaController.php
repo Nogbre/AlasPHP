@@ -72,7 +72,7 @@ class RegistrosSalidaController extends Controller
         $registrosSalida->update($request->validated());
 
         return Redirect::route('registros-salida.index')
-            ->with('success', 'RegistrosSalida updated successfully');
+            ->with('success', 'Registro de salida actualizado exitosamente.');
     }
 
     public function destroy($id): RedirectResponse
@@ -80,6 +80,6 @@ class RegistrosSalidaController extends Controller
         RegistrosSalida::find($id)->delete();
 
         return Redirect::route('registros-salida.index')
-            ->with('success', 'RegistrosSalida deleted successfully');
+            ->with('success', 'Registro de salida eliminado exitosamente.');
     }
 }

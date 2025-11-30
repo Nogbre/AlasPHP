@@ -35,12 +35,20 @@ class CategoriasProductoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CategoriasProductoRequest $request): RedirectResponse
+    public function store(CategoriasProductoRequest $request)
     {
-        CategoriasProducto::create($request->validated());
+        $categoria = CategoriasProducto::create($request->validated());
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'categoria' => $categoria,
+                'message' => 'Categoría creada exitosamente'
+            ]);
+        }
 
         return Redirect::route('categorias-producto.index')
-            ->with('success', 'CategoriasProducto created successfully.');
+            ->with('success', 'Categoría de producto creada exitosamente.');
     }
 
     /**
@@ -71,7 +79,7 @@ class CategoriasProductoController extends Controller
         $categoriasProducto->update($request->validated());
 
         return Redirect::route('categorias-producto.index')
-            ->with('success', 'CategoriasProducto updated successfully');
+            ->with('success', 'Categoría de producto actualizada exitosamente.');
     }
 
     public function destroy($id): RedirectResponse
@@ -79,6 +87,6 @@ class CategoriasProductoController extends Controller
         CategoriasProducto::find($id)->delete();
 
         return Redirect::route('categorias-producto.index')
-            ->with('success', 'CategoriasProducto deleted successfully');
+            ->with('success', 'Categoría de producto eliminada exitosamente.');
     }
 }

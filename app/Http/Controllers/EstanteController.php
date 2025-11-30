@@ -157,7 +157,7 @@ class EstanteController extends Controller
         $estante->update($request->validated());
 
         return Redirect::route('estante.index')
-            ->with('success', 'Estante updated successfully');
+            ->with('success', 'Estante actualizado exitosamente.');
     }
 
     public function destroy($id): RedirectResponse
@@ -165,7 +165,7 @@ class EstanteController extends Controller
         Estante::find($id)->delete();
 
         return Redirect::route('estante.index')
-            ->with('success', 'Estante deleted successfully');
+            ->with('success', 'Estante eliminado exitosamente.');
     }
 
     public function getEspacios($id)

@@ -36,18 +36,27 @@ class DonanteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(DonanteRequest $request): RedirectResponse
+    public function store(DonanteRequest $request)
     {
         $data = $request->validated();
-        
+
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         }
-        
-        Donante::create($data);
+
+        $donante = Donante::create($data);
+
+        // If AJAX request, return JSON
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Donante creado exitosamente',
+                'donante' => $donante
+            ]);
+        }
 
         return Redirect::route('donante.index')
-            ->with('success', 'Donante created successfully.');
+            ->with('success', 'Donante creado exitosamente.');
     }
 
     /**
@@ -77,17 +86,17 @@ class DonanteController extends Controller
     {
         $donante = Donante::findOrFail($id);
         $data = $request->validated();
-        
+
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         } else {
             unset($data['password']);
         }
-        
+
         $donante->update($data);
 
         return Redirect::route('donante.index')
-            ->with('success', 'Donante updated successfully');
+            ->with('success', 'Donante actualizado exitosamente.');
     }
 
     public function destroy($id): RedirectResponse
@@ -95,6 +104,6 @@ class DonanteController extends Controller
         Donante::find($id)->delete();
 
         return Redirect::route('donante.index')
-            ->with('success', 'Donante deleted successfully');
+            ->with('success', 'Donante eliminado exitosamente.');
     }
 }

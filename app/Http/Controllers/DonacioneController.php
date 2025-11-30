@@ -53,8 +53,9 @@ class DonacioneController extends Controller
         // Provide an empty model instance so the form can safely access $donacion
         $donacion = new Donacione();
         $almacenes = \App\Models\Almacene::pluck('nombre', 'id_almacen');
+        $categorias = \App\Models\CategoriasProducto::pluck('nombre', 'id_categoria');
 
-        return view('donaciones.create', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades', 'almacenes'));
+        return view('donaciones.create', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades', 'almacenes', 'categorias'));
     }
 
     public function store(DonacioneRequest $request): RedirectResponse
@@ -148,9 +149,14 @@ class DonacioneController extends Controller
         }
     }
 
-    public function show($id): View
+    public function show($id)
     {
         $donacion = Donacione::with(['detalles.producto', 'dinero', 'donante'])->find($id);
+
+        if (!$donacion) {
+            return redirect()->route('donaciones.index')->with('error', 'Donación no encontrada.');
+        }
+
         return view('donaciones.show', compact('donacion'));
     }
 
@@ -168,8 +174,9 @@ class DonacioneController extends Controller
         $productosData = Producto::select('id_producto', 'nombre', 'unidad_medida')->get();
         $productosUnidades = $productosData->pluck('unidad_medida', 'id_producto')->toArray();
         $almacenes = \App\Models\Almacene::pluck('nombre', 'id_almacen');
+        $categorias = \App\Models\CategoriasProducto::pluck('nombre', 'id_categoria');
 
-        return view('donaciones.edit', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades', 'almacenes'));
+        return view('donaciones.edit', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades', 'almacenes', 'categorias'));
     }
 
     public function update(DonacioneRequest $request, Donacione $donacione): RedirectResponse

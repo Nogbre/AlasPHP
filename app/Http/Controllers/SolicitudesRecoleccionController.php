@@ -44,7 +44,7 @@ class SolicitudesRecoleccionController extends Controller
         SolicitudesRecoleccion::create($request->validated());
 
         return Redirect::route('solicitudes-recoleccions.index')
-            ->with('success', 'SolicitudesRecoleccion created successfully.');
+            ->with('success', 'Solicitud de recolección creada exitosamente.');
     }
 
     /**
@@ -77,7 +77,7 @@ class SolicitudesRecoleccionController extends Controller
         $solicitudesRecoleccion->update($request->validated());
 
         return Redirect::route('solicitudes-recoleccions.index')
-            ->with('success', 'SolicitudesRecoleccion updated successfully');
+            ->with('success', 'Solicitud de recolección actualizada exitosamente.');
     }
 
     public function destroy($id): RedirectResponse
@@ -85,6 +85,6 @@ class SolicitudesRecoleccionController extends Controller
         SolicitudesRecoleccion::find($id)->delete();
 
         return Redirect::route('solicitudes-recoleccions.index')
-            ->with('success', 'SolicitudesRecoleccion deleted successfully');
+            ->with('success', 'Solicitud de recolección eliminada exitosamente.');
     }
 }

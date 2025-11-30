@@ -12,19 +12,23 @@
                     <div class="card-header">
                         <span class="card-title">{{ __('Edit Donación') }}</span>
                     </div>
-                    <form method="POST" action="{{ route('donaciones.update', $donacion->id_donacion) }}" role="form" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('donaciones.update', $donacion->id_donacion) }}" role="form"
+                        enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <div class="card-body">
                             @include('donaciones.form')
                         </div>
                         <div class="card-footer">
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> {{ __('Actualizar Donación') }}</button>
-                            <a href="{{ route('donaciones.index') }}" class="btn btn-secondary"><i class="fas fa-times"></i> {{ __('Cancelar') }}</a>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i>
+                                {{ __('Actualizar Donación') }}</button>
+                            <a href="{{ route('donaciones.index') }}" class="btn btn-secondary"><i class="fas fa-times"></i>
+                                {{ __('Cancelar') }}</a>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
     </section>
+    @include('donaciones.modals')
 @endsection

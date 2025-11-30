@@ -29,4 +29,22 @@ class PuntosRecoleccionRequest extends FormRequest
             'longitud' => 'nullable|numeric|between:-180,180',
         ];
     }
+
+    /**
+     * Handle a failed validation attempt for AJAX requests.
+     */
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        if ($this->expectsJson()) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                response()->json([
+                    'success' => false,
+                    'message' => 'Error de validación',
+                    'errors' => $validator->errors()
+                ], 422)
+            );
+        }
+
+        parent::failedValidation($validator);
+    }
 }

@@ -30,4 +30,18 @@ class CampanaRequest extends FormRequest
             'imagen_banner' => 'nullable|string|max:255',
         ];
     }
+
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        if ($this->expectsJson()) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                response()->json([
+                    'success' => false,
+                    'message' => 'Error de validación',
+                    'errors' => $validator->errors()
+                ], 422)
+            );
+        }
+        parent::failedValidation($validator);
+    }
 }
