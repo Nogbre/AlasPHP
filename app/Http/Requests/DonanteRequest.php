@@ -27,11 +27,11 @@ class DonanteRequest extends FormRequest
             'email' => 'nullable|email|max:100',
             'telefono' => 'nullable|string|max:20',
             'direccion' => 'nullable|string',
+            'cambiar_password' => 'nullable|boolean',
         ];
 
-        // Solo requerir id_donante cuando se está actualizando
+        // Validación de password según el método
         if ($this->isMethod('patch') || $this->isMethod('put')) {
-            $rules['id_donante'] = 'required';
             $rules['password'] = 'nullable|string|min:6';
         } else {
             // En creación, password es requerido

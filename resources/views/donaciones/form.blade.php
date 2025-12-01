@@ -102,7 +102,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="moneda">Moneda</label>
-                        <input type="text" name="moneda" class="form-control" value="{{ old('moneda', $donacion?->dinero->moneda ?? 'BOB') }}" placeholder="BOB">
+                        <input type="text" name="moneda" class="form-control" value="BOB" readonly style="background-color: #e9ecef;">
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -118,8 +118,39 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="referencia_pago">Referencia de Pago</label>
-                <input type="text" name="referencia_pago" class="form-control" value="{{ old('referencia_pago', $donacion?->dinero->referencia_pago ?? '') }}" placeholder="Ej: Nº recibo, código transacción">
+                <label for="referencia_pago_file">Referencia de Pago (Imagen de comprobante)</label>
+                <div class="custom-file">
+                    <input type="file" name="referencia_pago_file" class="custom-file-input @error('referencia_pago_file') is-invalid @enderror" 
+                        id="referencia_pago_file" accept="image/*" onchange="previewReferenciaPago(event)">
+                    <label class="custom-file-label" for="referencia_pago_file">Seleccionar comprobante...</label>
+                </div>
+                @error('referencia_pago_file')
+                    <span class="invalid-feedback d-block" role="alert"><strong>{{ $message }}</strong></span>
+                @enderror
+                <small class="form-text text-muted">Formatos permitidos: JPG, PNG, GIF, PDF. Tamaño máximo: 5MB</small>
+                
+                @if($donacion?->dinero?->referencia_pago)
+                    <div class="mt-3">
+                        <label>Comprobante actual:</label>
+                        <div>
+                            @if(Str::endsWith($donacion->dinero->referencia_pago, '.pdf'))
+                                <a href="{{ asset($donacion->dinero->referencia_pago) }}" target="_blank" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-file-pdf"></i> Ver PDF
+                                </a>
+                            @else
+                                <img src="{{ asset($donacion->dinero->referencia_pago) }}" alt="Comprobante" 
+                                    class="img-thumbnail" style="max-width: 300px; max-height: 200px;" id="current-referencia">
+                            @endif
+                        </div>
+                    </div>
+                @endif
+                
+                <div class="mt-3" id="preview-referencia-container" style="display: none;">
+                    <label>Vista previa:</label>
+                    <div>
+                        <img id="referencia-preview" class="img-thumbnail" style="max-width: 300px; max-height: 200px;">
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -950,5 +981,39 @@ document.addEventListener('DOMContentLoaded', function(){
         });
     }
 });
+
+// Preview de referencia de pago
+function previewReferenciaPago(event) {
+    const file = event.target.files[0];
+    const label = event.target.nextElementSibling;
+    const previewContainer = document.getElementById('preview-referencia-container');
+    const preview = document.getElementById('referencia-preview');
+    const currentReferencia = document.getElementById('current-referencia');
+    
+    if (file) {
+        label.textContent = file.name;
+        
+        // Solo mostrar preview si es imagen
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                previewContainer.style.display = 'block';
+                if (currentReferencia) {
+                    currentReferencia.style.opacity = '0.5';
+                }
+            };
+            reader.readAsDataURL(file);
+        } else {
+            previewContainer.style.display = 'none';
+        }
+    } else {
+        label.textContent = 'Seleccionar comprobante...';
+        previewContainer.style.display = 'none';
+        if (currentReferencia) {
+            currentReferencia.style.opacity = '1';
+        }
+    }
+}
 </script>
 @endpush

@@ -21,7 +21,7 @@ class SolicitudesRecoleccionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
 			'id_donante' => 'required|integer|exists:donantes,id_donante',
 			'id_recolector' => 'nullable|integer|exists:usuarios,id_usuario',
 			'direccion_recoleccion' => 'required|string',
@@ -29,12 +29,5 @@ class SolicitudesRecoleccionRequest extends FormRequest
 			'observaciones' => 'nullable|string',
 			'estado' => 'nullable|string|max:30',
         ];
-        
-        // Solo requerir id_solicitud cuando se está actualizando
-        if ($this->isMethod('patch') || $this->isMethod('put')) {
-            $rules['id_solicitud'] = 'required';
-        }
-        
-        return $rules;
     }
 }

@@ -41,12 +41,19 @@ class Donante extends Model
     public $incrementing = true;
     protected $keyType = 'int';
     
-    protected $fillable = ['nombre', 'tipo', 'email', 'telefono', 'direccion', 'fecha_registro', 'deleted_by', 'password'];
+    protected $fillable = ['nombre', 'tipo', 'email', 'telefono', 'direccion', 'fecha_registro', 'deleted_by', 'password', 'cambiar_password'];
 
     /**
      * Campos ocultos en serialización JSON
      */
     protected $hidden = ['password'];
+    
+    /**
+     * Los atributos que deben ser casteados.
+     */
+    protected $casts = [
+        'cambiar_password' => 'boolean',
+    ];
 
     /**
      * Get the route key for the model.

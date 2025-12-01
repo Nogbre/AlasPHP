@@ -27,7 +27,7 @@ class CampanaRequest extends FormRequest
             'descripcion' => 'nullable|string',
             'fecha_inicio' => 'nullable|date',
             'fecha_fin' => 'nullable|date',
-            'imagen_banner' => 'nullable|string|max:255',
+            'imagen_banner_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 

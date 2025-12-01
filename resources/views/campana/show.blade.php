@@ -115,9 +115,26 @@
             @if($campana->imagen_banner)
                 <dt class="col-sm-3">Banner:</dt>
                 <dd class="col-sm-9">
-                    <span class="badge badge-primary">
-                        <i class="fas fa-image"></i> {{ $campana->imagen_banner }}
-                    </span>
+                    <div class="mb-2">
+                        <img src="{{ asset($campana->imagen_banner) }}" 
+                             alt="Banner de {{ $campana->nombre }}" 
+                             class="img-thumbnail"
+                             style="max-width: 100%; max-height: 400px; cursor: pointer;"
+                             onclick="showImageModal('{{ asset($campana->imagen_banner) }}', 'Banner de {{ $campana->nombre }}')">
+                    </div>
+                    <div>
+                        <button type="button" 
+                                class="btn btn-sm btn-primary"
+                                onclick="showImageModal('{{ asset($campana->imagen_banner) }}', 'Banner de {{ $campana->nombre }}')">
+                            <i class="fas fa-search-plus"></i> Ver imagen completa
+                        </button>
+                        <small class="text-muted d-block mt-2">
+                            <i class="fas fa-link"></i> URL: 
+                            <a href="{{ url($campana->imagen_banner) }}" target="_blank" class="text-primary">
+                                <code>{{ url($campana->imagen_banner) }}</code>
+                            </a>
+                        </small>
+                    </div>
                 </dd>
             @endif
         </dl>
@@ -151,5 +168,43 @@
         font-size: 0.9rem;
         padding: 0.4rem 0.6rem;
     }
+    .modal-image {
+        width: 100%;
+        height: auto;
+        max-height: 80vh;
+        object-fit: contain;
+    }
 </style>
 @stop
+
+@section('js')
+<script>
+function showImageModal(imageUrl, imageTitle) {
+    $('#imageModalLabel').text(imageTitle);
+    $('#modalImage').attr('src', imageUrl);
+    $('#imageModal').modal('show');
+}
+</script>
+@stop
+
+<!-- Modal para ver imagen completa -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title" id="imageModalLabel">Imagen</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center p-0">
+                <img id="modalImage" src="" alt="Imagen" class="modal-image">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -356,6 +356,12 @@ return [
             'url' => '/producto',
             'icon' => 'fas fa-fw fa-box-open',
         ],
+        ['header' => 'ANÁLISIS'],
+        [
+            'text' => 'Reportes',
+            'url' => '/reportes',
+            'icon' => 'fas fa-fw fa-chart-bar',
+        ],
         ['header' => 'GESTIÓN'],
         [
             'text' => 'Donantes',

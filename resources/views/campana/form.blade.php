@@ -74,18 +74,34 @@
 
             <div class="col-md-12">
                 <div class="form-group">
-                    <label for="imagen_banner">URL Imagen Banner (Opcional)</label>
+                    <label for="imagen_banner_file">Imagen Banner (Opcional)</label>
                     <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fas fa-image"></i></span>
+                        <div class="custom-file">
+                            <input type="file" name="imagen_banner_file" class="custom-file-input @error('imagen_banner_file') is-invalid @enderror" 
+                                id="imagen_banner_file" accept="image/*" onchange="previewImage(event)">
+                            <label class="custom-file-label" for="imagen_banner_file">Seleccionar imagen...</label>
                         </div>
-                        <input type="text" name="imagen_banner"
-                            class="form-control @error('imagen_banner') is-invalid @enderror"
-                            value="{{ old('imagen_banner', $campana?->imagen_banner) }}" id="imagen_banner"
-                            placeholder="https://ejemplo.com/imagen.jpg">
-                        @error('imagen_banner')
-                            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
+                        @error('imagen_banner_file')
+                            <span class="invalid-feedback d-block" role="alert"><strong>{{ $message }}</strong></span>
                         @enderror
+                    </div>
+                    <small class="form-text text-muted">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 2MB</small>
+                    
+                    @if($campana?->imagen_banner)
+                        <div class="mt-3">
+                            <label>Imagen actual:</label>
+                            <div>
+                                <img src="{{ asset($campana->imagen_banner) }}" alt="Banner actual" 
+                                    class="img-thumbnail" style="max-width: 300px; max-height: 200px;" id="current-image">
+                            </div>
+                        </div>
+                    @endif
+                    
+                    <div class="mt-3" id="preview-container" style="display: none;">
+                        <label>Vista previa:</label>
+                        <div>
+                            <img id="image-preview" class="img-thumbnail" style="max-width: 300px; max-height: 200px;">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -97,3 +113,33 @@
             Cancelar</a>
     </div>
 </div>
+
+<script>
+function previewImage(event) {
+    const file = event.target.files[0];
+    const label = event.target.nextElementSibling;
+    const previewContainer = document.getElementById('preview-container');
+    const preview = document.getElementById('image-preview');
+    const currentImage = document.getElementById('current-image');
+    
+    if (file) {
+        label.textContent = file.name;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            previewContainer.style.display = 'block';
+            if (currentImage) {
+                currentImage.style.opacity = '0.5';
+            }
+        };
+        reader.readAsDataURL(file);
+    } else {
+        label.textContent = 'Seleccionar imagen...';
+        previewContainer.style.display = 'none';
+        if (currentImage) {
+            currentImage.style.opacity = '1';
+        }
+    }
+}
+</script>

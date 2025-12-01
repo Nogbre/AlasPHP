@@ -43,6 +43,9 @@ class DonanteController extends Controller
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         }
+        
+        // Manejar el checkbox de cambiar_password
+        $data['cambiar_password'] = $request->has('cambiar_password');
 
         $donante = Donante::create($data);
 
@@ -92,6 +95,9 @@ class DonanteController extends Controller
         } else {
             unset($data['password']);
         }
+        
+        // Manejar el checkbox de cambiar_password
+        $data['cambiar_password'] = $request->has('cambiar_password');
 
         $donante->update($data);
 

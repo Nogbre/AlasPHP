@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Logout
     Route::post('/donante-auth/logout', [DonanteAuthController::class, 'logout']);
+    Route::post('/donante-auth/change-password', [DonanteAuthController::class, 'changePassword']);
     Route::post('/auth/logout', [VoluntarioAuthController::class, 'logout']);
 
     // Usuarios
@@ -37,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Donaciones
     Route::post('/donaciones', [DonacionController::class, 'store']);
+    Route::post('/donaciones-en-dinero', [DonacionController::class, 'createMoneyDonation']);
     Route::put('/donaciones-en-dinero/{id}', [DonacionController::class, 'updateMoneyDonation']);
     Route::get('/donantes/{id}/donaciones', [DonacionController::class, 'getByDonante']);
     Route::get('/donaciones/donante/{id}', [DonacionController::class, 'getByDonante']); // Alias para compatibilidad
@@ -78,6 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Imágenes
     Route::post('/imagenes-solicitud-recogida', [ImagenController::class, 'upload']);
+    Route::post('/upload-comprobante', [DonacionController::class, 'uploadComprobante']);
     Route::apiResource('imagenes-solicitud-recogida', ImagenController::class);
 });
 

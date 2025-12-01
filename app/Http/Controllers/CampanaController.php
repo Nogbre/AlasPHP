@@ -37,7 +37,20 @@ class CampanaController extends Controller
      */
     public function store(CampanaRequest $request)
     {
-        $campana = Campana::create($request->validated());
+        $data = $request->validated();
+        
+        // Manejar la subida de imagen
+        if ($request->hasFile('imagen_banner_file')) {
+            $file = $request->file('imagen_banner_file');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/campanas'), $filename);
+            $data['imagen_banner'] = 'images/campanas/' . $filename;
+        }
+        
+        // Remover el campo del archivo ya que no existe en la BD
+        unset($data['imagen_banner_file']);
+        
+        $campana = Campana::create($data);
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -76,7 +89,25 @@ class CampanaController extends Controller
      */
     public function update(CampanaRequest $request, Campana $campana): RedirectResponse
     {
-        $campana->update($request->validated());
+        $data = $request->validated();
+        
+        // Manejar la subida de imagen
+        if ($request->hasFile('imagen_banner_file')) {
+            // Eliminar imagen anterior si existe
+            if ($campana->imagen_banner && file_exists(public_path($campana->imagen_banner))) {
+                unlink(public_path($campana->imagen_banner));
+            }
+            
+            $file = $request->file('imagen_banner_file');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/campanas'), $filename);
+            $data['imagen_banner'] = 'images/campanas/' . $filename;
+        }
+        
+        // Remover el campo del archivo ya que no existe en la BD
+        unset($data['imagen_banner_file']);
+        
+        $campana->update($data);
 
         return Redirect::route('campana.index')
             ->with('success', 'Campaña actualizada exitosamente.');

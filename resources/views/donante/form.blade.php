@@ -111,6 +111,21 @@
 
             <div class="col-md-12">
                 <div class="form-group">
+                    <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                        <input type="checkbox" class="custom-control-input" id="cambiar_password" name="cambiar_password" value="1" 
+                            {{ old('cambiar_password', $donante?->cambiar_password) ? 'checked' : '' }}>
+                        <label class="custom-control-label" for="cambiar_password">
+                            <i class="fas fa-key"></i> Requerir cambio de contraseña en próximo inicio de sesión
+                        </label>
+                    </div>
+                    <small class="form-text text-muted">
+                        Si está activado, el donante deberá cambiar su contraseña al iniciar sesión en la app móvil
+                    </small>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="form-group">
                     <label for="direccion">Dirección</label>
                     <div class="input-group">
                         <div class="input-group-prepend">

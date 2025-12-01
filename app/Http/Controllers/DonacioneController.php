@@ -66,7 +66,7 @@ class DonacioneController extends Controller
         \Log::info('Datos validados:', $data);
 
         try {
-            DB::transaction(function () use ($data) {
+            DB::transaction(function () use ($data, $request) {
                 \Log::info('Iniciando transacción...');
 
                 $donacion = Donacione::create([
@@ -82,12 +82,23 @@ class DonacioneController extends Controller
 
                 if ($data['tipo'] === 'dinero') {
                     \Log::info('Creando registro de dinero...');
+                    
+                    $referenciaPago = null;
+                    
+                    // Manejar la subida de imagen de referencia de pago
+                    if ($request->hasFile('referencia_pago_file')) {
+                        $file = $request->file('referencia_pago_file');
+                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $file->move(public_path('images/comprobantes'), $filename);
+                        $referenciaPago = 'images/comprobantes/' . $filename;
+                    }
+                    
                     \Log::info('Datos dinero:', [
                         'id_donacion' => $donacion->id_donacion,
                         'monto' => $data['monto'] ?? 'NULL',
                         'moneda' => $data['moneda'] ?? 'NULL',
                         'metodo_pago' => $data['metodo_pago'] ?? 'NULL',
-                        'referencia_pago' => $data['referencia_pago'] ?? 'NULL',
+                        'referencia_pago' => $referenciaPago ?? 'NULL',
                     ]);
 
                     DonacionesDinero::create([
@@ -95,7 +106,7 @@ class DonacioneController extends Controller
                         'monto' => $data['monto'],
                         'moneda' => $data['moneda'] ?? null,
                         'metodo_pago' => $data['metodo_pago'] ?? null,
-                        'referencia_pago' => $data['referencia_pago'] ?? null,
+                        'referencia_pago' => $referenciaPago,
                     ]);
 
                     \Log::info('Registro de dinero creado exitosamente');
@@ -184,7 +195,7 @@ class DonacioneController extends Controller
         $data = $request->validated();
 
         try {
-            DB::transaction(function () use ($data, $donacione) {
+            DB::transaction(function () use ($data, $donacione, $request) {
                 $donacione->update([
                     'id_donante' => $data['id_donante'],
                     'tipo' => $data['tipo'],
@@ -202,17 +213,41 @@ class DonacioneController extends Controller
                     $donacione->detalles()->delete();
                 }
 
-                // borrar dinero si existía
-                DonacionesDinero::where('id_donacion', $donacione->id_donacion)->delete();
+                // obtener donación dinero existente
+                $dineroExistente = DonacionesDinero::where('id_donacion', $donacione->id_donacion)->first();
 
                 if ($data['tipo'] === 'dinero') {
-                    DonacionesDinero::create([
-                        'id_donacion' => $donacione->id_donacion,
-                        'monto' => $data['monto'],
-                        'moneda' => $data['moneda'] ?? null,
-                        'metodo_pago' => $data['metodo_pago'] ?? null,
-                        'referencia_pago' => $data['referencia_pago'] ?? null,
-                    ]);
+                    $referenciaPago = $dineroExistente?->referencia_pago;
+                    
+                    // Manejar la subida de nueva imagen de referencia de pago
+                    if ($request->hasFile('referencia_pago_file')) {
+                        // Eliminar imagen anterior si existe
+                        if ($referenciaPago && file_exists(public_path($referenciaPago))) {
+                            unlink(public_path($referenciaPago));
+                        }
+                        
+                        $file = $request->file('referencia_pago_file');
+                        $filename = time() . '_' . $file->getClientOriginalName();
+                        $file->move(public_path('images/comprobantes'), $filename);
+                        $referenciaPago = 'images/comprobantes/' . $filename;
+                    }
+                    
+                    if ($dineroExistente) {
+                        $dineroExistente->update([
+                            'monto' => $data['monto'],
+                            'moneda' => $data['moneda'] ?? null,
+                            'metodo_pago' => $data['metodo_pago'] ?? null,
+                            'referencia_pago' => $referenciaPago,
+                        ]);
+                    } else {
+                        DonacionesDinero::create([
+                            'id_donacion' => $donacione->id_donacion,
+                            'monto' => $data['monto'],
+                            'moneda' => $data['moneda'] ?? null,
+                            'metodo_pago' => $data['metodo_pago'] ?? null,
+                            'referencia_pago' => $referenciaPago,
+                        ]);
+                    }
                 } else {
                     foreach ($data['detalles'] as $det) {
                         $detalle = DonacionDetalle::create([

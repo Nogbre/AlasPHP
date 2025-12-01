@@ -48,6 +48,14 @@ class Producto extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
+    public function categoriaProducto()
+    {
+        return $this->belongsTo(\App\Models\CategoriasProducto::class, 'id_categoria', 'id_categoria');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function categoriasProducto()
     {
         return $this->belongsTo(\App\Models\CategoriasProducto::class, 'id_categoria', 'id_categoria');

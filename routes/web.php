@@ -33,3 +33,11 @@ Route::get('api/almacenes/{id}/estantes', [App\Http\Controllers\AlmaceneControll
 Route::get('api/estantes/{id}/espacios', [App\Http\Controllers\EstanteController::class, 'getEspacios'])->middleware('auth');
 Route::post('espacio/{id}/toggle-status', [App\Http\Controllers\EspacioController::class, 'toggleStatus'])->name('espacio.toggleStatus')->middleware('auth');
 Route::resource('espacio', App\Http\Controllers\EspacioController::class)->middleware('auth');
+
+// Rutas de reportes
+Route::get('reportes', [App\Http\Controllers\ReportesController::class, 'index'])->name('reportes.index')->middleware('auth');
+Route::get('reportes/donaciones-periodo', [App\Http\Controllers\ReportesController::class, 'donacionesPorPeriodo'])->name('reportes.donaciones.periodo')->middleware('auth');
+Route::get('reportes/inventario-almacen', [App\Http\Controllers\ReportesController::class, 'inventarioPorAlmacen'])->name('reportes.inventario.almacen')->middleware('auth');
+Route::get('reportes/solicitudes-recoleccion', [App\Http\Controllers\ReportesController::class, 'solicitudesRecoleccion'])->name('reportes.solicitudes')->middleware('auth');
+Route::get('reportes/salidas-productos', [App\Http\Controllers\ReportesController::class, 'salidasProductos'])->name('reportes.salidas')->middleware('auth');
+Route::get('reportes/campanas', [App\Http\Controllers\ReportesController::class, 'campanasReporte'])->name('reportes.campanas')->middleware('auth');

@@ -29,6 +29,11 @@ class UbicacionesDonacione extends Model
         'cantidad_ubicada'
     ];
 
+    public function donacionDetalle()
+    {
+        return $this->belongsTo(DonacionDetalle::class, 'id_detalle', 'id_detalle');
+    }
+
     public function detalle()
     {
         return $this->belongsTo(DonacionDetalle::class, 'id_detalle', 'id_detalle');

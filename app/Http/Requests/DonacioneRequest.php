@@ -26,7 +26,7 @@ class DonacioneRequest extends FormRequest
             $rules['monto'] = 'required|numeric|min:0.01';
             $rules['moneda'] = 'nullable|string|max:10';
             $rules['metodo_pago'] = 'nullable|string|max:50';
-            $rules['referencia_pago'] = 'nullable|string|max:100';
+            $rules['referencia_pago_file'] = 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:5120';
         }
 
         // Validaciones específicas para tipo especie/ropa

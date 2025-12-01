@@ -104,6 +104,45 @@ class DonacionController extends Controller
     }
 
     /**
+     * POST /api/donaciones-en-dinero
+     * Create a money donation directly
+     */
+    public function createMoneyDonation(Request $request)
+    {
+        $validated = $request->validate([
+            'id_donacion' => 'required|exists:donaciones,id_donacion',
+            'monto' => 'required|numeric|min:0.01',
+            'moneda' => 'nullable|string|max:10',
+            'metodo_pago' => 'nullable|string|max:30',
+            'referencia_pago' => 'nullable|string|max:100',
+            'estado' => 'nullable|string|max:20',
+        ]);
+
+        try {
+            $donacionDinero = DonacionesDinero::create([
+                'id_donacion' => $validated['id_donacion'],
+                'monto' => $validated['monto'],
+                'moneda' => $validated['moneda'] ?? 'BOB',
+                'metodo_pago' => $validated['metodo_pago'] ?? 'Pasarela',
+                'referencia_pago' => $validated['referencia_pago'] ?? null,
+                'estado' => $validated['estado'] ?? 'pendiente',
+            ]);
+
+            return response()->json([
+                'id' => $donacionDinero->id_donacion_dinero,
+                'message' => 'Donación en dinero creada exitosamente'
+            ], 201);
+
+        } catch (\Exception $e) {
+            Log::error('Error creando donación en dinero: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Error al crear donación en dinero',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * GET /api/donantes/{id}/donaciones
      */
     public function getByDonante($donanteId)
@@ -196,4 +235,41 @@ class DonacionController extends Controller
     {
         return Donacione::with(['detalles', 'dinero', 'donante'])->findOrFail($id);
     }
+
+    /**
+     * POST /api/upload-comprobante
+     * Upload payment receipt image
+     */
+    public function uploadComprobante(Request $request)
+    {
+        $request->validate([
+            'comprobante' => 'required|image|mimes:jpeg,png,jpg,gif,pdf|max:5120'
+        ]);
+
+        try {
+            if ($request->hasFile('comprobante')) {
+                $file = $request->file('comprobante');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('images/comprobantes'), $filename);
+                
+                return response()->json([
+                    'path' => 'images/comprobantes/' . $filename,
+                    'url' => url('images/comprobantes/' . $filename),
+                    'message' => 'Comprobante subido exitosamente'
+                ], 200);
+            }
+
+            return response()->json([
+                'error' => 'No se recibió ningún archivo'
+            ], 400);
+
+        } catch (\Exception $e) {
+            Log::error('Error al subir comprobante: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Error al subir comprobante',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
+

@@ -149,7 +149,32 @@
 
                 @if($donacion->dinero->referencia_pago)
                     <dt class="col-sm-3">Referencia:</dt>
-                    <dd class="col-sm-9">{{ $donacion->dinero->referencia_pago }}</dd>
+                    <dd class="col-sm-9">
+                        @if(Str::endsWith($donacion->dinero->referencia_pago, '.pdf'))
+                            <a href="{{ asset($donacion->dinero->referencia_pago) }}" target="_blank" class="btn btn-sm btn-primary">
+                                <i class="fas fa-file-pdf"></i> Ver Comprobante PDF
+                            </a>
+                        @else
+                            <div class="mb-2">
+                                <img src="{{ asset($donacion->dinero->referencia_pago) }}" 
+                                     alt="Comprobante de pago" 
+                                     class="img-thumbnail"
+                                     style="max-width: 100%; max-height: 300px; cursor: pointer;"
+                                     onclick="showImageModal('{{ asset($donacion->dinero->referencia_pago) }}', 'Comprobante de Pago')">
+                            </div>
+                            <button type="button" 
+                                    class="btn btn-sm btn-primary"
+                                    onclick="showImageModal('{{ asset($donacion->dinero->referencia_pago) }}', 'Comprobante de Pago')">
+                                <i class="fas fa-search-plus"></i> Ver imagen completa
+                            </button>
+                        @endif
+                        <small class="text-muted d-block mt-2">
+                            <i class="fas fa-link"></i> URL: 
+                            <a href="{{ url($donacion->dinero->referencia_pago) }}" target="_blank" class="text-primary">
+                                <code>{{ url($donacion->dinero->referencia_pago) }}</code>
+                            </a>
+                        </small>
+                    </dd>
                 @endif
             </dl>
         </div>
@@ -257,5 +282,44 @@
         background-color: #6f42c1;
         color: white;
     }
+    
+    .modal-image {
+        width: 100%;
+        height: auto;
+        max-height: 80vh;
+        object-fit: contain;
+    }
 </style>
 @stop
+
+@section('js')
+<script>
+function showImageModal(imageUrl, imageTitle) {
+    $('#imageModalLabel').text(imageTitle);
+    $('#modalImage').attr('src', imageUrl);
+    $('#imageModal').modal('show');
+}
+</script>
+@stop
+
+<!-- Modal para ver imagen completa -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title" id="imageModalLabel">Imagen</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center p-0">
+                <img id="modalImage" src="" alt="Imagen" class="modal-image">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

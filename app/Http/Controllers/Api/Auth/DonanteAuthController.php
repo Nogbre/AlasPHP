@@ -48,7 +48,30 @@ class DonanteAuthController extends Controller
             'donante' => [
                 'id' => $donante->id_donante,
                 'nombres' => $donante->nombre,
+                'cambiar_password' => $donante->cambiar_password,
             ]
+        ], 200);
+    }
+
+    /**
+     * Cambiar contraseña
+     */
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'nueva_password' => 'required|string|min:6',
+        ]);
+
+        $donante = $request->user();
+        
+        $donante->update([
+            'password' => Hash::make($request->nueva_password),
+            'cambiar_password' => false,
+        ]);
+
+        return response()->json([
+            'message' => 'Contraseña actualizada exitosamente',
+            'cambiar_password' => false,
         ], 200);
     }
 
