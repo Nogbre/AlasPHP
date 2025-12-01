@@ -26,14 +26,14 @@
 
     {{-- Email field --}}
     <div class="input-group mb-3">
-        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-            value="{{ old('email') }}" placeholder="Correo Electrónico" autofocus>
+        <input type="email" name="correo" class="form-control @error('correo') is-invalid @enderror"
+            value="{{ old('correo') }}" placeholder="Correo Electrónico" autofocus>
         <div class="input-group-append">
             <div class="input-group-text">
                 <span class="fas fa-envelope"></span>
             </div>
         </div>
-        @error('email')
+        @error('correo')
             <span class="invalid-feedback" role="alert">
                 <strong>{{ $message }}</strong>
             </span>

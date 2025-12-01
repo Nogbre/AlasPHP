@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
@@ -25,6 +26,8 @@ use Laravel\Sanctum\HasApiTokens;
  * @property $entidad_pertenencia
  * @property $tipo_sangre
  * @property $id_rol
+ * @property $is_recolector
+ * @property $remember_token
  * @property $fecha_registro
  *
  * @property Role $role
@@ -33,7 +36,7 @@ use Laravel\Sanctum\HasApiTokens;
  */
 class Usuario extends Authenticatable
 {
-    use HasApiTokens;
+    use HasApiTokens, Notifiable;
 
     /** 👇 CLAVE: nombre de tabla y PK personalizada */
     protected $table = 'usuarios';
@@ -64,20 +67,56 @@ class Usuario extends Authenticatable
         'entidad_pertenencia',
         'tipo_sangre',
         'id_rol',
+        'is_recolector',
         'fecha_registro'
     ];
 
     /**
      * Campos ocultos en serialización JSON
      */
-    protected $hidden = ['contrasena'];
+    protected $hidden = ['contrasena', 'remember_token'];
 
     /**
      * Método requerido por Authenticatable para obtener la contraseña
+     * Laravel busca 'password' por defecto, le decimos que use 'contrasena'
      */
     public function getAuthPassword()
     {
         return $this->contrasena;
+    }
+
+    /**
+     * Get the name of the unique identifier for the user.
+     * Retorna el nombre de la columna del ID (no del email/correo)
+     */
+    public function getAuthIdentifierName()
+    {
+        return 'id_usuario';
+    }
+
+    /**
+     * Get the unique identifier for the user.
+     * Retorna el valor del ID del usuario
+     */
+    public function getAuthIdentifier()
+    {
+        return $this->id_usuario;
+    }
+
+    /**
+     * Get the column name for the "remember me" token.
+     */
+    public function getRememberTokenName()
+    {
+        return 'remember_token';
+    }
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName()
+    {
+        return 'id_usuario';
     }
 
     /**

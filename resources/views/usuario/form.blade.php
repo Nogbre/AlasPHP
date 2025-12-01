@@ -55,7 +55,7 @@
                 <strong><span class="error-text"></span></strong>
             </span>
         </div>
-        <div class="form-group mb-2 mb20">
+        <div class="form-group mb-2 mb20" style="display: none;">
             <label for="foto_ci" class="form-label">{{ __('Foto Ci') }}</label>
             <input type="text" name="foto_ci" class="form-control @error('foto_ci') is-invalid @enderror" value="{{ old('foto_ci', $usuario?->foto_ci) }}" id="foto_ci" placeholder="Foto Ci">
             @error('foto_ci')
@@ -65,7 +65,19 @@
             @enderror
         </div>
         <div class="form-group mb-2 mb20">
-            <label for="licencia_conducir" class="form-label">{{ __('Licencia Conducir') }}</label>
+            <div class="form-check">
+                <input type="checkbox" name="is_recolector" class="form-check-input" id="is_recolector" value="1" {{ old('is_recolector', $usuario?->is_recolector) ? 'checked' : '' }}>
+                <label class="form-check-label" for="is_recolector">
+                    {{ __('¿Es recolector?') }}
+                </label>
+            </div>
+            <small class="text-muted">Si es recolector, la licencia de conducir será obligatoria</small>
+        </div>
+        <div class="form-group mb-2 mb20" id="licencia-group">
+            <label for="licencia_conducir" class="form-label">
+                {{ __('Licencia Conducir') }} 
+                <span class="text-danger licencia-required" style="display: none;">*</span>
+            </label>
             <input type="text" name="licencia_conducir" class="form-control @error('licencia_conducir') is-invalid @enderror" value="{{ old('licencia_conducir', $usuario?->licencia_conducir) }}" id="licencia_conducir" placeholder="Licencia Conducir" maxlength="50">
             @error('licencia_conducir')
                 <span class="invalid-feedback d-block" role="alert">
@@ -73,7 +85,7 @@
                 </span>
             @enderror
         </div>
-        <div class="form-group mb-2 mb20">
+        <div class="form-group mb-2 mb20" style="display: none;">
             <label for="foto_licencia" class="form-label">{{ __('Foto Licencia') }}</label>
             <input type="text" name="foto_licencia" class="form-control @error('foto_licencia') is-invalid @enderror" value="{{ old('foto_licencia', $usuario?->foto_licencia) }}" id="foto_licencia" placeholder="Foto Licencia">
             @error('foto_licencia')
@@ -127,8 +139,15 @@
             @enderror
         </div>
         <div class="form-group mb-2 mb20">
-            <label for="contrasena" class="form-label">{{ __('Contrasena') }} <span class="text-danger">*</span></label>
-            <input type="password" name="contrasena" class="form-control @error('contrasena') is-invalid @enderror" value="{{ old('contrasena') }}" id="contrasena" placeholder="Contrasena" required>
+            <label for="contrasena" class="form-label">
+                {{ __('Contraseña') }} 
+                @if(!isset($usuario) || !$usuario->id_usuario)
+                    <span class="text-danger">*</span>
+                @else
+                    <small class="text-muted">(dejar en blanco para no cambiar)</small>
+                @endif
+            </label>
+            <input type="password" name="contrasena" class="form-control @error('contrasena') is-invalid @enderror" value="{{ old('contrasena') }}" id="contrasena" placeholder="Contraseña" {{ (!isset($usuario) || !$usuario->id_usuario) ? 'required' : '' }}>
             @error('contrasena')
                 <span class="invalid-feedback d-block error-message" role="alert" data-field="contrasena">
                     <strong>{{ $message }}</strong>
@@ -151,7 +170,7 @@
                 </span>
             @enderror
         </div>
-        <div class="form-group mb-2 mb20">
+        <div class="form-group mb-2 mb20" style="display: none;">
             <label for="entidad_pertenencia" class="form-label">{{ __('Entidad Pertenencia') }}</label>
             <input type="text" name="entidad_pertenencia" class="form-control @error('entidad_pertenencia') is-invalid @enderror" value="{{ old('entidad_pertenencia', $usuario?->entidad_pertenencia) }}" id="entidad_pertenencia" placeholder="Entidad Pertenencia" maxlength="150">
             @error('entidad_pertenencia')
@@ -160,7 +179,7 @@
                 </span>
             @enderror
         </div>
-        <div class="form-group mb-2 mb20">
+        <div class="form-group mb-2 mb20" style="display: none;">
             <label for="tipo_sangre" class="form-label">{{ __('Tipo Sangre') }}</label>
             <input type="text" name="tipo_sangre" class="form-control @error('tipo_sangre') is-invalid @enderror" value="{{ old('tipo_sangre', $usuario?->tipo_sangre) }}" id="tipo_sangre" placeholder="Tipo Sangre" maxlength="5">
             @error('tipo_sangre')
@@ -170,8 +189,15 @@
             @enderror
         </div>
         <div class="form-group mb-2 mb20">
-            <label for="id_rol" class="form-label">{{ __('Id Rol') }}</label>
-            <input type="text" name="id_rol" class="form-control @error('id_rol') is-invalid @enderror" value="{{ old('id_rol', $usuario?->id_rol) }}" id="id_rol" placeholder="Id Rol">
+            <label for="id_rol" class="form-label">{{ __('Rol') }}</label>
+            <select name="id_rol" class="form-control @error('id_rol') is-invalid @enderror" id="id_rol">
+                <option value="">Seleccione un rol</option>
+                @foreach(\App\Models\Role::all() as $role)
+                    <option value="{{ $role->id_rol }}" {{ old('id_rol', $usuario?->id_rol) == $role->id_rol ? 'selected' : '' }}>
+                        {{ $role->nombre_rol }}
+                    </option>
+                @endforeach
+            </select>
             @error('id_rol')
                 <span class="invalid-feedback d-block" role="alert">
                     <strong>{{ $message }}</strong>
@@ -193,6 +219,31 @@
 
 <script>
 $(document).ready(function() {
+    // Manejo del checkbox is_recolector
+    function toggleLicenciaRequired() {
+        const isRecolector = $('#is_recolector').is(':checked');
+        const licenciaInput = $('#licencia_conducir');
+        const requiredMark = $('.licencia-required');
+        
+        if (isRecolector) {
+            licenciaInput.attr('required', 'required');
+            requiredMark.show();
+            $('#licencia-group').addClass('required-field');
+        } else {
+            licenciaInput.removeAttr('required');
+            requiredMark.hide();
+            $('#licencia-group').removeClass('required-field');
+        }
+    }
+    
+    // Ejecutar al cargar la página
+    toggleLicenciaRequired();
+    
+    // Ejecutar al cambiar el checkbox
+    $('#is_recolector').on('change', function() {
+        toggleLicenciaRequired();
+    });
+
     // Validación en tiempo real para campos requeridos
     const requiredFields = {
         'nombres': {

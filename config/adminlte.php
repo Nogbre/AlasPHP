@@ -320,68 +320,94 @@ return [
             'url' => 'home',
             'icon' => 'fas fa-fw fa-tachometer-alt',
         ],
-        ['header' => 'AJUSTES INTERNOS'],
+        // Solo Administrador
+        [
+            'text' => 'Usuarios',
+            'url' => '/usuario',
+            'icon' => 'fas fa-fw fa-users',
+            'can' => 'ver-usuarios',
+        ],
+        // Solo Administrador
+        [
+            'text' => 'Campañas',
+            'url' => '/campana',
+            'icon' => 'fas fa-fw fa-bullhorn',
+            'can' => 'ver-campanas',
+        ],
+        // Solo Administrador
+        [
+            'text' => 'Puntos de Recolección',
+            'url' => '/puntos-recoleccion',
+            'icon' => 'fas fa-fw fa-globe',
+            'can' => 'ver-puntos',
+        ],
+        // Solo Administrador
+        [
+            'text' => 'Categorías de Producto',
+            'url' => '/categorias-producto',
+            'icon' => 'fas fa-fw fa-list',
+            'can' => 'ver-categorias',
+        ],
+        // Solo Administrador
+        [
+            'text' => 'Productos',
+            'url' => '/producto',
+            'icon' => 'fas fa-fw fa-box-open',
+            'can' => 'ver-productos',
+        ],
+        // Solo Administrador
+        [
+            'text' => 'Donantes',
+            'url' => '/donante',
+            'icon' => 'fas fa-fw fa-hand-holding-heart',
+            'can' => 'ver-donantes',
+        ],
+        
+        ['header' => 'ALMACÉN', 'can' => 'ver-almacen'],
+        // Administrador y Almacenista
         [
             'text' => 'Almacenes',
             'url' => '/almacene',
             'icon' => 'fas fa-fw fa-store',
+            'can' => 'ver-almacen',
         ],
         /*[
             'text' => 'Espacios',
             'url' => '/espacio',
             'icon' => 'fas fa-fw fa-box',
+            'can' => 'ver-almacen',
         ],*/
         [
             'text' => 'Inventario',
             'url' => '/donaciones',
             'icon' => 'fas fa-fw fa-box',
-        ],
-        [
-            'text' => 'Campañas',
-            'url' => '/campana',
-            'icon' => 'fas fa-fw fa-bullhorn',
-        ],
-        [
-            'text' => 'Puntos de Recolección',
-            'url' => '/puntos-recoleccion',
-            'icon' => 'fas fa-fw fa-globe',
-        ],
-        [
-            'text' => 'Categorías de Producto',
-            'url' => '/categorias-producto',
-            'icon' => 'fas fa-fw fa-list',
-        ],
-        [
-            'text' => 'Productos',
-            'url' => '/producto',
-            'icon' => 'fas fa-fw fa-box-open',
-        ],
-        ['header' => 'ANÁLISIS'],
-        [
-            'text' => 'Reportes',
-            'url' => '/reportes',
-            'icon' => 'fas fa-fw fa-chart-bar',
-        ],
-        ['header' => 'GESTIÓN'],
-        [
-            'text' => 'Donantes',
-            'url' => '/donante',
-            'icon' => 'fas fa-fw fa-hand-holding-heart',
+            'can' => 'ver-almacen',
         ],
         [
             'text' => 'Solicitudes de Recolección',
             'url' => '/solicitudes-recoleccions',
             'icon' => 'fas fa-fw fa-clipboard-list',
+            'can' => 'ver-almacen',
         ],
         [
             'text' => 'Paquetes',
             'url' => '/paquete',
             'icon' => 'fas fa-fw fa-box',
+            'can' => 'ver-almacen',
         ],
         [
             'text' => 'Registros de Salida',
             'url' => '/registros-salida',
             'icon' => 'fas fa-fw fa-sign-out-alt',
+            'can' => 'ver-almacen',
+        ],
+        
+        ['header' => 'ANÁLISIS', 'can' => 'ver-almacen'],
+        [
+            'text' => 'Reportes',
+            'url' => '/reportes',
+            'icon' => 'fas fa-fw fa-chart-bar',
+            'can' => 'ver-almacen',
         ],
     ],
 

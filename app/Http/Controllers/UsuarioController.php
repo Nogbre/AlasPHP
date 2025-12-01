@@ -37,29 +37,32 @@ class UsuarioController extends Controller
      */
     public function store(UsuarioRequest $request): RedirectResponse
     {
-        Usuario::create($request->validated());
+        $data = $request->validated();
+        
+        // Hash de la contraseña
+        if (isset($data['contrasena'])) {
+            $data['contrasena'] = bcrypt($data['contrasena']);
+        }
+        
+        Usuario::create($data);
 
-        return Redirect::route('usuarios.index')
+        return Redirect::route('usuario.index')
             ->with('success', 'Usuario creado exitosamente.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($id): View
+    public function show(Usuario $usuario): View
     {
-        $usuario = Usuario::find($id);
-
         return view('usuario.show', compact('usuario'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id): View
+    public function edit(Usuario $usuario): View
     {
-        $usuario = Usuario::find($id);
-
         return view('usuario.edit', compact('usuario'));
     }
 
@@ -68,17 +71,27 @@ class UsuarioController extends Controller
      */
     public function update(UsuarioRequest $request, Usuario $usuario): RedirectResponse
     {
-        $usuario->update($request->validated());
+        $data = $request->validated();
+        
+        // Hash de la contraseña solo si se proporciona una nueva
+        if (isset($data['contrasena']) && !empty($data['contrasena'])) {
+            $data['contrasena'] = bcrypt($data['contrasena']);
+        } else {
+            // No actualizar contraseña si está vacía
+            unset($data['contrasena']);
+        }
+        
+        $usuario->update($data);
 
-        return Redirect::route('usuarios.index')
+        return Redirect::route('usuario.index')
             ->with('success', 'Usuario actualizado exitosamente.');
     }
 
-    public function destroy($id): RedirectResponse
+    public function destroy(Usuario $usuario): RedirectResponse
     {
-        Usuario::find($id)->delete();
+        $usuario->delete();
 
-        return Redirect::route('usuarios.index')
+        return Redirect::route('usuario.index')
             ->with('success', 'Usuario eliminado exitosamente.');
     }
 }
