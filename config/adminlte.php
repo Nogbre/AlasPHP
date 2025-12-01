@@ -369,11 +369,6 @@ return [
             'icon' => 'fas fa-fw fa-hand-holding-heart',
         ],
         [
-            'text' => 'Recolectores',
-            'url' => '/recolectores',
-            'icon' => 'fas fa-fw fa-user-tie',
-        ],
-        [
             'text' => 'Solicitudes de Recolección',
             'url' => '/solicitudes-recoleccions',
             'icon' => 'fas fa-fw fa-clipboard-list',
