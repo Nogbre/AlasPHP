@@ -22,6 +22,7 @@ class ProductoRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'id_categoria' => 'required|integer|exists:categorias_productos,id_categoria',
             'nombre' => 'required|string',
             'descripcion' => 'string',
             'unidad_medida' => 'string',

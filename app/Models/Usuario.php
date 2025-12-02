@@ -120,6 +120,23 @@ class Usuario extends Authenticatable
     }
 
     /**
+     * Get the user's name for display (used by AdminLTE).
+     * Combines nombres and apellidos.
+     */
+    public function getNameAttribute()
+    {
+        return trim($this->nombres . ' ' . $this->apellidos);
+    }
+
+    /**
+     * Get the user's email for display (used by AdminLTE).
+     */
+    public function getEmailAttribute()
+    {
+        return $this->correo;
+    }
+
+    /**
      * Relación con roles
      */
     public function role()

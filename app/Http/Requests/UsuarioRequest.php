@@ -38,7 +38,7 @@ class UsuarioRequest extends FormRequest
             'estado' => 'nullable|string|in:Activo,Inactivo',
             'entidad_pertenencia' => 'nullable|string|max:150',
             'tipo_sangre' => 'nullable|string|max:5',
-            'id_rol' => 'nullable|integer|exists:roles,id_rol',
+            'id_rol' => 'required|integer|exists:roles,id_rol',
             'is_recolector' => 'nullable|boolean',
         ];
 
