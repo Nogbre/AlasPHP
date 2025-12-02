@@ -226,6 +226,25 @@ class DonacionController extends Controller
         }
     }
 
+    /**
+     * GET /api/donaciones/especie
+     */
+    public function getAllInKindDonations()
+    {
+        try {
+            $donaciones = Donacione::whereIn('tipo', ['especie', 'ropa'])
+                ->with(['detalles.producto', 'donante', 'campana'])
+                ->orderBy('fecha', 'desc')
+                ->get();
+
+            return response()->json($donaciones, 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error obteniendo donaciones en especie: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener donaciones en especie'], 500);
+        }
+    }
+
     public function index()
     {
         return Donacione::with(['donante', 'campana'])->paginate(20);

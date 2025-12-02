@@ -22,7 +22,9 @@ Route::post('/auth/login', [VoluntarioAuthController::class, 'login']);
 // Rutas públicas
 Route::get('/inventario/por-producto', [InventarioController::class, 'getInventoryByProduct']);
 Route::get('/campanas', [CampanaController::class, 'index']);
+Route::get('/campanas/{id}', [CampanaController::class, 'show']);
 Route::get('/donaciones/dinero', [DonacionController::class, 'getAllMoneyDonations']);
+Route::get('/donaciones/especie', [DonacionController::class, 'getAllInKindDonations']);
 
 // Rutas protegidas con autenticación Sanctum
 Route::middleware('auth:sanctum')->group(function () {
@@ -47,8 +49,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/donaciones/estado/{id}', [DonacionController::class, 'updateEstado']);
     Route::apiResource('donaciones', DonacionController::class)->names('api.donaciones');
 
-    // Campañas
-    Route::apiResource('campanas', CampanaController::class);
+    // Campañas (solo operaciones que requieren autenticación)
+    Route::post('/campanas', [CampanaController::class, 'store']);
+    Route::put('/campanas/{id}', [CampanaController::class, 'update']);
+    Route::delete('/campanas/{id}', [CampanaController::class, 'destroy']);
 
     // Puntos de recolección
     Route::get('/puntos-de-recoleccion/campana/{id}', [PuntoRecoleccionController::class, 'getByCampana']);
