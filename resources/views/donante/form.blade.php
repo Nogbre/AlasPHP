@@ -113,7 +113,7 @@
                 <div class="form-group">
                     <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
                         <input type="checkbox" class="custom-control-input" id="cambiar_password" name="cambiar_password" value="1" 
-                            {{ old('cambiar_password', $donante?->cambiar_password) ? 'checked' : '' }}>
+                            {{ old('cambiar_password', $donante?->cambiar_password ?? true) ? 'checked' : '' }}>
                         <label class="custom-control-label" for="cambiar_password">
                             <i class="fas fa-key"></i> Requerir cambio de contraseña en próximo inicio de sesión
                         </label>
@@ -121,6 +121,9 @@
                     <small class="form-text text-muted">
                         Si está activado, el donante deberá cambiar su contraseña al iniciar sesión en la app móvil
                     </small>
+                    <div class="alert alert-warning mt-2" id="password-warning" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Advertencia:</strong> Desactivar esta opción es un riesgo de seguridad. Solo desactívela si es estrictamente necesario.
+                    </div>
                 </div>
             </div>
 
@@ -163,3 +166,23 @@
             Cancelar</a>
     </div>
 </div>
+
+@push('js')
+<script>
+    $(document).ready(function() {
+        // Mostrar/ocultar advertencia al cambiar el estado del checkbox
+        $('#cambiar_password').on('change', function() {
+            if (!$(this).is(':checked')) {
+                $('#password-warning').slideDown();
+            } else {
+                $('#password-warning').slideUp();
+            }
+        });
+
+        // Verificar estado inicial
+        if (!$('#cambiar_password').is(':checked')) {
+            $('#password-warning').show();
+        }
+    });
+</script>
+@endpush

@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests\DonanteRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\DonanteBienvenida;
 use Illuminate\View\View;
 
 class DonanteController extends Controller
@@ -39,6 +41,9 @@ class DonanteController extends Controller
     public function store(DonanteRequest $request)
     {
         $data = $request->validated();
+        
+        // Guardar la contraseña sin encriptar para enviarla por correo
+        $plainPassword = $data['password'] ?? null;
 
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
@@ -48,6 +53,16 @@ class DonanteController extends Controller
         $data['cambiar_password'] = $request->has('cambiar_password');
 
         $donante = Donante::create($data);
+        
+        // Enviar correo de bienvenida si tiene email y password
+        if ($donante->email && $plainPassword) {
+            try {
+                Mail::to($donante->email)->send(new DonanteBienvenida($donante, $plainPassword));
+            } catch (\Exception $e) {
+                // Log error but don't fail the request
+                \Log::error('Error enviando correo de bienvenida: ' . $e->getMessage());
+            }
+        }
 
         // If AJAX request, return JSON
         if ($request->ajax() || $request->wantsJson()) {
