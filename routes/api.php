@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\SolicitudRecoleccionController;
 use App\Http\Controllers\Api\ImagenController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\CategoriaController;
+use App\Http\Controllers\Api\DonanteController;
 
 // Rutas públicas de autenticación
 Route::post('/donante-auth/login', [DonanteAuthController::class, 'login']);
@@ -25,6 +27,11 @@ Route::get('/campanas', [CampanaController::class, 'index']);
 Route::get('/campanas/{id}', [CampanaController::class, 'show']);
 Route::get('/donaciones/dinero', [DonacionController::class, 'getAllMoneyDonations']);
 Route::get('/donaciones/especie', [DonacionController::class, 'getAllInKindDonations']);
+
+// Nuevos endpoints públicos
+Route::get('/categorias', [CategoriaController::class, 'getAllWithProducts']);
+Route::get('/almacenes-completo', [AlmacenController::class, 'getAllWithStructure']);
+Route::get('/donantes', [DonanteController::class, 'index']);
 
 // Rutas protegidas con autenticación Sanctum
 Route::middleware('auth:sanctum')->group(function () {

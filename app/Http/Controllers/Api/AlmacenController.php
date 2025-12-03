@@ -9,7 +9,31 @@ use Illuminate\Http\Request;
 class AlmacenController extends Controller
 {
     /**
-     * GET /api/almacenes
+     * GET /api/almacenes - Get all almacenes with estantes and espacios
+     */
+    public function getAllWithStructure()
+    {
+        try {
+            $almacenes = Almacene::with(['estantes.espacios'])
+                ->select('id_almacen', 'nombre', 'direccion', 'latitud', 'longitud')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $almacenes
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener almacenes',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * GET /api/almacenes - Simple list
      */
     public function index()
     {
