@@ -27,6 +27,7 @@ Route::get('/campanas', [CampanaController::class, 'index']);
 Route::get('/campanas/{id}', [CampanaController::class, 'show']);
 Route::get('/donaciones/dinero', [DonacionController::class, 'getAllMoneyDonations']);
 Route::get('/donaciones/especie', [DonacionController::class, 'getAllInKindDonations']);
+Route::get('/donaciones/especie/{id}/detalle', [DonacionController::class, 'getInKindDonationDetail']);
 
 // Nuevos endpoints públicos
 Route::get('/categorias', [CategoriaController::class, 'getAllWithProducts']);

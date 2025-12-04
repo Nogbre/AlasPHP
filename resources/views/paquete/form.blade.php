@@ -16,6 +16,11 @@
             </div>
         @endif
 
+        {{-- Campo oculto con id_paquete en modo edición --}}
+        @if(isset($paquete) && $paquete->id_paquete)
+            <input type="hidden" name="id_paquete" value="{{ $paquete->id_paquete }}">
+        @endif
+
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
@@ -28,7 +33,7 @@
                             <input type="text" name="codigo_paquete"
                                 class="form-control @error('codigo_paquete') is-invalid @enderror"
                                 value="{{ old('codigo_paquete', $paquete?->codigo_paquete) }}" id="codigo_paquete"
-                                placeholder="Código del paquete">
+                                placeholder="Código del paquete" readonly>
                         @else
                             <input type="text" name="codigo_paquete" class="form-control"
                                 value="{{ old('codigo_paquete') }}" id="codigo_paquete"

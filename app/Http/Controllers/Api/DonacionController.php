@@ -290,5 +290,93 @@ class DonacionController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * GET /api/donaciones/especie/{id}/detalle
+     * Get detailed information of in-kind donation including location and packages
+     */
+    public function getInKindDonationDetail($id)
+    {
+        try {
+            $donacion = Donacione::with([
+                'donante:id_donante,nombre,email,telefono,tipo',
+                'campana:id_campana,nombre,descripcion',
+                'detalles.producto:id_producto,nombre,descripcion,unidad_medida',
+                'detalles.ubicaciones.espacio.estante.almacene',
+                'detalles.paqueteDetalles.paquete'
+            ])
+            ->where('id_donacion', $id)
+            ->whereIn('tipo', ['especie', 'ropa'])
+            ->first();
+
+            if (!$donacion) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Donación en especie no encontrada'
+                ], 404);
+            }
+
+            // Formatear la respuesta
+            $response = [
+                'id_donacion' => $donacion->id_donacion,
+                'tipo' => $donacion->tipo,
+                'fecha' => $donacion->fecha,
+                'observaciones' => $donacion->observaciones,
+                'donante' => $donacion->donante,
+                'campana' => $donacion->campana,
+                'detalles' => $donacion->detalles->map(function ($detalle) {
+                    return [
+                        'id_detalle_donacion' => $detalle->id_detalle_donacion,
+                        'cantidad' => $detalle->cantidad,
+                        'unidad_medida' => $detalle->unidad_medida,
+                        'producto' => $detalle->producto,
+                        'ubicaciones' => $detalle->ubicaciones->map(function ($ubicacion) {
+                            $espacio = $ubicacion->espacio;
+                            $estante = $espacio ? $espacio->estante : null;
+                            $almacen = $estante ? $estante->almacene : null;
+                            
+                            return [
+                                'id_ubicacion' => $ubicacion->id_ubicacion,
+                                'espacio' => [
+                                    'id_espacio' => $espacio->id_espacio ?? null,
+                                    'codigo_espacio' => $espacio->codigo_espacio ?? null,
+                                ],
+                                'estante' => [
+                                    'id_estante' => $estante->id_estante ?? null,
+                                    'codigo_estante' => $estante->codigo_estante ?? null,
+                                ],
+                                'almacen' => [
+                                    'id_almacen' => $almacen->id_almacen ?? null,
+                                    'nombre' => $almacen->nombre ?? null,
+                                    'direccion' => $almacen->direccion ?? null,
+                                ]
+                            ];
+                        }),
+                        'paquetes' => $detalle->paqueteDetalles->map(function ($paqueteDetalle) {
+                            return [
+                                'id_paquete' => $paqueteDetalle->paquete->id_paquete ?? null,
+                                'codigo_paquete' => $paqueteDetalle->paquete->codigo_paquete ?? null,
+                                'fecha_creacion' => $paqueteDetalle->paquete->fecha_creacion ?? null,
+                                'cantidad_en_paquete' => $paqueteDetalle->cantidad_usada ?? null,
+                            ];
+                        })
+                    ];
+                })
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => $response
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error obteniendo detalle de donación en especie: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener detalle de donación',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
 
