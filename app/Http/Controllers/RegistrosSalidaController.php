@@ -29,7 +29,11 @@ class RegistrosSalidaController extends Controller
     public function create(): View
     {
         $registrosSalida = new RegistrosSalida();
-        $paquetes = Paquete::where('estado', '!=', 'Entregado')->get(); // Solo paquetes no entregados
+        // Excluir paquetes que ya tienen registro de salida
+        $paquetesConSalida = RegistrosSalida::pluck('id_paquete')->toArray();
+        $paquetes = Paquete::where('estado', '!=', 'Entregado')
+            ->whereNotIn('id_paquete', $paquetesConSalida)
+            ->get();
         return view('registros-salida.create', compact('registrosSalida', 'paquetes'));
     }
 
@@ -67,8 +71,9 @@ class RegistrosSalidaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(RegistrosSalidaRequest $request, RegistrosSalida $registrosSalida): RedirectResponse
+    public function update(RegistrosSalidaRequest $request, $id): RedirectResponse
     {
+        $registrosSalida = RegistrosSalida::findOrFail($id);
         $registrosSalida->update($request->validated());
 
         return Redirect::route('registros-salida.index')

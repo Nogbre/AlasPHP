@@ -70,7 +70,7 @@
                                             <td>
                                                 <form action="{{ route('registros-salida.destroy', $registrosSalida->id_salida) }}" method="POST">
                                                     <a class="btn btn-sm btn-primary" href="{{ route('registros-salida.show', $registrosSalida->id_salida) }}" title="Ver"><i class="fas fa-eye"></i></a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('registros-salida.edit', $registrosSalida->id_salida) }}" title="Editar"><i class="fas fa-edit"></i></a>
+                                                    {{-- <a class="btn btn-sm btn-success" href="{{ route('registros-salida.edit', $registrosSalida->id_salida) }}" title="Editar"><i class="fas fa-edit"></i></a> --}}
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Está seguro de eliminar este registro?')" title="Eliminar"><i class="fas fa-trash"></i></button>

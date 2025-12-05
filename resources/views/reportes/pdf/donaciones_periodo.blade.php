@@ -152,7 +152,7 @@
                     <td>#{{ $donacion->id_donacion }}</td>
                     <td>{{ \Carbon\Carbon::parse($donacion->fecha)->format('d/m/Y H:i') }}</td>
                     <td>{{ $donacion->donante->nombre ?? 'Anónimo' }}</td>
-                    <td>{{ $donacion->campana->nombre_campana ?? 'General' }}</td>
+                    <td>{{ $donacion->campana->nombre ?? 'General' }}</td>
                     <td>
                         <span class="badge badge-{{ $donacion->tipo }}">{{ ucfirst($donacion->tipo) }}</span>
                     </td>

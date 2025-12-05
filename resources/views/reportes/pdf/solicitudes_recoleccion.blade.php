@@ -89,7 +89,13 @@
                         @endphp
                         <span class="badge badge-{{ $clase }}">{{ $solicitud->estado }}</span>
                     </td>
-                    <td>{{ $solicitud->recolector->nombre ?? 'Sin asignar' }}</td>
+                    <td>
+                        @if($solicitud->usuario)
+                            {{ $solicitud->usuario->nombres }} {{ $solicitud->usuario->apellidos }}
+                        @else
+                            Sin asignar
+                        @endif
+                    </td>
                     <td style="font-size: 8px;">{{ Str::limit($solicitud->observaciones ?? '-', 30) }}</td>
                 </tr>
             @empty

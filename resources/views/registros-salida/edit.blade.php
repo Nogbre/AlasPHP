@@ -13,7 +13,7 @@
                 @includeif('partials.errors')
                 <form method="POST" action="{{ route('registros-salida.update', $registrosSalida->id_salida) }}" role="form"
                     enctype="multipart/form-data">
-                    {{ method_field('PATCH') }}
+                    {{ method_field('PUT') }}
                     @csrf
                     @include('registros-salida.form')
                 </form>

@@ -50,19 +50,18 @@
         </div>
         <div class="stat-box">
             <div class="label">Recaudación Total</div>
-            <div class="value" style="color: #28a745;">${{ number_format($montoTotalRecaudado, 2) }}</div>
+            <div class="value" style="color: #28a745;">BOB {{ number_format($montoTotalRecaudado, 2) }}</div>
         </div>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th style="width: 8%;">ID</th>
-                <th style="width: 25%;">Nombre</th>
-                <th style="width: 13%;">Inicio</th>
-                <th style="width: 13%;">Fin</th>
-                <th style="width: 13%;">Estado</th>
-                <th style="width: 13%;">Monto Meta</th>
+                <th style="width: 10%;">ID</th>
+                <th style="width: 30%;">Nombre</th>
+                <th style="width: 15%;">Inicio</th>
+                <th style="width: 15%;">Fin</th>
+                <th style="width: 15%;">Estado</th>
                 <th style="width: 15%;">Recaudado</th>
             </tr>
         </thead>
@@ -84,7 +83,9 @@
                         $badgeClass = 'badge-finalizada';
                     }
 
-                    $montoRecaudado = $campana->donaciones_dinero->sum('monto');
+                    $montoRecaudado = $campana->donaciones
+                        ->filter(fn($d) => $d->tipo === 'dinero' && $d->dinero)
+                        ->sum(fn($d) => $d->dinero->monto ?? 0);
                 @endphp
                 <tr>
                     <td>#{{ $campana->id_campana }}</td>
@@ -94,14 +95,13 @@
                     <td class="text-center">
                         <span class="badge {{ $badgeClass }}">{{ $estado }}</span>
                     </td>
-                    <td class="text-right">${{ number_format($campana->monto_meta, 2) }}</td>
                     <td class="text-right">
-                        <span class="amount">${{ number_format($montoRecaudado, 2) }}</span>
+                        <span class="amount">BOB {{ number_format($montoRecaudado, 2) }}</span>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="text-center" style="padding: 20px; color: #999;">
+                    <td colspan="6" class="text-center" style="padding: 20px; color: #999;">
                         No hay campañas registradas
                     </td>
                 </tr>

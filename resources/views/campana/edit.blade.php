@@ -13,7 +13,7 @@
 
             <form method="POST" action="{{ route('campana.update', $campana->id_campana) }}" role="form"
                 enctype="multipart/form-data">
-                {{ method_field('PATCH') }}
+                {{ method_field('PUT') }}
                 @csrf
 
                 @include('campana.form')

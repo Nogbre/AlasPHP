@@ -35,7 +35,7 @@
                         <span class="info-box-icon"><i class="fas fa-dollar-sign"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Total Recaudado</span>
-                            <span class="info-box-number">Bs. {{ number_format($totalRecaudado, 2) }}</span>
+                            <span class="info-box-number">Bs. {{ number_format($montoTotalRecaudado, 2) }}</span>
                         </div>
                     </div>
                 </div>
@@ -75,7 +75,7 @@
                             @endphp
                             <tr>
                                 <td>{{ $campana->id_campana }}</td>
-                                <td>{{ $campana->nombre_campana }}</td>
+                                <td>{{ $campana->nombre }}</td>
                                 <td>{{ $inicio->format('d/m/Y') }}</td>
                                 <td>{{ $fin->format('d/m/Y') }}</td>
                                 <td><span class="badge badge-{{ $badgeClass }}">{{ $estado }}</span></td>

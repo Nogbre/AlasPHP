@@ -47,19 +47,21 @@ class Paquete extends Model
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * Relación comentada porque SolicitudesAyuda no existe
      */
-    public function solicitud()
-    {
-        return $this->belongsTo(\App\Models\SolicitudesAyuda::class, 'id_solicitud', 'id_solicitud');
-    }
+    // public function solicitud()
+    // {
+    //     return $this->belongsTo(\App\Models\SolicitudesAyuda::class, 'id_solicitud', 'id_solicitud');
+    // }
     
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * Relación comentada porque SolicitudesAyuda no existe
      */
-    public function solicitudesAyuda()
-    {
-        return $this->belongsTo(\App\Models\SolicitudesAyuda::class, 'id_solicitud', 'id_solicitud');
-    }
+    // public function solicitudesAyuda()
+    // {
+    //     return $this->belongsTo(\App\Models\SolicitudesAyuda::class, 'id_solicitud', 'id_solicitud');
+    // }
     
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

@@ -105,28 +105,42 @@ class ReportesController extends Controller
                 $q->where('id_almacen', $almacenId);
             });
         })
+        ->whereHas('donacionDetalle.producto') // Solo ubicaciones con producto válido
         ->get();
 
         // Agrupar por producto para calcular totales
         $productosAgrupados = $ubicaciones->groupBy(function($ubicacion) {
             return $ubicacion->donacionDetalle->id_producto ?? 0;
-        })->map(function($grupo) {
+        })
+        ->filter(function($grupo, $key) {
+            return $key > 0; // Filtrar productos con ID 0 o null
+        })
+        ->map(function($grupo) {
             $primerItem = $grupo->first();
             $detalle = $primerItem->donacionDetalle;
+            
+            // Agrupar ubicaciones por almacén/estante/espacio y sumar cantidades
+            $ubicacionesAgrupadas = $grupo->groupBy(function($ub) {
+                $almacen = $ub->espacio->estante->almacene->nombre ?? 'N/A';
+                $estante = $ub->espacio->estante->codigo_estante ?? 'N/A';
+                $espacio = $ub->espacio->codigo_espacio ?? 'N/A';
+                return $almacen . '|' . $estante . '|' . $espacio;
+            })->map(function($ubicacionesGrupo) {
+                $primera = $ubicacionesGrupo->first();
+                return [
+                    'almacen' => $primera->espacio->estante->almacene->nombre ?? 'N/A',
+                    'estante' => $primera->espacio->estante->codigo_estante ?? 'N/A',
+                    'espacio' => $primera->espacio->codigo_espacio ?? 'N/A',
+                    'cantidad' => $ubicacionesGrupo->sum('cantidad_ubicada')
+                ];
+            })->values();
             
             return (object)[
                 'id_producto' => $detalle->id_producto ?? 0,
                 'nombre_producto' => $detalle->producto->nombre ?? 'N/A',
-                'categoria' => $detalle->producto->categoriaProducto->nombre_categoria ?? 'N/A',
+                'categoria' => $detalle->producto->categoriaProducto->nombre ?? 'N/A',
                 'cantidad_total' => $grupo->sum('cantidad_ubicada'),
-                'ubicaciones' => $grupo->map(function($ub) {
-                    return [
-                        'almacen' => $ub->espacio->estante->almacene->nombre_almacen ?? 'N/A',
-                        'estante' => $ub->espacio->estante->codigo_estante ?? 'N/A',
-                        'espacio' => $ub->espacio->codigo_espacio ?? 'N/A',
-                        'cantidad' => $ub->cantidad_ubicada
-                    ];
-                })
+                'ubicaciones' => $ubicacionesAgrupadas
             ];
         })->values();
 
@@ -174,7 +188,7 @@ class ReportesController extends Controller
             'estado' => 'nullable|string',
         ]);
 
-        $solicitudes = SolicitudesRecoleccion::with(['donante', 'recolector'])
+        $solicitudes = SolicitudesRecoleccion::with(['donante', 'usuario'])
             ->when($request->fecha_inicio && $request->fecha_fin, function ($query) use ($request) {
                 return $query->whereBetween('fecha_programada', [
                     $request->fecha_inicio,
@@ -219,8 +233,7 @@ class ReportesController extends Controller
         ]);
 
         $salidas = RegistrosSalida::with([
-            'paquete.detalles.donacionDetalle.producto',
-            'paquete.solicitud'
+            'paquete.detalles.donacionDetalle.producto'
         ])
         ->when($request->fecha_inicio && $request->fecha_fin, function ($query) use ($request) {
             return $query->whereBetween('fecha_salida', [
@@ -290,7 +303,7 @@ class ReportesController extends Controller
             ->get();
 
         $totalCampanas = $campanas->count();
-        $totalRecaudado = $campanas->sum(function ($campana) {
+        $montoTotalRecaudado = $campanas->sum(function ($campana) {
             return $campana->donaciones
                 ->filter(fn($d) => $d->tipo === 'dinero' && $d->dinero)
                 ->sum(fn($d) => $d->dinero->monto ?? 0);
@@ -300,7 +313,7 @@ class ReportesController extends Controller
             return $this->exportarPDF('campanas_reporte', compact(
                 'campanas',
                 'totalCampanas',
-                'totalRecaudado',
+                'montoTotalRecaudado',
                 'request'
             ));
         }
@@ -312,7 +325,7 @@ class ReportesController extends Controller
         return view('reportes.campanas_reporte', compact(
             'campanas',
             'totalCampanas',
-            'totalRecaudado',
+            'montoTotalRecaudado',
             'request'
         ));
     }
@@ -376,7 +389,7 @@ class ReportesController extends Controller
                     echo '<td>' . $item->id_donacion . '</td>';
                     echo '<td>' . \Carbon\Carbon::parse($item->fecha)->format('d/m/Y H:i') . '</td>';
                     echo '<td>' . ($item->donante->nombre ?? 'Anónimo') . '</td>';
-                    echo '<td>' . ($item->campana->nombre_campana ?? 'General') . '</td>';
+                    echo '<td>' . ($item->campana->nombre ?? 'General') . '</td>';
                     echo '<td><span class="badge">' . ucfirst($item->tipo) . '</span></td>';
                     echo '<td class="amount">Bs. ' . number_format($monto, 2) . '</td>';
                     echo '<td>' . $items . '</td>';
@@ -416,13 +429,18 @@ class ReportesController extends Controller
                 echo '</tr></thead><tbody>';
                 
                 foreach ($datos as $item) {
+                    $recolectorNombre = 'Sin asignar';
+                    if ($item->usuario) {
+                        $recolectorNombre = trim($item->usuario->nombres . ' ' . $item->usuario->apellidos);
+                    }
+                    
                     echo '<tr>';
                     echo '<td>' . $item->id_solicitud . '</td>';
                     echo '<td>' . ($item->donante->nombre ?? 'N/A') . '</td>';
                     echo '<td>' . $item->direccion_recoleccion . '</td>';
                     echo '<td>' . \Carbon\Carbon::parse($item->fecha_programada)->format('d/m/Y H:i') . '</td>';
                     echo '<td><span class="badge">' . $item->estado . '</span></td>';
-                    echo '<td>' . ($item->recolector->nombre ?? 'Sin asignar') . '</td>';
+                    echo '<td>' . $recolectorNombre . '</td>';
                     echo '</tr>';
                 }
                 echo '</tbody></table>';
@@ -465,7 +483,7 @@ class ReportesController extends Controller
                         
                     echo '<tr>';
                     echo '<td>' . $item->id_campana . '</td>';
-                    echo '<td><strong>' . $item->nombre_campana . '</strong></td>';
+                    echo '<td><strong>' . $item->nombre . '</strong></td>';
                     echo '<td>' . \Carbon\Carbon::parse($item->fecha_inicio)->format('d/m/Y') . '</td>';
                     echo '<td>' . \Carbon\Carbon::parse($item->fecha_fin)->format('d/m/Y') . '</td>';
                     echo '<td style="text-align: center;">' . $item->donaciones->count() . '</td>';
