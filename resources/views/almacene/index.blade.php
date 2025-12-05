@@ -8,9 +8,11 @@
         <h1><i class="fas fa-warehouse"></i> Gestión de Almacenes</h1>
     </div>
     <div class="col-sm-6">
-        <a href="{{ route('almacene.create') }}" class="btn btn-primary float-right">
-            <i class="fas fa-plus"></i> Nuevo Almacén
-        </a>
+        @can('gestionar-almacen')
+            <a href="{{ route('almacene.create') }}" class="btn btn-primary float-right">
+                <i class="fas fa-plus"></i> Nuevo Almacén
+            </a>
+        @endcan
     </div>
 </div>
 @stop
@@ -114,20 +116,22 @@
                                     title="Ver detalles">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a class="btn btn-warning btn-sm" href="{{ route('almacene.edit', $almacene->id_almacen) }}"
-                                    title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form id="delete-form-{{ $almacene->id_almacen }}"
-                                    action="{{ route('almacene.destroy', $almacene->id_almacen) }}" method="POST"
-                                    style="display: inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" class="btn btn-danger btn-sm" title="Eliminar"
-                                        onclick="confirmDelete('{{ $almacene->id_almacen }}')">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+                                @can('gestionar-almacen')
+                                    <a class="btn btn-warning btn-sm" href="{{ route('almacene.edit', $almacene->id_almacen) }}"
+                                        title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form id="delete-form-{{ $almacene->id_almacen }}"
+                                        action="{{ route('almacene.destroy', $almacene->id_almacen) }}" method="POST"
+                                        style="display: inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="btn btn-danger btn-sm" title="Eliminar"
+                                            onclick="confirmDelete('{{ $almacene->id_almacen }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                @endcan
                             </div>
                         </td>
                     </tr>

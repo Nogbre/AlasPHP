@@ -253,7 +253,7 @@
                                     <select class="form-control form-control-sm almacen-select" data-row="0">
                                         <option value="">-- Seleccione --</option>
                                         @foreach($almacenes ?? [] as $almId => $almName)
-                                            <option value="{{ $almId }}">{{ $almName }}</option>
+                                            <option value="{{ $almId }}" {{ isset($defaultAlmacenId) && $defaultAlmacenId == $almId ? 'selected' : '' }}>{{ $almName }}</option>
                                         @endforeach
                                     </select>
                                 </td>
@@ -299,6 +299,7 @@
 // Make sure productosUnidades is a let/var so we can update it
 let productosUnidades = @json($productosUnidades ?? []);
 const almacenesData = @json($almacenes ?? []);
+const defaultAlmacenId = @json($defaultAlmacenId ?? null);
 
 document.addEventListener('DOMContentLoaded', function(){
     const tipoSelect = document.getElementById('tipo');
@@ -545,8 +546,13 @@ document.addEventListener('DOMContentLoaded', function(){
             const newEstanteSelect = newRow.querySelector('.estante-select');
             const newEspacioSelect = newRow.querySelector('.espacio-select');
             
-            if(newAlmacenSelect && prevAlmacenValue) {
-                newAlmacenSelect.value = prevAlmacenValue;
+            // Use previous warehouse if exists, otherwise use default (Almacén Central)
+            if(newAlmacenSelect) {
+                if(prevAlmacenValue) {
+                    newAlmacenSelect.value = prevAlmacenValue;
+                } else if(defaultAlmacenId) {
+                    newAlmacenSelect.value = defaultAlmacenId;
+                }
             }
             
             if(newEstanteSelect && prevEstanteOptions) {
@@ -567,9 +573,14 @@ document.addEventListener('DOMContentLoaded', function(){
             detalleIndex++;
             console.log('Fila agregada. Nuevo índice:', detalleIndex);
             
-            // Setup listeners for the new row - DO NOT trigger change events as we manually set values
+            // Setup listeners for the new row
             setupProductListeners(newRow, false);
             setupCascadingDropdowns(newRow, false);
+            
+            // If no previous values but default warehouse is set, trigger cascade to load shelves
+            if(!prevAlmacenValue && defaultAlmacenId && newAlmacenSelect) {
+                newAlmacenSelect.dispatchEvent(new Event('change'));
+            }
         }
     });
     

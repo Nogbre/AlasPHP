@@ -54,8 +54,12 @@ class DonacioneController extends Controller
         $donacion = new Donacione();
         $almacenes = \App\Models\Almacene::pluck('nombre', 'id_almacen');
         $categorias = \App\Models\CategoriasProducto::pluck('nombre', 'id_categoria');
+        
+        // Find the "Central" warehouse as default
+        $almacenCentral = \App\Models\Almacene::where('nombre', 'LIKE', '%Central%')->first();
+        $defaultAlmacenId = $almacenCentral ? $almacenCentral->id_almacen : null;
 
-        return view('donaciones.create', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades', 'almacenes', 'categorias'));
+        return view('donaciones.create', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades', 'almacenes', 'categorias', 'defaultAlmacenId'));
     }
 
     public function store(DonacioneRequest $request): RedirectResponse
@@ -186,8 +190,12 @@ class DonacioneController extends Controller
         $productosUnidades = $productosData->pluck('unidad_medida', 'id_producto')->toArray();
         $almacenes = \App\Models\Almacene::pluck('nombre', 'id_almacen');
         $categorias = \App\Models\CategoriasProducto::pluck('nombre', 'id_categoria');
+        
+        // Find the "Central" warehouse as default
+        $almacenCentral = \App\Models\Almacene::where('nombre', 'LIKE', '%Central%')->first();
+        $defaultAlmacenId = $almacenCentral ? $almacenCentral->id_almacen : null;
 
-        return view('donaciones.edit', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades', 'almacenes', 'categorias'));
+        return view('donaciones.edit', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades', 'almacenes', 'categorias', 'defaultAlmacenId'));
     }
 
     public function update(DonacioneRequest $request, Donacione $donacione): RedirectResponse

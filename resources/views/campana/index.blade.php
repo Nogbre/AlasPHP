@@ -8,9 +8,11 @@
         <h1>Gestión de Campañas</h1>
     </div>
     <div class="col-sm-6">
-        <a href="{{ route('campana.create') }}" class="btn btn-primary float-right">
-            Nueva Campaña
-        </a>
+        @can('gestionar-campanas')
+            <a href="{{ route('campana.create') }}" class="btn btn-primary float-right">
+                Nueva Campaña
+            </a>
+        @endcan
     </div>
 </div>
 @stop
@@ -97,19 +99,21 @@
                                     title="Ver detalles">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a class="btn btn-warning btn-sm" href="{{ route('campana.edit', $campana->id_campana) }}"
-                                    title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('campana.destroy', $campana->id_campana) }}" method="POST"
-                                    style="display: inline;"
-                                    onsubmit="return confirm('¿Está seguro de eliminar esta campaña?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+                                @can('gestionar-campanas')
+                                    <a class="btn btn-warning btn-sm" href="{{ route('campana.edit', $campana->id_campana) }}"
+                                        title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('campana.destroy', $campana->id_campana) }}" method="POST"
+                                        style="display: inline;"
+                                        onsubmit="return confirm('¿Está seguro de eliminar esta campaña?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                @endcan
                             </div>
                         </td>
                     </tr>
