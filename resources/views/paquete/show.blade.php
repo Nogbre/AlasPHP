@@ -118,17 +118,21 @@
             <tbody>
                 @forelse($paquete->paqueteDetalles as $detalle)
                     <tr>
-                        <td>{{ $detalle->donacionDetalle->producto->nombre ?? 'N/A' }}</td>
-                        <td>{{ $detalle->donacionDetalle->descripcion ?? '-' }}</td>
+                        <td>{{ $detalle->donacionDetalle?->producto->nombre ?? 'N/A' }}</td>
+                        <td>{{ $detalle->donacionDetalle?->descripcion ?? '-' }}</td>
                         <td><strong>{{ $detalle->cantidad_usada }}</strong>
-                            {{ $detalle->donacionDetalle->unidad_medida ?? 'unidades' }}</td>
+                            {{ $detalle->donacionDetalle?->unidad_medida ?? 'unidades' }}</td>
                         <td>
-                            <a href="{{ route('donante.show', $detalle->donacionDetalle->donacion->id_donante) }}">
-                                Donación #{{ $detalle->donacionDetalle->id_donacion }}
-                            </a>
-                            <small class="text-muted d-block">
-                                {{ $detalle->donacionDetalle->donacion->donante->nombres ?? 'Anónimo' }}
-                            </small>
+                            @if($detalle->donacionDetalle?->donacion)
+                                <a href="{{ route('donante.show', $detalle->donacionDetalle->donacion->id_donante) }}">
+                                    Donación #{{ $detalle->donacionDetalle->id_donacion }}
+                                </a>
+                                <small class="text-muted d-block">
+                                    {{ $detalle->donacionDetalle->donacion->donante->nombres ?? 'Anónimo' }}
+                                </small>
+                            @else
+                                <span class="text-muted">Origen desconocido</span>
+                            @endif
                         </td>
                     </tr>
                 @empty

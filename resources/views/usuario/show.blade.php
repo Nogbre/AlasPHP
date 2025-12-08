@@ -81,8 +81,12 @@
                             {{ $usuario->tipo_sangre }}
                         </div>
                         <div class="form-group mb-2 mb20">
-                            <strong>Id Rol:</strong>
-                            {{ $usuario->id_rol }}
+                            <strong>Rol:</strong>
+                            {{ $usuario->getRoleNames()->first() ?? 'Sin rol' }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Es Recolector:</strong>
+                            {{ $usuario->is_recolector ? 'Sí' : 'No' }}
                         </div>
                         <div class="form-group mb-2 mb20">
                             <strong>Fecha Registro:</strong>

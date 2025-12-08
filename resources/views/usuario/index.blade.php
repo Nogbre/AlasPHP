@@ -69,7 +69,7 @@
                                                     <span class="badge badge-secondary">Inactivo</span>
                                                 @endif
                                             </td>
-                                            <td>{{ $usuario->role?->nombre_rol ?? 'Sin rol' }}</td>
+                                            <td>{{ $usuario->getRoleNames()->first() ?? 'Sin rol' }}</td>
                                             <td>{{ $usuario->fecha_registro ? \Carbon\Carbon::parse($usuario->fecha_registro)->format('d/m/Y') : '-' }}</td>
 
                                             <td>

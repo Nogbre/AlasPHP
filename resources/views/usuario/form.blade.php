@@ -189,16 +189,16 @@
             @enderror
         </div>
         <div class="form-group mb-2 mb20">
-            <label for="id_rol" class="form-label">{{ __('Rol') }}</label>
-            <select name="id_rol" class="form-control @error('id_rol') is-invalid @enderror" id="id_rol">
+            <label for="rol" class="form-label">{{ __('Rol') }}</label>
+            <select name="rol" class="form-control @error('rol') is-invalid @enderror" id="rol">
                 <option value="">Seleccione un rol</option>
-                @foreach(\App\Models\Role::all() as $role)
-                    <option value="{{ $role->id_rol }}" {{ old('id_rol', $usuario?->id_rol) == $role->id_rol ? 'selected' : '' }}>
-                        {{ $role->nombre_rol }}
+                @foreach($roles ?? [] as $role)
+                    <option value="{{ $role->name }}" {{ old('rol', $usuario?->getRoleNames()->first()) == $role->name ? 'selected' : '' }}>
+                        {{ $role->name }}
                     </option>
                 @endforeach
             </select>
-            @error('id_rol')
+            @error('rol')
                 <span class="invalid-feedback d-block" role="alert">
                     <strong>{{ $message }}</strong>
                 </span>

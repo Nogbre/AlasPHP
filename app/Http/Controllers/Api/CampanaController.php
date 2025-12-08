@@ -14,13 +14,15 @@ class CampanaController extends Controller
     public function index()
     {
         try {
-            $campanas = Campana::where('fecha_fin', '>=', now())
+            $campanas = Campana::select('id_campana', 'nombre', 'descripcion', 'fecha_inicio', 'fecha_fin', 'imagen_banner')
+                ->where('fecha_fin', '>=', now())
                 ->orderBy('fecha_inicio', 'desc')
                 ->get();
 
             return response()->json($campanas, 200);
 
         } catch (\Exception $e) {
+            \Log::error('Error en GET /api/campanas: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Error al obtener campañas',
                 'message' => $e->getMessage()

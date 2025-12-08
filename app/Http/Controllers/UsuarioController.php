@@ -28,8 +28,9 @@ class UsuarioController extends Controller
     public function create(): View
     {
         $usuario = new Usuario();
+        $roles = \Spatie\Permission\Models\Role::all();
 
-        return view('usuario.create', compact('usuario'));
+        return view('usuario.create', compact('usuario', 'roles'));
     }
 
     /**
@@ -44,7 +45,12 @@ class UsuarioController extends Controller
             $data['contrasena'] = bcrypt($data['contrasena']);
         }
         
-        Usuario::create($data);
+        $usuario = Usuario::create($data);
+        
+        // Asignar rol con Spatie
+        if ($request->has('rol')) {
+            $usuario->assignRole($request->rol);
+        }
 
         return Redirect::route('usuario.index')
             ->with('success', 'Usuario creado exitosamente.');
@@ -63,7 +69,8 @@ class UsuarioController extends Controller
      */
     public function edit(Usuario $usuario): View
     {
-        return view('usuario.edit', compact('usuario'));
+        $roles = \Spatie\Permission\Models\Role::all();
+        return view('usuario.edit', compact('usuario', 'roles'));
     }
 
     /**
@@ -82,6 +89,11 @@ class UsuarioController extends Controller
         }
         
         $usuario->update($data);
+        
+        // Sincronizar rol con Spatie
+        if ($request->has('rol')) {
+            $usuario->syncRoles([$request->rol]);
+        }
 
         return Redirect::route('usuario.index')
             ->with('success', 'Usuario actualizado exitosamente.');

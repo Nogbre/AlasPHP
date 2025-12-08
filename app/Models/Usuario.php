@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * Class Usuario
@@ -25,7 +26,6 @@ use Laravel\Sanctum\HasApiTokens;
  * @property $estado
  * @property $entidad_pertenencia
  * @property $tipo_sangre
- * @property $id_rol
  * @property $is_recolector
  * @property $remember_token
  * @property $fecha_registro
@@ -36,7 +36,7 @@ use Laravel\Sanctum\HasApiTokens;
  */
 class Usuario extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable, HasRoles;
 
     /** 👇 CLAVE: nombre de tabla y PK personalizada */
     protected $table = 'usuarios';
@@ -44,6 +44,7 @@ class Usuario extends Authenticatable
     public $timestamps = false;         // tu tabla usa fecha_registro, no created_at/updated_at
     public $incrementing = true;        // Laravel ya no pedirá el id manualmente
     protected $keyType = 'int';         // el id es entero
+    protected $guard_name = 'web';      // Spatie solo para web, no API
 
     /** Paginación por defecto */
     protected $perPage = 20;
@@ -66,7 +67,6 @@ class Usuario extends Authenticatable
         'estado',
         'entidad_pertenencia',
         'tipo_sangre',
-        'id_rol',
         'is_recolector',
         'fecha_registro'
     ];
@@ -134,13 +134,5 @@ class Usuario extends Authenticatable
     public function getEmailAttribute()
     {
         return $this->correo;
-    }
-
-    /**
-     * Relación con roles
-     */
-    public function role()
-    {
-        return $this->belongsTo(\App\Models\Role::class, 'id_rol', 'id_rol');
     }
 }
