@@ -58,6 +58,7 @@ Route::middleware(['auth', 'can:registrar-donaciones'])->group(function () {
     // Gestión completa de estantes, espacios, donaciones, etc.
     Route::resource('estante', App\Http\Controllers\EstanteController::class);
     Route::resource('solicitudes-recoleccions', App\Http\Controllers\SolicitudesRecoleccionController::class);
+    Route::get('paquete/pendientes', [App\Http\Controllers\PaqueteController::class, 'pendientes'])->name('paquete.pendientes');
     Route::resource('paquete', App\Http\Controllers\PaqueteController::class);
     Route::resource('registros-salida', App\Http\Controllers\RegistrosSalidaController::class);
     Route::post('donaciones/guardar', [App\Http\Controllers\DonacioneController::class, 'store'])->name('donaciones.guardar_manual');

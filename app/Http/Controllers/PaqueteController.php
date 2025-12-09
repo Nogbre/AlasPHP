@@ -28,6 +28,14 @@ class PaqueteController extends Controller
     }
 
     /**
+     * Display pending package requests
+     */
+    public function pendientes(): View
+    {
+        return view('paquete.pendientes');
+    }
+
+    /**
      * Helper para obtener productos con stock agrupado
      */
     private function getProductosConStock()
@@ -96,7 +104,10 @@ class PaqueteController extends Controller
         $data['fecha_creacion'] = now();
 
         try {
-            DB::transaction(function () use ($data, $request) {
+            $paquete = null;
+            $primeraUbicacion = null;
+            
+            DB::transaction(function () use ($data, $request, &$paquete, &$primeraUbicacion) {
                 \Log::info('Iniciando transacción...');
 
                 $paquete = Paquete::create($data);
@@ -104,11 +115,16 @@ class PaqueteController extends Controller
 
                 if ($request->has('detalles')) {
                     \Log::info('Procesando detalles del paquete...', ['cantidad_detalles' => count($request->detalles)]);
-                    $this->procesarDetallesPaquete($paquete, $request->detalles);
+                    $primeraUbicacion = $this->procesarDetallesPaquete($paquete, $request->detalles);
                 }
 
                 \Log::info('Transacción completada exitosamente');
             });
+
+            // Si hay paquete externo, enviar PATCH al sistema ADS
+            if ($request->has('paquete_externo_id') && !empty($request->paquete_externo_id)) {
+                $this->notificarSistemaExterno($request->paquete_externo_id, $primeraUbicacion);
+            }
 
             \Log::info('=== FIN STORE PAQUETE (SUCCESS) ===');
             return Redirect::route('paquete.index')
@@ -130,6 +146,8 @@ class PaqueteController extends Controller
      */
     private function procesarDetallesPaquete($paquete, $detallesSolicitados)
     {
+        $primeraUbicacion = null;
+        
         foreach ($detallesSolicitados as $index => $solicitud) {
             if (empty($solicitud['id_producto']) || empty($solicitud['cantidad_usada'])) {
                 continue;
@@ -145,7 +163,7 @@ class PaqueteController extends Controller
                 ->whereHas('donacion', function ($q) {
                     $q->where('tipo', 'especie');
                 })
-                ->with(['donacion', 'paqueteDetalles'])
+                ->with(['donacion', 'paqueteDetalles', 'ubicaciones.espacio.estante.almacen'])
                 ->get()
                 ->sortBy(function ($lote) {
                     return $lote->donacion->fecha;
@@ -169,6 +187,19 @@ class PaqueteController extends Controller
 
                     \Log::info("Asignado del lote {$lote->id_detalle}: {$cantidadATomar} unidades. Detalle ID: {$detalle->id_paquete_detalle}");
 
+                    // Obtener la primera ubicación si aún no la tenemos
+                    if (!$primeraUbicacion && $lote->ubicaciones->isNotEmpty()) {
+                        $ubicacion = $lote->ubicaciones->first();
+                        if ($ubicacion && $ubicacion->espacio && $ubicacion->espacio->estante && $ubicacion->espacio->estante->almacen) {
+                            $almacen = $ubicacion->espacio->estante->almacen;
+                            $primeraUbicacion = [
+                                'direccion' => $almacen->direccion ?? 'Dirección no especificada',
+                                'latitud' => $almacen->latitud ?? '0',
+                                'longitud' => $almacen->longitud ?? '0'
+                            ];
+                        }
+                    }
+
                     $cantidadRequerida -= $cantidadATomar;
                 }
             }
@@ -176,6 +207,65 @@ class PaqueteController extends Controller
             if ($cantidadRequerida > 0) {
                 throw new \Exception("No hay suficiente stock disponible para el producto ID: $idProducto. Faltan $cantidadRequerida unidades.");
             }
+        }
+        
+        return $primeraUbicacion;
+    }
+
+    /**
+     * Notificar al sistema externo (ADS) que el paquete está armado
+     */
+    private function notificarSistemaExterno($idPaqueteExterno, $primeraUbicacion)
+    {
+        try {
+            $apiBaseUrl = env('API_BASE_URL_ADS', 'http://192.168.22.128:8000');
+            $url = "{$apiBaseUrl}/api/paquetes/{$idPaqueteExterno}/armar";
+            
+            // Obtener CI del usuario logueado
+            $ciUsuario = auth()->user()->ci ?? 'Sin CI';
+            
+            // Formatear ubicación
+            $ubicacionActual = 'Ubicación no especificada';
+            if ($primeraUbicacion) {
+                $ubicacionActual = sprintf(
+                    "%s-(%s, %s)",
+                    $primeraUbicacion['direccion'],
+                    $primeraUbicacion['latitud'],
+                    $primeraUbicacion['longitud']
+                );
+            }
+            
+            $body = [
+                'ci_usuario' => $ciUsuario,
+                'ubicacion_actual' => $ubicacionActual
+            ];
+            
+            \Log::info('Enviando PATCH al sistema ADS', [
+                'url' => $url,
+                'body' => $body
+            ]);
+            
+            // Enviar petición PATCH
+            $client = new \GuzzleHttp\Client();
+            $response = $client->patch($url, [
+                'json' => $body,
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ]
+            ]);
+            
+            \Log::info('Respuesta del sistema ADS', [
+                'status' => $response->getStatusCode(),
+                'body' => $response->getBody()->getContents()
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error al notificar al sistema externo ADS', [
+                'mensaje' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            // No lanzamos excepción para no bloquear el guardado del paquete local
         }
     }
 

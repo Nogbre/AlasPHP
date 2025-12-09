@@ -37,16 +37,8 @@
                             {{ $usuario->ci }}
                         </div>
                         <div class="form-group mb-2 mb20">
-                            <strong>Foto Ci:</strong>
-                            {{ $usuario->foto_ci }}
-                        </div>
-                        <div class="form-group mb-2 mb20">
                             <strong>Licencia Conducir:</strong>
                             {{ $usuario->licencia_conducir }}
-                        </div>
-                        <div class="form-group mb-2 mb20">
-                            <strong>Foto Licencia:</strong>
-                            {{ $usuario->foto_licencia }}
                         </div>
                         <div class="form-group mb-2 mb20">
                             <strong>Genero:</strong>
@@ -65,20 +57,8 @@
                             {{ $usuario->direccion_domicilio }}
                         </div>
                         <div class="form-group mb-2 mb20">
-                            <strong>Contrasena:</strong>
-                            {{ $usuario->contrasena }}
-                        </div>
-                        <div class="form-group mb-2 mb20">
                             <strong>Estado:</strong>
                             {{ $usuario->estado }}
-                        </div>
-                        <div class="form-group mb-2 mb20">
-                            <strong>Entidad Pertenencia:</strong>
-                            {{ $usuario->entidad_pertenencia }}
-                        </div>
-                        <div class="form-group mb-2 mb20">
-                            <strong>Tipo Sangre:</strong>
-                            {{ $usuario->tipo_sangre }}
                         </div>
                         <div class="form-group mb-2 mb20">
                             <strong>Rol:</strong>

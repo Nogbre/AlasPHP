@@ -39,6 +39,7 @@
                                 value="{{ old('codigo_paquete') }}" id="codigo_paquete"
                                 placeholder="Se generará automáticamente" readonly>
                         @endif
+                        <input type="hidden" name="paquete_externo_id" id="paquete_externo_id" value="">
                         @error('codigo_paquete')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -264,5 +265,17 @@
                 }
             }
         });
+
+        // Cargar código de seguimiento desde sessionStorage si existe
+        const codigoSeguimiento = sessionStorage.getItem('codigo_seguimiento');
+        const paqueteExternoId = sessionStorage.getItem('paquete_externo_id');
+        
+        if (codigoSeguimiento) {
+            document.getElementById('codigo_paquete').value = codigoSeguimiento;
+            document.getElementById('paquete_externo_id').value = paqueteExternoId;
+            // Limpiar sessionStorage
+            sessionStorage.removeItem('codigo_seguimiento');
+            sessionStorage.removeItem('paquete_externo_id');
+        }
     });
 </script>

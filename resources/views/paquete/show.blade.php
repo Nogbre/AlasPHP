@@ -119,7 +119,7 @@
                 @forelse($paquete->paqueteDetalles as $detalle)
                     <tr>
                         <td>{{ $detalle->donacionDetalle?->producto->nombre ?? 'N/A' }}</td>
-                        <td>{{ $detalle->donacionDetalle?->descripcion ?? '-' }}</td>
+                        <td>{{ $detalle->donacionDetalle?->producto->descripcion ?? '-' }}</td>
                         <td><strong>{{ $detalle->cantidad_usada }}</strong>
                             {{ $detalle->donacionDetalle?->unidad_medida ?? 'unidades' }}</td>
                         <td>
@@ -128,7 +128,7 @@
                                     Donación #{{ $detalle->donacionDetalle->id_donacion }}
                                 </a>
                                 <small class="text-muted d-block">
-                                    {{ $detalle->donacionDetalle->donacion->donante->nombres ?? 'Anónimo' }}
+                                    {{ $detalle->donacionDetalle->donacion->donante->nombre ?? 'Anónimo' }}
                                 </small>
                             @else
                                 <span class="text-muted">Origen desconocido</span>

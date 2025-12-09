@@ -29,6 +29,20 @@
             </div>
         </div>
     </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3><i class="fas fa-clock"></i></h3>
+                <p>Solicitudes de Paquetes</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <a href="{{ route('paquete.pendientes') }}" class="small-box-footer">
+                Ver solicitudes <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
 </div>
 
 {{-- Alert Messages --}}
