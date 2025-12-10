@@ -16,11 +16,11 @@ class VoluntarioUsuarioSeeder extends Seeder
      */
     public function run(): void
     {
-        // Obtener el rol de Voluntario
-        $rolVoluntario = Role::where('nombre_rol', 'Voluntario')->first();
+        // Obtener el rol de Voluntario usando Spatie
+        $rolVoluntario = \Spatie\Permission\Models\Role::where('name', 'Voluntario')->where('guard_name', 'web')->first();
 
         if (!$rolVoluntario) {
-            $this->command->error('No existe el rol de Voluntario. Ejecuta primero el RolesSeeder.');
+            $this->command->error('No existe el rol de Voluntario. Ejecuta primero el PermissionsSeeder.');
             return;
         }
 
@@ -48,10 +48,13 @@ class VoluntarioUsuarioSeeder extends Seeder
             'estado' => 'Activo',
             'entidad_pertenencia' => null,
             'tipo_sangre' => null,
-            'id_rol' => $rolVoluntario->id_rol,
             'is_recolector' => false,
             'fecha_registro' => Carbon::now(),
         ]);
+
+        // Asignar rol usando Spatie
+        $usuario = Usuario::where('correo', 'voluntario@donaciones.com')->first();
+        $usuario->assignRole('Voluntario');
 
         $this->command->info('Usuario voluntario creado exitosamente.');
         $this->command->info('Email: voluntario@donaciones.com');

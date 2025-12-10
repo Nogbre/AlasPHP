@@ -16,11 +16,11 @@ class AlmacenistaUsuarioSeeder extends Seeder
      */
     public function run(): void
     {
-        // Obtener el rol de Almacenista
-        $rolAlmacenista = Role::where('nombre_rol', 'Almacenista')->first();
+        // Obtener el rol de Almacenista usando Spatie
+        $rolAlmacenista = \Spatie\Permission\Models\Role::where('name', 'Almacenista')->where('guard_name', 'web')->first();
 
         if (!$rolAlmacenista) {
-            $this->command->error('No existe el rol de Almacenista. Ejecuta primero el RolesSeeder.');
+            $this->command->error('No existe el rol de Almacenista. Ejecuta primero el PermissionsSeeder.');
             return;
         }
 
@@ -48,10 +48,13 @@ class AlmacenistaUsuarioSeeder extends Seeder
             'estado' => 'Activo',
             'entidad_pertenencia' => null,
             'tipo_sangre' => null,
-            'id_rol' => $rolAlmacenista->id_rol,
             'is_recolector' => false,
             'fecha_registro' => Carbon::now(),
         ]);
+
+        // Asignar rol usando Spatie
+        $usuario = Usuario::where('correo', 'almacenista@donaciones.com')->first();
+        $usuario->assignRole('Almacenista');
 
         $this->command->info('Usuario almacenista creado exitosamente.');
         $this->command->info('Email: almacenista@donaciones.com');
