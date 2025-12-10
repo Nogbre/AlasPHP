@@ -80,6 +80,7 @@ class DonacioneController extends Controller
                     'id_punto_recoleccion' => $data['id_punto_recoleccion'] ?? null,
                     'observaciones' => $data['observaciones'] ?? null,
                     'fecha' => now(),
+                    'ci_usuario_registro' => auth()->user()->ci ?? null,
                 ]);
 
                 \Log::info('Donación creada:', ['id' => $donacion->id_donacion, 'tipo' => $donacion->tipo]);

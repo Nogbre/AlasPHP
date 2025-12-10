@@ -42,7 +42,7 @@ class Paquete extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['codigo_paquete', 'fecha_creacion', 'id_solicitud', 'estado', 'deleted_by', 'deleted_reason', 'codigo_solicitud_externa'];
+    protected $fillable = ['codigo_paquete', 'fecha_creacion', 'id_solicitud', 'estado', 'deleted_by', 'deleted_reason', 'codigo_solicitud_externa', 'ci_usuario_registro'];
 
 
     /**

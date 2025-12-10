@@ -35,7 +35,8 @@ class Donacione extends Model
         'observaciones',
         'fecha',
         'deleted_reason',
-        'deleted_by'
+        'deleted_by',
+        'ci_usuario_registro'
     ];
 
     public function detalles()

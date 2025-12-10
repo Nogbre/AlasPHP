@@ -102,6 +102,7 @@ class PaqueteController extends Controller
             $data['codigo_paquete'] = $this->generarCodigoPaquete();
         }
         $data['fecha_creacion'] = now();
+        $data['ci_usuario_registro'] = auth()->user()->ci ?? null;
 
         try {
             $paquete = null;

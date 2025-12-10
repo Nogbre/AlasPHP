@@ -114,6 +114,15 @@
                 <dt class="col-sm-3">Observaciones:</dt>
                 <dd class="col-sm-9">{{ $donacion->observaciones }}</dd>
             @endif
+
+            @if($donacion->ci_usuario_registro)
+                <dt class="col-sm-3">Registrado por (CI):</dt>
+                <dd class="col-sm-9">
+                    <span class="badge badge-info badge-lg">
+                        <i class="fas fa-id-card"></i> {{ $donacion->ci_usuario_registro }}
+                    </span>
+                </dd>
+            @endif
         </dl>
     </div>
 </div>
@@ -151,25 +160,23 @@
                     <dt class="col-sm-3">Referencia:</dt>
                     <dd class="col-sm-9">
                         @if(Str::endsWith($donacion->dinero->referencia_pago, '.pdf'))
-                            <a href="{{ asset($donacion->dinero->referencia_pago) }}" target="_blank" class="btn btn-sm btn-primary">
+                            <a href="{{ asset($donacion->dinero->referencia_pago) }}" target="_blank"
+                                class="btn btn-sm btn-primary">
                                 <i class="fas fa-file-pdf"></i> Ver Comprobante PDF
                             </a>
                         @else
                             <div class="mb-2">
-                                <img src="{{ asset($donacion->dinero->referencia_pago) }}" 
-                                     alt="Comprobante de pago" 
-                                     class="img-thumbnail"
-                                     style="max-width: 100%; max-height: 300px; cursor: pointer;"
-                                     onclick="showImageModal('{{ asset($donacion->dinero->referencia_pago) }}', 'Comprobante de Pago')">
-                            </div>
-                            <button type="button" 
-                                    class="btn btn-sm btn-primary"
+                                <img src="{{ asset($donacion->dinero->referencia_pago) }}" alt="Comprobante de pago"
+                                    class="img-thumbnail" style="max-width: 100%; max-height: 300px; cursor: pointer;"
                                     onclick="showImageModal('{{ asset($donacion->dinero->referencia_pago) }}', 'Comprobante de Pago')">
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary"
+                                onclick="showImageModal('{{ asset($donacion->dinero->referencia_pago) }}', 'Comprobante de Pago')">
                                 <i class="fas fa-search-plus"></i> Ver imagen completa
                             </button>
                         @endif
                         <small class="text-muted d-block mt-2">
-                            <i class="fas fa-link"></i> URL: 
+                            <i class="fas fa-link"></i> URL:
                             <a href="{{ url($donacion->dinero->referencia_pago) }}" target="_blank" class="text-primary">
                                 <code>{{ url($donacion->dinero->referencia_pago) }}</code>
                             </a>
@@ -282,7 +289,7 @@
         background-color: #6f42c1;
         color: white;
     }
-    
+
     .modal-image {
         width: 100%;
         height: auto;
@@ -294,16 +301,17 @@
 
 @section('js')
 <script>
-function showImageModal(imageUrl, imageTitle) {
-    $('#imageModalLabel').text(imageTitle);
-    $('#modalImage').attr('src', imageUrl);
-    $('#imageModal').modal('show');
-}
+    function showImageModal(imageUrl, imageTitle) {
+        $('#imageModalLabel').text(imageTitle);
+        $('#modalImage').attr('src', imageUrl);
+        $('#imageModal').modal('show');
+    }
 </script>
 @stop
 
 <!-- Modal para ver imagen completa -->
-<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary">

@@ -95,7 +95,15 @@
                     {{ ucfirst(str_replace('_', ' ', $paquete->estado ?? 'Pendiente')) }}
                 </span>
             </dd>
-        </dl>
+
+            @if($paquete->ci_usuario_registro)
+                <dt class="col-sm-3">Registrado por (CI):</dt>
+                <dd class="col-sm-9">
+                    <span class="badge badge-info badge-lg">
+                        <i class="fas fa-id-card"></i> {{ $paquete->ci_usuario_registro }}
+                    </span>
+                </dd>
+            @endif
         </dl>
     </div>
 </div>

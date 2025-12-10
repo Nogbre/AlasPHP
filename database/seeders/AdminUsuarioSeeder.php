@@ -41,7 +41,7 @@ class AdminUsuarioSeeder extends Seeder
         $usuario = Usuario::create([
             'nombres' => 'Administrador',
             'apellidos' => 'Sistema',
-            'ci' => '00000000',
+            'ci' => 'ADMIN-2025',
             'foto_ci' => null,
             'licencia_conducir' => null,
             'foto_licencia' => null,
