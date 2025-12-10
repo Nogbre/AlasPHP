@@ -55,7 +55,7 @@
                             <select name="almacen_id" class="form-control">
                                 <option value="">Todos los almacenes</option>
                                 @foreach(\App\Models\Almacene::all() as $almacen)
-                                    <option value="{{ $almacen->id_almacen }}">{{ $almacen->nombre_almacen }}</option>
+                                    <option value="{{ $almacen->id_almacen }}">{{ $almacen->nombre }}</option>
                                 @endforeach
                             </select>
                         </div>

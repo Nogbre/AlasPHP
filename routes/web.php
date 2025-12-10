@@ -57,7 +57,6 @@ Route::middleware(['auth', 'can:registrar-donaciones'])->group(function () {
 
     // Gestión completa de estantes, espacios, donaciones, etc.
     Route::resource('estante', App\Http\Controllers\EstanteController::class);
-    Route::resource('solicitudes-recoleccions', App\Http\Controllers\SolicitudesRecoleccionController::class);
     Route::get('paquete/pendientes', [App\Http\Controllers\PaqueteController::class, 'pendientes'])->name('paquete.pendientes');
     Route::resource('paquete', App\Http\Controllers\PaqueteController::class);
     Route::resource('registros-salida', App\Http\Controllers\RegistrosSalidaController::class);
@@ -78,6 +77,21 @@ Route::middleware(['auth', 'can:registrar-donaciones'])->group(function () {
     Route::get('reportes/solicitudes-recoleccion', [App\Http\Controllers\ReportesController::class, 'solicitudesRecoleccion'])->name('reportes.solicitudes');
     Route::get('reportes/salidas-productos', [App\Http\Controllers\ReportesController::class, 'salidasProductos'])->name('reportes.salidas');
     Route::get('reportes/campanas', [App\Http\Controllers\ReportesController::class, 'campanasReporte'])->name('reportes.campanas');
+});
+
+// Rutas de solicitudes de recolección (Voluntario puede crear, solo Admin/Almacenista puede editar/eliminar)
+Route::middleware(['auth', 'can:gestionar-solicitudes'])->group(function () {
+    Route::get('solicitudes-recoleccions', [App\Http\Controllers\SolicitudesRecoleccionController::class, 'index'])->name('solicitudes-recoleccions.index');
+    Route::get('solicitudes-recoleccions/create', [App\Http\Controllers\SolicitudesRecoleccionController::class, 'create'])->name('solicitudes-recoleccions.create');
+    Route::post('solicitudes-recoleccions', [App\Http\Controllers\SolicitudesRecoleccionController::class, 'store'])->name('solicitudes-recoleccions.store');
+    Route::get('solicitudes-recoleccions/{solicitudes_recoleccion}', [App\Http\Controllers\SolicitudesRecoleccionController::class, 'show'])->name('solicitudes-recoleccions.show');
+});
+
+Route::middleware(['auth', 'can:gestionar-almacen'])->group(function () {
+    // Solo Admin y Almacenista pueden editar/eliminar solicitudes
+    Route::get('solicitudes-recoleccions/{solicitudes_recoleccion}/edit', [App\Http\Controllers\SolicitudesRecoleccionController::class, 'edit'])->name('solicitudes-recoleccions.edit');
+    Route::put('solicitudes-recoleccions/{solicitudes_recoleccion}', [App\Http\Controllers\SolicitudesRecoleccionController::class, 'update'])->name('solicitudes-recoleccions.update');
+    Route::delete('solicitudes-recoleccions/{solicitudes_recoleccion}', [App\Http\Controllers\SolicitudesRecoleccionController::class, 'destroy'])->name('solicitudes-recoleccions.destroy');
 });
 
 // Rutas solo para Administrador (gestión de almacenes)

@@ -30,10 +30,11 @@ class PermissionsSeeder extends Seeder
             'registrar-donaciones',
             'consultar-donaciones',
             'consultar-inventario',
+            'gestionar-solicitudes',
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create([
+            Permission::firstOrCreate([
                 'name' => $permission,
                 'guard_name' => 'web',
             ]);
@@ -43,30 +44,32 @@ class PermissionsSeeder extends Seeder
         $administrador = Role::where('name', 'Administrador')->where('guard_name', 'web')->first();
         if ($administrador) {
             // Administrador tiene todos los permisos
-            $administrador->givePermissionTo(Permission::all());
+            $administrador->syncPermissions(Permission::all());
         }
 
         $voluntario = Role::where('name', 'Voluntario')->where('guard_name', 'web')->first();
         if ($voluntario) {
-            // Voluntario tiene permisos limitados
-            $voluntario->givePermissionTo([
+            // Voluntario puede ver campañas, inventario, donaciones y crear solicitudes de recolección
+            $voluntario->syncPermissions([
                 'ver-campanas',
                 'ver-donantes',
-                'ver-almacen',
                 'registrar-donaciones',
                 'consultar-donaciones',
                 'consultar-inventario',
+                'gestionar-solicitudes',
             ]);
         }
 
         $almacenista = Role::where('name', 'Almacenista')->where('guard_name', 'web')->first();
         if ($almacenista) {
             // Almacenista tiene permisos de almacén y donaciones
-            $almacenista->givePermissionTo([
+            $almacenista->syncPermissions([
                 'ver-almacen',
+                'gestionar-almacen',
                 'registrar-donaciones',
                 'consultar-donaciones',
                 'consultar-inventario',
+                'gestionar-solicitudes',
             ]);
         }
     }

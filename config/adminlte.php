@@ -381,19 +381,19 @@ return [
             'text' => 'Espacios',
             'url' => '/espacio',
             'icon' => 'fas fa-fw fa-th',
-            'can' => 'ver-almacen',
+            'can' => 'gestionar-almacen',
         ],
         [
             'text' => 'Inventario',
             'url' => '/donaciones',
             'icon' => 'fas fa-fw fa-box',
-            'can' => 'ver-almacen',
+            'can' => 'consultar-inventario',
         ],
         [
             'text' => 'Solicitudes de Recolección',
             'url' => '/solicitudes-recoleccions',
             'icon' => 'fas fa-fw fa-clipboard-list',
-            'can' => 'ver-almacen',
+            'can' => 'gestionar-solicitudes',
         ],
         [
             'text' => 'Paquetes',
@@ -405,7 +405,7 @@ return [
             'text' => 'Registros de Salida',
             'url' => '/registros-salida',
             'icon' => 'fas fa-fw fa-sign-out-alt',
-            'can' => 'ver-almacen',
+            'can' => 'gestionar-almacen',
         ],
         
         ['header' => 'ANÁLISIS', 'can' => 'ver-almacen'],
