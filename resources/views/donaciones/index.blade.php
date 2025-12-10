@@ -128,12 +128,15 @@
                                     href="{{ route('donaciones.edit', $donacion->id_donacion) }}" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('donaciones.destroy', $donacion->id_donacion) }}" method="POST"
-                                    style="display: inline;"
-                                    onsubmit="return confirm('¿Está seguro de eliminar esta donación?');">
+                                <form id="delete-form-{{ $donacion->id_donacion }}"
+                                    action="{{ route('donaciones.destroy', $donacion->id_donacion) }}" method="POST"
+                                    style="display: inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
+                                    <input type="hidden" name="deleted_reason"
+                                        id="deleted-reason-{{ $donacion->id_donacion }}">
+                                    <button type="button" class="btn btn-danger btn-sm delete-btn"
+                                        data-id="{{ $donacion->id_donacion }}" data-type="donación" title="Eliminar">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
@@ -172,6 +175,7 @@
 @stop
 
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
 <script>
@@ -189,6 +193,57 @@
                 "zeroRecords": "No se encontraron resultados",
                 "emptyTable": "No hay donaciones registradas"
             }
+        });
+
+        // Handle delete button clicks
+        $('.delete-btn').on('click', function() {
+            const id = $(this).data('id');
+            const type = $(this).data('type');
+            
+            Swal.fire({
+                title: `¿Eliminar ${type}?`,
+                html: `
+                    <div class="form-group text-left mt-3">
+                        <label for="swal-reason" class="font-weight-bold">Motivo de eliminación *</label>
+                        <textarea id="swal-reason" class="form-control mt-2" 
+                            placeholder="Ingrese el motivo por el cual desea eliminar esta ${type}..."
+                            rows="4" style="resize: vertical;"></textarea>
+                        <small class="form-text text-muted mt-1">
+                            <i class="fas fa-info-circle"></i> Este motivo quedará registrado en el sistema para auditoría.
+                        </small>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-trash mr-1"></i> Sí, eliminar',
+                cancelButtonText: '<i class="fas fa-times mr-1"></i> Cancelar',
+                width: '600px',
+                customClass: {
+                    popup: 'swal-delete-modal',
+                    confirmButton: 'btn btn-danger',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false,
+                preConfirm: () => {
+                    const reason = document.getElementById('swal-reason').value;
+                    if (!reason || reason.trim().length < 10) {
+                        Swal.showValidationMessage('Por favor ingrese un motivo válido (mínimo 10 caracteres)');
+                        return false;
+                    }
+                    if (reason.trim().length > 500) {
+                        Swal.showValidationMessage('El motivo no puede exceder 500 caracteres');
+                        return false;
+                    }
+                    return reason;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#deleted-reason-' + id).val(result.value);
+                    $('#delete-form-' + id).submit();
+                }
+            });
         });
     });
 </script>

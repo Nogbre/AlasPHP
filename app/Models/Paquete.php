@@ -34,7 +34,7 @@ class Paquete extends Model
     public $timestamps = false;
     public $incrementing = true;
     protected $keyType = 'int';
-    
+
     protected $perPage = 20;
 
     /**
@@ -42,7 +42,7 @@ class Paquete extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['codigo_paquete', 'fecha_creacion', 'id_solicitud', 'estado', 'deleted_by', 'codigo_solicitud_externa'];
+    protected $fillable = ['codigo_paquete', 'fecha_creacion', 'id_solicitud', 'estado', 'deleted_by', 'deleted_reason', 'codigo_solicitud_externa'];
 
 
     /**
@@ -53,7 +53,7 @@ class Paquete extends Model
     // {
     //     return $this->belongsTo(\App\Models\SolicitudesAyuda::class, 'id_solicitud', 'id_solicitud');
     // }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      * Relación comentada porque SolicitudesAyuda no existe
@@ -62,7 +62,7 @@ class Paquete extends Model
     // {
     //     return $this->belongsTo(\App\Models\SolicitudesAyuda::class, 'id_solicitud', 'id_solicitud');
     // }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -70,7 +70,7 @@ class Paquete extends Model
     {
         return $this->hasMany(\App\Models\PaqueteDetalle::class, 'id_paquete', 'id_paquete');
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -78,7 +78,7 @@ class Paquete extends Model
     {
         return $this->hasMany(\App\Models\PaqueteDetalle::class, 'id_paquete', 'id_paquete');
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -86,5 +86,5 @@ class Paquete extends Model
     {
         return $this->hasMany(\App\Models\RegistrosSalida::class, 'id_paquete', 'id_paquete');
     }
-    
+
 }

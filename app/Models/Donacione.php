@@ -33,7 +33,9 @@ class Donacione extends Model
         'id_campana',
         'id_punto_recoleccion',
         'observaciones',
-        'fecha'
+        'fecha',
+        'deleted_reason',
+        'deleted_by'
     ];
 
     public function detalles()

@@ -54,7 +54,7 @@ class DonacioneController extends Controller
         $donacion = new Donacione();
         $almacenes = \App\Models\Almacene::pluck('nombre', 'id_almacen');
         $categorias = \App\Models\CategoriasProducto::pluck('nombre', 'id_categoria');
-        
+
         // Find the "Central" warehouse as default
         $almacenCentral = \App\Models\Almacene::where('nombre', 'LIKE', '%Central%')->first();
         $defaultAlmacenId = $almacenCentral ? $almacenCentral->id_almacen : null;
@@ -86,9 +86,9 @@ class DonacioneController extends Controller
 
                 if ($data['tipo'] === 'dinero') {
                     \Log::info('Creando registro de dinero...');
-                    
+
                     $referenciaPago = null;
-                    
+
                     // Manejar la subida de imagen de referencia de pago
                     if ($request->hasFile('referencia_pago_file')) {
                         $file = $request->file('referencia_pago_file');
@@ -96,7 +96,7 @@ class DonacioneController extends Controller
                         $file->move(public_path('images/comprobantes'), $filename);
                         $referenciaPago = 'images/comprobantes/' . $filename;
                     }
-                    
+
                     \Log::info('Datos dinero:', [
                         'id_donacion' => $donacion->id_donacion,
                         'monto' => $data['monto'] ?? 'NULL',
@@ -190,7 +190,7 @@ class DonacioneController extends Controller
         $productosUnidades = $productosData->pluck('unidad_medida', 'id_producto')->toArray();
         $almacenes = \App\Models\Almacene::pluck('nombre', 'id_almacen');
         $categorias = \App\Models\CategoriasProducto::pluck('nombre', 'id_categoria');
-        
+
         // Find the "Central" warehouse as default
         $almacenCentral = \App\Models\Almacene::where('nombre', 'LIKE', '%Central%')->first();
         $defaultAlmacenId = $almacenCentral ? $almacenCentral->id_almacen : null;
@@ -226,20 +226,20 @@ class DonacioneController extends Controller
 
                 if ($data['tipo'] === 'dinero') {
                     $referenciaPago = $dineroExistente?->referencia_pago;
-                    
+
                     // Manejar la subida de nueva imagen de referencia de pago
                     if ($request->hasFile('referencia_pago_file')) {
                         // Eliminar imagen anterior si existe
                         if ($referenciaPago && file_exists(public_path($referenciaPago))) {
                             unlink(public_path($referenciaPago));
                         }
-                        
+
                         $file = $request->file('referencia_pago_file');
                         $filename = time() . '_' . $file->getClientOriginalName();
                         $file->move(public_path('images/comprobantes'), $filename);
                         $referenciaPago = 'images/comprobantes/' . $filename;
                     }
-                    
+
                     if ($dineroExistente) {
                         $dineroExistente->update([
                             'monto' => $data['monto'],
@@ -290,11 +290,25 @@ class DonacioneController extends Controller
         }
     }
 
-    public function destroy($id): RedirectResponse
+    public function destroy(Request $request, $id): RedirectResponse
     {
+        // Validate deletion reason
+        $request->validate([
+            'deleted_reason' => 'required|string|min:10|max:500'
+        ], [
+            'deleted_reason.required' => 'El motivo de eliminación es obligatorio.',
+            'deleted_reason.min' => 'El motivo debe tener al menos 10 caracteres.',
+            'deleted_reason.max' => 'El motivo no puede exceder 500 caracteres.'
+        ]);
+
         $donacion = Donacione::find($id);
         if ($donacion) {
-            DB::transaction(function () use ($donacion) {
+            DB::transaction(function () use ($donacion, $request) {
+                // Store deletion metadata before deleting
+                $donacion->deleted_reason = $request->deleted_reason;
+                $donacion->deleted_by = auth()->user()->id_usuario ?? null;
+                $donacion->save();
+
                 // eliminar ubicaciones, detalles y registros de dinero
                 foreach ($donacion->detalles as $det) {
                     UbicacionesDonacione::where('id_detalle', $det->id_detalle)->delete();

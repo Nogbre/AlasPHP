@@ -106,7 +106,7 @@ class PaqueteController extends Controller
         try {
             $paquete = null;
             $primeraUbicacion = null;
-            
+
             DB::transaction(function () use ($data, $request, &$paquete, &$primeraUbicacion) {
                 \Log::info('Iniciando transacción...');
 
@@ -147,7 +147,7 @@ class PaqueteController extends Controller
     private function procesarDetallesPaquete($paquete, $detallesSolicitados)
     {
         $primeraUbicacion = null;
-        
+
         foreach ($detallesSolicitados as $index => $solicitud) {
             if (empty($solicitud['id_producto']) || empty($solicitud['cantidad_usada'])) {
                 continue;
@@ -208,7 +208,7 @@ class PaqueteController extends Controller
                 throw new \Exception("No hay suficiente stock disponible para el producto ID: $idProducto. Faltan $cantidadRequerida unidades.");
             }
         }
-        
+
         return $primeraUbicacion;
     }
 
@@ -220,10 +220,10 @@ class PaqueteController extends Controller
         try {
             $apiBaseUrl = env('API_BASE_URL_ADS', 'http://192.168.22.128:8000');
             $url = "{$apiBaseUrl}/api/paquetes/{$idPaqueteExterno}/armar";
-            
+
             // Obtener CI del usuario logueado
             $ciUsuario = auth()->user()->ci ?? 'Sin CI';
-            
+
             // Formatear ubicación
             $ubicacionActual = 'Ubicación no especificada';
             if ($primeraUbicacion) {
@@ -234,17 +234,17 @@ class PaqueteController extends Controller
                     $primeraUbicacion['longitud']
                 );
             }
-            
+
             $body = [
                 'ci_usuario' => $ciUsuario,
                 'ubicacion_actual' => $ubicacionActual
             ];
-            
+
             \Log::info('Enviando PATCH al sistema ADS', [
                 'url' => $url,
                 'body' => $body
             ]);
-            
+
             // Enviar petición PATCH
             $client = new \GuzzleHttp\Client();
             $response = $client->patch($url, [
@@ -254,12 +254,12 @@ class PaqueteController extends Controller
                     'Accept' => 'application/json',
                 ]
             ]);
-            
+
             \Log::info('Respuesta del sistema ADS', [
                 'status' => $response->getStatusCode(),
                 'body' => $response->getBody()->getContents()
             ]);
-            
+
         } catch (\Exception $e) {
             \Log::error('Error al notificar al sistema externo ADS', [
                 'mensaje' => $e->getMessage(),
@@ -363,13 +363,27 @@ class PaqueteController extends Controller
         }
     }
 
-    public function destroy($id): RedirectResponse
+    public function destroy(Request $request, $id): RedirectResponse
     {
+        // Validate deletion reason
+        $request->validate([
+            'deleted_reason' => 'required|string|min:10|max:500'
+        ], [
+            'deleted_reason.required' => 'El motivo de eliminación es obligatorio.',
+            'deleted_reason.min' => 'El motivo debe tener al menos 10 caracteres.',
+            'deleted_reason.max' => 'El motivo no puede exceder 500 caracteres.'
+        ]);
+
         $paquete = Paquete::find($id);
 
         if ($paquete) {
             try {
-                DB::transaction(function () use ($paquete) {
+                DB::transaction(function () use ($paquete, $request) {
+                    // Store deletion metadata before deleting
+                    $paquete->deleted_reason = $request->deleted_reason;
+                    $paquete->deleted_by = auth()->user()->id_usuario ?? null;
+                    $paquete->save();
+
                     // Primero eliminamos los detalles para mantener integridad si no hay cascade
                     $paquete->paqueteDetalles()->delete();
                     $paquete->delete();
