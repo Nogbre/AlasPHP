@@ -70,19 +70,24 @@
                                                 @endif
                                             </td>
                                             <td>{{ $usuario->getRoleNames()->first() ?? 'Sin rol' }}</td>
-                                            <td>{{ $usuario->fecha_registro ? \Carbon\Carbon::parse($usuario->fecha_registro)->format('d/m/Y') : '-' }}</td>
+                                            <td>{{ $usuario->fecha_registro ? \Carbon\Carbon::parse($usuario->fecha_registro)->format('d/m/Y') : '-' }}
+                                            </td>
 
                                             <td>
-                                                <form action="{{ route('usuario.destroy', $usuario->id_usuario) }}" method="POST" style="display: inline-block;">
-                                                    <a class="btn btn-sm btn-info" href="{{ route('usuario.show', $usuario->id_usuario) }}" title="Ver">
+                                                <form action="{{ route('usuario.destroy', $usuario->id_usuario) }}"
+                                                    method="POST" style="display: inline-block;">
+                                                    <a class="btn btn-sm btn-info"
+                                                        href="{{ route('usuario.show', $usuario->id_usuario) }}" title="Ver">
                                                         <i class="fa fa-fw fa-eye"></i>
                                                     </a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('usuario.edit', $usuario->id_usuario) }}" title="Editar">
+                                                    <a class="btn btn-sm btn-success"
+                                                        href="{{ route('usuario.edit', $usuario->id_usuario) }}" title="Editar">
                                                         <i class="fa fa-fw fa-edit"></i>
                                                     </a>
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar" onclick="event.preventDefault(); confirm('¿Está seguro de eliminar?') ? this.closest('form').submit() : false;">
+                                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar"
+                                                        onclick="event.preventDefault(); confirm('¿Está seguro de eliminar?') ? this.closest('form').submit() : false;">
                                                         <i class="fa fa-fw fa-trash"></i>
                                                     </button>
                                                 </form>
@@ -93,9 +98,49 @@
                             </table>
                         </div>
                     </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Usa los controles de la tabla para navegar entre páginas</small>
+                    </div>
                 </div>
-                {!! $usuarios->withQueryString()->links() !!}
             </div>
         </div>
     </div>
+@endsection
+
+@section('css')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css">
+@endsection
+
+@section('js')
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('table').DataTable({
+                "paging": true,
+                "pageLength": 10,
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": false,
+                "responsive": true,
+                "language": {
+                    "search": "Buscar:",
+                    "zeroRecords": "No se encontraron resultados",
+                    "emptyTable": "No hay usuarios registrados",
+                    "lengthMenu": "Mostrar _MENU_ registros por página",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    "infoEmpty": "Mostrando 0 a 0 de 0 registros",
+                    "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
+            });
+        });
+    </script>
 @endsection

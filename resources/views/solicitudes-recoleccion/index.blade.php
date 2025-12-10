@@ -116,9 +116,7 @@
         </table>
     </div>
     <div class="card-footer">
-        <div class="float-right">
-            {!! $solicitudesRecoleccions->withQueryString()->links() !!}
-        </div>
+        <small class="text-muted">Usa los controles de la tabla para navegar entre páginas</small>
     </div>
 </div>
 @stop
@@ -145,7 +143,7 @@
         $('#solicitudesTable').DataTable({
             "paging": true,
             "pageLength": 10,
-            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
             "searching": true,
             "ordering": true,
             "info": true,
@@ -154,7 +152,17 @@
             "language": {
                 "search": "Buscar:",
                 "zeroRecords": "No se encontraron resultados",
-                "emptyTable": "No hay solicitudes registradas"
+                "emptyTable": "No hay solicitudes registradas",
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando 0 a 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
             }
         });
     });
