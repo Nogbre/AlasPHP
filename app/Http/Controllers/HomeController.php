@@ -31,7 +31,12 @@ class HomeController extends Controller
             return $this->dashboardAlmacenista();
         }
 
-        // Dashboard general para Administrador y Voluntario
+        // Si es voluntario, mostrar dashboard específico
+        if ($user->hasRole('Voluntario')) {
+            return $this->dashboardVoluntario();
+        }
+
+        // Dashboard general para Administrador
         return $this->dashboardGeneral();
     }
 
@@ -366,6 +371,204 @@ class HomeController extends Controller
             // Viz 5: Top Productos
             'nombresTopProductos',
             'cantidadesTopProductos'
+        ));
+    }
+
+    /**
+     * Dashboard específico para Voluntario
+     */
+    private function dashboardVoluntario()
+    {
+        // ============================================
+        // KPIs para Voluntario
+        // ============================================
+        $totalDonaciones = \App\Models\Donacione::count();
+
+        // Donaciones del mes actual
+        $donacionesMesActual = \App\Models\Donacione::whereYear('fecha', \Carbon\Carbon::now()->year)
+            ->whereMonth('fecha', \Carbon\Carbon::now()->month)
+            ->count();
+
+        $totalDonantes = \App\Models\Donante::count();
+
+        // Total donaciones en dinero
+        $totalDonacionesDinero = \App\Models\DonacionesDinero::sum('monto');
+
+        // Promedio de donaciones por día (últimos 30 días)
+        $donacionesUltimos30Dias = \App\Models\Donacione::where('fecha', '>=', \Carbon\Carbon::now()->subDays(30))->count();
+        $promedioDonacionesDia = $donacionesUltimos30Dias > 0 ? round($donacionesUltimos30Dias / 30, 1) : 0;
+
+        // Solicitudes de recolección pendientes
+        $solicitudesPendientes = \App\Models\SolicitudesRecoleccion::where('estado', 'Pendiente')->count();
+
+        // ============================================
+        // VIZ 1: Tendencia de Donaciones (12 meses) - LINE CHART
+        // ============================================
+        $donacionesPorMes = \App\Models\Donacione::selectRaw('EXTRACT(YEAR FROM fecha) as anio, EXTRACT(MONTH FROM fecha) as mes, COUNT(*) as total')
+            ->where('fecha', '>=', \Carbon\Carbon::now()->subMonths(12))
+            ->groupBy('anio', 'mes')
+            ->orderBy('anio')
+            ->orderBy('mes')
+            ->get();
+
+        $mesesLabels = [];
+        $cantidadesDonaciones = [];
+
+        for ($i = 11; $i >= 0; $i--) {
+            $fecha = \Carbon\Carbon::now()->subMonths($i);
+            $mesesLabels[] = $fecha->locale('es')->isoFormat('MMM YYYY');
+
+            $registro = $donacionesPorMes->first(function ($item) use ($fecha) {
+                return $item->mes == $fecha->month && $item->anio == $fecha->year;
+            });
+
+            $cantidadesDonaciones[] = $registro ? $registro->total : 0;
+        }
+
+        // ============================================
+        // VIZ 2: Top 5 Categorías de Productos Donados - HORIZONTAL BAR CHART
+        // ============================================
+        $topCategorias = \App\Models\DonacionDetalle::join('productos', 'donacion_detalles.id_producto', '=', 'productos.id_producto')
+            ->join('categorias_productos', 'productos.id_categoria', '=', 'categorias_productos.id_categoria')
+            ->select('categorias_productos.nombre', \Illuminate\Support\Facades\DB::raw('COUNT(donacion_detalles.id_detalle) as total'))
+            ->groupBy('categorias_productos.nombre')
+            ->orderByDesc('total')
+            ->take(5)
+            ->get();
+
+        $nombresTopCategorias = $topCategorias->pluck('nombre');
+        $cantidadesTopCategorias = $topCategorias->pluck('total');
+
+        // ============================================
+        // VIZ 3: Estado de Solicitudes de Recolección - DOUGHNUT CHART
+        // ============================================
+        $solicitudesPorEstado = \App\Models\SolicitudesRecoleccion::selectRaw('estado, COUNT(*) as total')
+            ->groupBy('estado')
+            ->pluck('total', 'estado');
+
+        $estadosSolicitudes = $solicitudesPorEstado->keys();
+        $cantidadesSolicitudes = $solicitudesPorEstado->values();
+
+        // ============================================
+        // VIZ 4: Donaciones en Especie vs Dinero (12 meses) - LINE CHART
+        // ============================================
+        // Para donaciones en especie, contar las donaciones que tienen detalles (productos)
+        $donacionesEspeciePorMes = \App\Models\Donacione::join('donacion_detalles', 'donaciones.id_donacion', '=', 'donacion_detalles.id_donacion')
+            ->selectRaw('EXTRACT(YEAR FROM donaciones.fecha) as anio, EXTRACT(MONTH FROM donaciones.fecha) as mes, COUNT(DISTINCT donaciones.id_donacion) as total')
+            ->where('donaciones.fecha', '>=', \Carbon\Carbon::now()->subMonths(12))
+            ->groupBy('anio', 'mes')
+            ->orderBy('anio')
+            ->orderBy('mes')
+            ->get();
+
+        // Para donaciones en dinero
+        $donacionesDineroPorMes = \App\Models\DonacionesDinero::join('donaciones', 'donaciones_dinero.id_donacion', '=', 'donaciones.id_donacion')
+            ->selectRaw('EXTRACT(YEAR FROM donaciones.fecha) as anio, EXTRACT(MONTH FROM donaciones.fecha) as mes, COUNT(*) as total')
+            ->where('donaciones.fecha', '>=', \Carbon\Carbon::now()->subMonths(12))
+            ->groupBy('anio', 'mes')
+            ->orderBy('anio')
+            ->orderBy('mes')
+            ->get();
+
+        $mesesComparacionLabels = [];
+        $cantidadesDonacionesEspecie = [];
+        $cantidadesDonacionesDinero = [];
+
+        for ($i = 11; $i >= 0; $i--) {
+            $fecha = \Carbon\Carbon::now()->subMonths($i);
+            $mesesComparacionLabels[] = $fecha->locale('es')->isoFormat('MMM YYYY');
+
+            $registroEspecie = $donacionesEspeciePorMes->first(function ($item) use ($fecha) {
+                return $item->mes == $fecha->month && $item->anio == $fecha->year;
+            });
+            $cantidadesDonacionesEspecie[] = $registroEspecie ? $registroEspecie->total : 0;
+
+            $registroDinero = $donacionesDineroPorMes->first(function ($item) use ($fecha) {
+                return $item->mes == $fecha->month && $item->anio == $fecha->year;
+            });
+            $cantidadesDonacionesDinero[] = $registroDinero ? $registroDinero->total : 0;
+        }
+
+        // ============================================
+        // VIZ 5: Top 5 Donantes Más Activos - BAR CHART
+        // ============================================
+        $topDonantes = \App\Models\Donante::leftJoin('donaciones', 'donantes.id_donante', '=', 'donaciones.id_donante')
+            ->select('donantes.nombre', \Illuminate\Support\Facades\DB::raw('COUNT(donaciones.id_donacion) as total_donaciones'))
+            ->groupBy('donantes.id_donante', 'donantes.nombre')
+            ->orderByDesc('total_donaciones')
+            ->take(5)
+            ->get();
+
+        $nombresTopDonantes = $topDonantes->pluck('nombre');
+        $cantidadesTopDonantes = $topDonantes->pluck('total_donaciones');
+
+        // ============================================
+        // VIZ 6: Actividad Reciente - TIMELINE
+        // ============================================
+        $actividadesRecientes = [];
+
+        // Últimas donaciones
+        $ultimasDonaciones = \App\Models\Donacione::with('donante')
+            ->orderBy('fecha', 'desc')
+            ->take(5)
+            ->get()
+            ->map(function ($donacion) {
+                return [
+                    'tipo' => 'donacion',
+                    'icono' => 'fas fa-gift',
+                    'color' => 'success',
+                    'titulo' => 'Nueva Donación',
+                    'descripcion' => 'Donación de ' . ($donacion->donante ? $donacion->donante->nombre : 'Anónimo'),
+                    'fecha' => \Carbon\Carbon::parse($donacion->fecha)
+                ];
+            });
+
+        // Últimas solicitudes de recolección
+        $ultimasSolicitudes = \App\Models\SolicitudesRecoleccion::orderBy('fecha_creacion', 'desc')
+            ->take(5)
+            ->get()
+            ->map(function ($solicitud) {
+                return [
+                    'tipo' => 'solicitud',
+                    'icono' => 'fas fa-truck',
+                    'color' => 'info',
+                    'titulo' => 'Solicitud de Recolección',
+                    'descripcion' => 'Estado: ' . $solicitud->estado . ' - ' . ($solicitud->direccion_recoleccion ?? 'Sin dirección'),
+                    'fecha' => \Carbon\Carbon::parse($solicitud->fecha_creacion)
+                ];
+            });
+
+        $actividadesRecientes = $ultimasDonaciones->concat($ultimasSolicitudes)
+            ->sortByDesc('fecha')
+            ->take(10)
+            ->values();
+
+        return view('home-voluntario', compact(
+            // KPIs
+            'totalDonaciones',
+            'donacionesMesActual',
+            'totalDonantes',
+            'totalDonacionesDinero',
+            'promedioDonacionesDia',
+            'solicitudesPendientes',
+            // Viz 1: Tendencia Donaciones
+            'mesesLabels',
+            'cantidadesDonaciones',
+            // Viz 2: Top Categorías
+            'nombresTopCategorias',
+            'cantidadesTopCategorias',
+            // Viz 3: Estado Solicitudes
+            'estadosSolicitudes',
+            'cantidadesSolicitudes',
+            // Viz 4: Donaciones Especie vs Dinero
+            'mesesComparacionLabels',
+            'cantidadesDonacionesEspecie',
+            'cantidadesDonacionesDinero',
+            // Viz 5: Top Donantes
+            'nombresTopDonantes',
+            'cantidadesTopDonantes',
+            // Viz 6: Actividades Recientes
+            'actividadesRecientes'
         ));
     }
 }
