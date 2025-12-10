@@ -122,9 +122,7 @@
         </table>
     </div>
     <div class="card-footer">
-        <div class="float-right">
-            {!! $campanas->withQueryString()->links() !!}
-        </div>
+        <small class="text-muted">Usa los controles de la tabla para navegar entre páginas</small>
     </div>
 </div>
 @stop
@@ -149,16 +147,28 @@
 <script>
     $(document).ready(function () {
         $('#campanasTable').DataTable({
-            "paging": false,
+            "paging": true,
+            "pageLength": 10,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
             "searching": true,
             "ordering": true,
-            "info": false,
+            "info": true,
             "autoWidth": false,
             "responsive": true,
             "language": {
                 "search": "Buscar:",
                 "zeroRecords": "No se encontraron resultados",
-                "emptyTable": "No hay campañas registradas"
+                "emptyTable": "No hay campañas registradas",
+                "lengthMenu": "Mostrar _MENU_ registros por página",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando 0 a 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                }
             }
         });
     });

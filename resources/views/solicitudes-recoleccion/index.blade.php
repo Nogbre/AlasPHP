@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+﻿@extends('adminlte::page')
 
 @section('title', 'Solicitudes de Recolección')
 
@@ -143,10 +143,12 @@
 <script>
     $(document).ready(function () {
         $('#solicitudesTable').DataTable({
-            "paging": false,
+            "paging": true,
+            "pageLength": 10,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],,
             "searching": true,
             "ordering": true,
-            "info": false,
+            "info": true,
             "autoWidth": false,
             "responsive": true,
             "language": {
