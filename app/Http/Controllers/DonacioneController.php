@@ -304,20 +304,11 @@ class DonacioneController extends Controller
 
         $donacion = Donacione::find($id);
         if ($donacion) {
-            DB::transaction(function () use ($donacion, $request) {
-                // Store deletion metadata before deleting
-                $donacion->deleted_reason = $request->deleted_reason;
-                $donacion->deleted_by = auth()->user()->id_usuario ?? null;
-                $donacion->save();
-
-                // eliminar ubicaciones, detalles y registros de dinero
-                foreach ($donacion->detalles as $det) {
-                    UbicacionesDonacione::where('id_detalle', $det->id_detalle)->delete();
-                }
-                $donacion->detalles()->delete();
-                DonacionesDinero::where('id_donacion', $donacion->id_donacion)->delete();
-                $donacion->delete();
-            });
+            // Store deletion metadata and soft delete (no se borran los detalles para mantener trazabilidad)
+            $donacion->deleted_reason = $request->deleted_reason;
+            $donacion->deleted_by = auth()->user()->ci ?? null;
+            $donacion->save();
+            $donacion->delete(); // Soft delete - solo marca deleted_at
         }
 
         return Redirect::route('donaciones.index')->with('success', 'Donación eliminada correctamente.');

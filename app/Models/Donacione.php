@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Donacione
@@ -14,6 +15,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property $id_punto_recoleccion
  * @property $observaciones
  * @property $fecha
+ * @property $deleted_at
+ * @property $deleted_by
+ * @property $deleted_reason
  *
  * @property DonacionDetalle[] $donacionDetalles
  * @property DonacionesDinero $donacionesDinero
@@ -22,6 +26,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Donacione extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'donaciones';
     protected $primaryKey = 'id_donacion';
     public $timestamps = false;

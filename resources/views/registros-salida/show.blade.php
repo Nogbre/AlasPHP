@@ -42,6 +42,9 @@
 
                                     <dt class="col-sm-4">Destino:</dt>
                                     <dd class="col-sm-8">{{ $registrosSalida->destino }}</dd>
+                                    
+                                    <dt class="col-sm-4">Encargado:</dt>
+                                    <dd class="col-sm-8">{{ $registrosSalida->encargado ?: 'No especificado' }}</dd>
                                 </dl>
                             </div>
                             <div class="col-md-6">
@@ -53,9 +56,7 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        <a href="{{ route('registros-salida.edit', $registrosSalida->id_salida) }}" class="btn btn-primary">
-                            <i class="fas fa-edit"></i> Editar
-                        </a>
+                        <!-- Botón de editar removido -->
                     </div>
                 </div>
             </div>

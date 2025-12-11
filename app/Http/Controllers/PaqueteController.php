@@ -382,7 +382,7 @@ class PaqueteController extends Controller
                 DB::transaction(function () use ($paquete, $request) {
                     // Store deletion metadata before deleting
                     $paquete->deleted_reason = $request->deleted_reason;
-                    $paquete->deleted_by = auth()->user()->id_usuario ?? null;
+                    $paquete->deleted_by = auth()->user()->ci ?? null;
                     $paquete->save();
 
                     // Primero eliminamos los detalles para mantener integridad si no hay cascade

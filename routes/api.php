@@ -16,6 +16,8 @@ use App\Http\Controllers\Api\ImagenController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CategoriaController;
 use App\Http\Controllers\Api\DonanteController;
+use App\Http\Controllers\Api\TrazabilidadController;
+use App\Http\Controllers\Api\PaqueteController;
 
 // Rutas públicas de autenticación
 Route::post('/donante-auth/login', [DonanteAuthController::class, 'login']);
@@ -95,4 +97,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/upload-comprobante', [DonacionController::class, 'uploadComprobante']);
     Route::apiResource('imagenes-solicitud-recogida', ImagenController::class);
 });
+
+// Trazabilidad - acciones realizadas por un voluntario (público)
+Route::get('/trazabilidad/voluntario/{ci}', [TrazabilidadController::class, 'porVoluntario']);
+
+// Paquetes - información completa por código (público)
+Route::get('/trazabilidad/paquete/{codigo}', [PaqueteController::class, 'porCodigo']);
 

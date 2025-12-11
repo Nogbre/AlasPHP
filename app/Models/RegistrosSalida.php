@@ -33,7 +33,7 @@ class RegistrosSalida extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['id_paquete', 'fecha_salida', 'destino', 'observaciones'];
+    protected $fillable = ['id_paquete', 'fecha_salida', 'destino', 'encargado', 'observaciones'];
 
 
     
