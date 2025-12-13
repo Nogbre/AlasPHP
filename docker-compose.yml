@@ -13,6 +13,16 @@ services:
       DB_DATABASE: donaciones_db
       DB_USERNAME: admin
       DB_PASSWORD: admin123
+      MAIL_MAILER: smtp
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: 587
+      MAIL_USERNAME: proyectourbanointegrador@gmail.com
+      MAIL_PASSWORD: xdzjkdlgekeembwc
+      MAIL_ENCRYPTION: tls
+      MAIL_FROM_ADDRESS: proyectourbanointegrador@gmail.com
+      MAIL_FROM_NAME: "SISTEMA DE DONACIONES"
+      API_BASE_URL_ADS: http://gatealas.dasalas.shop
+      HELPDESK_API_URL: https://proyecto-de-ultimo-minuto.online
     depends_on:
       - db
     networks:

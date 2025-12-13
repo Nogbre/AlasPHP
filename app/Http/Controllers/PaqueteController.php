@@ -220,7 +220,7 @@ class PaqueteController extends Controller
     {
         try {
             $apiBaseUrl = env('API_BASE_URL_ADS', 'http://192.168.22.128:8000');
-            $url = "{$apiBaseUrl}/api/paquetes/{$idPaqueteExterno}/armar";
+            $url = "{$apiBaseUrl}/api/gateway/logistica/paquetes/{$idPaqueteExterno}/armar";
 
             // Obtener CI del usuario logueado
             $ciUsuario = auth()->user()->ci ?? 'Sin CI';
@@ -239,7 +239,7 @@ class PaqueteController extends Controller
             $body = [
                 'ci_usuario' => $ciUsuario,
                 'ubicacion_actual' => $ubicacionActual
-            ];
+            ];  
 
             \Log::info('Enviando PATCH al sistema ADS', [
                 'url' => $url,
