@@ -98,7 +98,7 @@
         error.style.display = 'none';
         container.innerHTML = '';
         
-        fetch(`${API_BASE_URL}/api/paquetes/pendientes`)
+        fetch(`${API_BASE_URL}/api/gateway/logistica/paquetes/pendientes`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Error al cargar las solicitudes');

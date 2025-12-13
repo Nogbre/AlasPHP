@@ -18,10 +18,14 @@ use App\Http\Controllers\Api\CategoriaController;
 use App\Http\Controllers\Api\DonanteController;
 use App\Http\Controllers\Api\TrazabilidadController;
 use App\Http\Controllers\Api\PaqueteController;
+use App\Http\Controllers\Auth\RegistroSimpleController;
 
 // Rutas públicas de autenticación
 Route::post('/donante-auth/login', [DonanteAuthController::class, 'login']);
 Route::post('/auth/login', [VoluntarioAuthController::class, 'login']);
+
+// Ruta pública para gateway (búsqueda de voluntarios por CI)
+Route::get('registro/ci/{ci}', [RegistroSimpleController::class, 'showByCi']);
 
 // Rutas públicas
 Route::get('/inventario/por-producto', [InventarioController::class, 'getInventoryByProduct']);

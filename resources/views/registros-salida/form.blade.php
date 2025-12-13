@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!codigoPaquete) return;
 
         try {
-            const response = await fetch(`${apiBaseUrl}/api/paquetes/destino-voluntario/${codigoPaquete}`);
+            const response = await fetch(`${apiBaseUrl}/api/gateway/logistica/paquetes/destino-voluntario/${codigoPaquete}`);
             
             if (response.ok) {
                 const data = await response.json();
