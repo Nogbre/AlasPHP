@@ -415,6 +415,12 @@ return [
             'icon' => 'fas fa-fw fa-chart-bar',
             'can' => 'ver-almacen',
         ],
+        ['header' => 'SOPORTE'],
+        [
+            'text' => 'Centro de Soporte',
+            'url' => 'helpdesk',
+            'icon' => 'fas fa-fw fa-headset',
+        ],
     ],
 
 

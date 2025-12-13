@@ -2,37 +2,28 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 
 class RolesSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
+        // Limpiamos caché
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        // Creamos los roles usando 'name' que es lo que sale en tu diagrama
         $roles = [
-            [
-                'nombre_rol' => 'Administrador',
-                'descripcion_rol' => 'Usuario con acceso completo al sistema',
-            ],
-            [
-                'nombre_rol' => 'Voluntario',
-                'descripcion_rol' => 'Voluntario que apoya en las actividades',
-            ],
-            [
-                'nombre_rol' => 'Almacenista',
-                'descripcion_rol' => 'Gestiona el inventario y almacenes',
-            ],
+            'Administrador',
+            'Voluntario',
+            'Almacenista',
         ];
 
-        foreach ($roles as $rol) {
-            DB::table('roles')->updateOrInsert(
-                ['nombre_rol' => $rol['nombre_rol']],
-                $rol
-            );
+        foreach ($roles as $rolName) {
+            Role::firstOrCreate([
+                'name' => $rolName,
+                'guard_name' => 'web'
+            ]);
         }
     }
 }
