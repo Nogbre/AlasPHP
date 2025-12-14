@@ -59,7 +59,7 @@ Route::middleware(['auth', 'can:gestionar-almacen'])->group(function () {
 });
 
 // Rutas de solicitudes de recolección - create ANTES de show
-Route::middleware(['auth', 'can:gestionar-solicitudes'])->group(function () {
+Route::middleware(['auth', 'can:registrar-donaciones'])->group(function () {
     Route::get('solicitudes-recoleccions', [App\Http\Controllers\SolicitudesRecoleccionController::class, 'index'])->name('solicitudes-recoleccions.index');
     Route::get('solicitudes-recoleccions/create', [App\Http\Controllers\SolicitudesRecoleccionController::class, 'create'])->name('solicitudes-recoleccions.create');
     Route::post('solicitudes-recoleccions', [App\Http\Controllers\SolicitudesRecoleccionController::class, 'store'])->name('solicitudes-recoleccions.store');
@@ -79,11 +79,11 @@ Route::middleware(['auth', 'can:registrar-donaciones'])->group(function () {
     Route::get('paquete/pendientes', [App\Http\Controllers\PaqueteController::class, 'pendientes'])->name('paquete.pendientes');
     Route::post('donaciones/guardar', [App\Http\Controllers\DonacioneController::class, 'store'])->name('donaciones.guardar_manual');
     Route::post('espacio/{id}/toggle-status', [App\Http\Controllers\EspacioController::class, 'toggleStatus'])->name('espacio.toggleStatus');
-    
+
     // API routes for cascading dropdowns
     Route::get('api/almacenes/{id}/estantes', [App\Http\Controllers\AlmaceneController::class, 'getEstantes']);
     Route::get('api/estantes/{id}/espacios', [App\Http\Controllers\EstanteController::class, 'getEspacios']);
-    
+
     // Rutas de almacenes (solo ver)
     Route::get('almacene', [App\Http\Controllers\AlmaceneController::class, 'index'])->name('almacene.index');
     Route::get('almacene/{almacene}', [App\Http\Controllers\AlmaceneController::class, 'show'])->name('almacene.show');
@@ -103,6 +103,7 @@ Route::middleware(['auth', 'can:registrar-donaciones'])->group(function () {
     Route::get('reportes/solicitudes-recoleccion', [App\Http\Controllers\ReportesController::class, 'solicitudesRecoleccion'])->name('reportes.solicitudes');
     Route::get('reportes/salidas-productos', [App\Http\Controllers\ReportesController::class, 'salidasProductos'])->name('reportes.salidas');
     Route::get('reportes/campanas', [App\Http\Controllers\ReportesController::class, 'campanasReporte'])->name('reportes.campanas');
+    Route::get('reportes/distribucion', [App\Http\Controllers\ReportesController::class, 'reporteDistribucion'])->name('reportes.distribucion');
 });
 
 
