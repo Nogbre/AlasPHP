@@ -19,6 +19,32 @@
             <input type="text" name="id_usuario" class="form-control" value="{{ old('id_usuario', $usuario->id_usuario) }}" id="id_usuario" readonly>
         </div>
         @endif
+        
+        {{-- Campo CI primero para búsqueda automática --}}
+        <div class="form-group mb-2 mb20">
+            <label for="ci" class="form-label">{{ __('Carnet de Identidad (CI)') }} <span class="text-danger">*</span></label>
+            <input type="text" name="ci" class="form-control @error('ci') is-invalid @enderror" value="{{ old('ci', $usuario?->ci) }}" id="ci" placeholder="Ingrese el CI para buscar datos" required maxlength="20">
+            @error('ci')
+                <span class="invalid-feedback d-block error-message" role="alert" data-field="ci">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+            <span class="invalid-feedback d-block error-message" role="alert" data-field="ci" style="display: none;">
+                <strong><span class="error-text"></span></strong>
+            </span>
+            <small class="text-muted" id="ci-help-text">Al ingresar el CI se buscarán datos automáticamente en el sistema</small>
+            <small class="text-info" id="ci-loading" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i> Buscando datos...
+            </small>
+        </div>
+
+        {{-- Alerta para mostrar datos encontrados --}}
+        <div id="ci-lookup-alert" class="alert alert-info alert-dismissible fade show" style="display: none;" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <i class="fas fa-info-circle mr-2"></i>
+            <span id="ci-lookup-message"></span>
+        </div>
+
         <div class="form-group mb-2 mb20">
             <label for="nombres" class="form-label">{{ __('Nombres') }} <span class="text-danger">*</span></label>
             <input type="text" name="nombres" class="form-control @error('nombres') is-invalid @enderror" value="{{ old('nombres', $usuario?->nombres) }}" id="nombres" placeholder="Nombres" required maxlength="100">
@@ -40,18 +66,6 @@
                 </span>
             @enderror
             <span class="invalid-feedback d-block error-message" role="alert" data-field="apellidos" style="display: none;">
-                <strong><span class="error-text"></span></strong>
-            </span>
-        </div>
-        <div class="form-group mb-2 mb20">
-            <label for="ci" class="form-label">{{ __('Ci') }} <span class="text-danger">*</span></label>
-            <input type="text" name="ci" class="form-control @error('ci') is-invalid @enderror" value="{{ old('ci', $usuario?->ci) }}" id="ci" placeholder="Ci" required maxlength="20">
-            @error('ci')
-                <span class="invalid-feedback d-block error-message" role="alert" data-field="ci">
-                    <strong>{{ $message }}</strong>
-                </span>
-            @enderror
-            <span class="invalid-feedback d-block error-message" role="alert" data-field="ci" style="display: none;">
                 <strong><span class="error-text"></span></strong>
             </span>
         </div>
@@ -218,6 +232,158 @@
 </div>
 
 <script>
+// ===== Búsqueda automática por CI (JavaScript Vanilla) =====
+(function() {
+    console.log('Script de usuario cargado');
+    
+    const apiBaseUrl = @json(env('API_BASE_URL_ADS', ''));
+    const ciInput = document.getElementById('ci');
+    const nombresInput = document.getElementById('nombres');
+    const apellidosInput = document.getElementById('apellidos');
+    const telefonoInput = document.getElementById('telefono');
+    const ciLoadingSpinner = document.getElementById('ci-loading');
+    const ciHelpText = document.getElementById('ci-help-text');
+    const ciLookupAlert = document.getElementById('ci-lookup-alert');
+    const ciLookupMessage = document.getElementById('ci-lookup-message');
+
+    console.log('API Base URL:', apiBaseUrl);
+    console.log('CI Input encontrado:', !!ciInput);
+
+    let lastLookupCi = null;
+    let isFetching = false;
+
+    if (ciInput && apiBaseUrl) {
+        console.log('Agregando evento blur al campo CI');
+        
+        ciInput.addEventListener('blur', async function() {
+            console.log('Evento blur disparado');
+            const ci = (ciInput.value || '').trim();
+            console.log('CI ingresado:', ci);
+
+            // Solo buscar si el CI tiene al menos 5 caracteres y no se ha buscado antes
+            if (ci.length < 5) {
+                console.log('CI muy corto, se requieren al menos 5 caracteres');
+                return;
+            }
+            
+            if (ci === lastLookupCi) {
+                console.log('CI ya fue buscado anteriormente');
+                return;
+            }
+            
+            if (isFetching) {
+                console.log('Ya hay una búsqueda en progreso');
+                return;
+            }
+
+            lastLookupCi = ci;
+            isFetching = true;
+
+            // Mostrar spinner de carga
+            console.log('Mostrando spinner');
+            if (ciLoadingSpinner) {
+                ciLoadingSpinner.style.display = 'block';
+            }
+            if (ciHelpText) {
+                ciHelpText.style.display = 'none';
+            }
+
+            try {
+                const url = `${apiBaseUrl}/api/gateway/registro/ci/${encodeURIComponent(ci)}`;
+                console.log('Llamando a URL:', url);
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Client-System': 'donaciones',
+                    },
+                });
+
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    console.warn('Gateway lookup failed with status', response.status);
+                    return;
+                }
+
+                const json = await response.json();
+                console.log('Respuesta JSON:', json);
+
+                if (!json.success || !json.found) {
+                    console.log('No se encontraron datos');
+                    // Ocultar alerta si no se encontraron datos
+                    if (ciLookupAlert) {
+                        ciLookupAlert.style.display = 'none';
+                    }
+                    return;
+                }
+
+                // Obtener datos (pueden venir directamente o dentro de data)
+                const nombre = json.nombre || (json.data && json.data.nombre) || '';
+                const apellido = json.apellido || (json.data && json.data.apellido) || '';
+                const telefono = json.telefono || (json.data && json.data.telefono) || '';
+                const sistema = json.system || 'el sistema';
+
+                console.log('Datos encontrados:', { nombre, apellido, telefono, sistema });
+
+                // Mostrar mensaje de éxito
+                if (ciLookupAlert && ciLookupMessage) {
+                    ciLookupMessage.textContent = `¡Datos encontrados del sistema "${sistema}"! Los campos han sido autocompletados.`;
+                    ciLookupAlert.style.display = 'block';
+                    ciLookupAlert.className = 'alert alert-success alert-dismissible fade show';
+                }
+
+                // Rellenar campos solo si están vacíos
+                if (nombresInput && !nombresInput.value.trim() && nombre) {
+                    console.log('Llenando campo nombres');
+                    nombresInput.value = nombre;
+                    // Disparar evento input para validación
+                    const event = new Event('input', { bubbles: true });
+                    nombresInput.dispatchEvent(event);
+                }
+                if (apellidosInput && !apellidosInput.value.trim() && apellido) {
+                    console.log('Llenando campo apellidos');
+                    apellidosInput.value = apellido;
+                    const event = new Event('input', { bubbles: true });
+                    apellidosInput.dispatchEvent(event);
+                }
+                if (telefonoInput && !telefonoInput.value.trim() && telefono) {
+                    console.log('Llenando campo telefono');
+                    telefonoInput.value = telefono;
+                }
+
+            } catch (error) {
+                console.error('Error llamando al gateway para autocompletar', error);
+                // Mostrar error discreto
+                if (ciLookupAlert && ciLookupMessage) {
+                    ciLookupMessage.textContent = 'No se pudo conectar con el servicio de búsqueda. Por favor complete los datos manualmente.';
+                    ciLookupAlert.style.display = 'block';
+                    ciLookupAlert.className = 'alert alert-warning alert-dismissible fade show';
+                }
+            } finally {
+                isFetching = false;
+                console.log('Ocultando spinner');
+                // Ocultar spinner
+                if (ciLoadingSpinner) {
+                    ciLoadingSpinner.style.display = 'none';
+                }
+                if (ciHelpText) {
+                    ciHelpText.style.display = 'block';
+                }
+            }
+        });
+    } else {
+        if (!ciInput) {
+            console.warn('No se encontró el campo CI');
+        }
+        if (!apiBaseUrl) {
+            console.warn('No se encontró API_BASE_URL_ADS en .env');
+        }
+    }
+})();
+
+// ===== Resto del código con jQuery =====
 $(document).ready(function() {
     // Manejo del checkbox is_recolector
     function toggleLicenciaRequired() {
