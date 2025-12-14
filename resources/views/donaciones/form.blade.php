@@ -159,18 +159,20 @@
                 <table class="table table-bordered table-hover" id="detalles-table">
                     <thead class="bg-light">
                         <tr>
-                            <th width="20%">
+                            <th width="15%">
                                 Producto <span class="text-danger">*</span>
                                 <button type="button" class="btn btn-xs btn-success ml-1" data-toggle="modal" data-target="#createProductModal" title="Crear nuevo producto">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </th>
-                            <th width="10%">Cantidad <span class="text-danger">*</span></th>
-                            <th width="10%">Unidad</th>
-                            <th width="15%">Almacén <span class="text-danger">*</span></th>
-                            <th width="15%">Estante <span class="text-danger">*</span></th>
-                            <th width="20%">Espacio <span class="text-danger">*</span></th>
-                            <th width="10%"></th>
+                            <th width="8%">Cantidad <span class="text-danger">*</span></th>
+                            <th width="8%">Unidad</th>
+                            <th width="11%">Almacén <span class="text-danger">*</span></th>
+                            <th width="11%">Estante <span class="text-muted">(opcional)</span></th>
+                            <th width="13%">Espacio <span class="text-muted">(opcional)</span></th>
+                            <th width="10%" class="talla-header" style="display:none;">Talla</th>
+                            <th width="10%" class="fecha-caducidad-header" style="display:none;">F. Caducidad</th>
+                            <th width="6%"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -233,6 +235,17 @@
                                             @endif
                                         </select>
                                     </td>
+                                    <td class="talla-cell" style="display:none;">
+                                        <select name="detalles[{{ $idx }}][id_talla]" class="form-control form-control-sm talla-select">
+                                            <option value="">-- Seleccione --</option>
+                                            @foreach($tallas ?? [] as $tallaId => $tallaNombre)
+                                                <option value="{{ $tallaId }}" {{ (string)($det['id_talla'] ?? $det->id_talla ?? '') === (string)$tallaId ? 'selected' : '' }}>{{ $tallaNombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td class="fecha-caducidad-cell" style="display:none;">
+                                        <input name="detalles[{{ $idx }}][fecha_caducidad]" type="date" class="form-control form-control-sm fecha-caducidad-input" value="{{ $det['fecha_caducidad'] ?? $det->fecha_caducidad ?? '' }}">
+                                    </td>
                                     <td><button class="btn btn-danger btn-sm remove-row" type="button"><i class="fas fa-trash"></i></button></td>
                                 </tr>
                             @endforeach
@@ -267,6 +280,17 @@
                                         <option value="">-- Seleccione Estante --</option>
                                     </select>
                                 </td>
+                                <td class="talla-cell" style="display:none;">
+                                    <select name="detalles[0][id_talla]" class="form-control form-control-sm talla-select">
+                                        <option value="">-- Seleccione --</option>
+                                        @foreach($tallas ?? [] as $tallaId => $tallaNombre)
+                                            <option value="{{ $tallaId }}">{{ $tallaNombre }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td class="fecha-caducidad-cell" style="display:none;">
+                                    <input name="detalles[0][fecha_caducidad]" type="date" class="form-control form-control-sm fecha-caducidad-input">
+                                </td>
                                 <td><button class="btn btn-danger btn-sm remove-row" type="button"><i class="fas fa-trash"></i></button></td>
                             </tr>
                         @endif
@@ -298,6 +322,7 @@
 // Product units data from controller
 // Make sure productosUnidades is a let/var so we can update it
 let productosUnidades = @json($productosUnidades ?? []);
+const productosCategorias = @json($productosCategorias ?? []);
 const almacenesData = @json($almacenes ?? []);
 const defaultAlmacenId = @json($defaultAlmacenId ?? null);
 
@@ -306,6 +331,64 @@ document.addEventListener('DOMContentLoaded', function(){
     const blockDinero = document.getElementById('block-dinero');
     const blockDetalles = document.getElementById('block-detalles');
     let detalleIndex = 1;
+    
+    // Function to check if any row has a food product and update column visibility
+    function updateFechaCaducidadColumnVisibility() {
+        const rows = document.querySelectorAll('.detalle-row');
+        let anyFoodProduct = false;
+        
+        rows.forEach(function(row) {
+            const select = row.querySelector('.producto-select');
+            const productId = select ? select.value : null;
+            const categoria = productId ? productosCategorias[productId] : null;
+            const isFoodProduct = categoria === 'Alimentos';
+            
+            if (isFoodProduct) {
+                anyFoodProduct = true;
+            }
+        });
+        
+        // Show or hide the header and all cells
+        const header = document.querySelector('.fecha-caducidad-header');
+        const cells = document.querySelectorAll('.fecha-caducidad-cell');
+        
+        if (anyFoodProduct) {
+            if (header) header.style.display = '';
+            cells.forEach(cell => cell.style.display = '');
+        } else {
+            if (header) header.style.display = 'none';
+            cells.forEach(cell => cell.style.display = 'none');
+        }
+    }
+    
+    // Function to check if any row has a clothing product and update talla column visibility
+    function updateTallaColumnVisibility() {
+        const rows = document.querySelectorAll('.detalle-row');
+        let anyClothingProduct = false;
+        
+        rows.forEach(function(row) {
+            const select = row.querySelector('.producto-select');
+            const productId = select ? select.value : null;
+            const categoria = productId ? productosCategorias[productId] : null;
+            const isClothingProduct = categoria === 'Ropa';
+            
+            if (isClothingProduct) {
+                anyClothingProduct = true;
+            }
+        });
+        
+        // Show or hide the header and all cells
+        const header = document.querySelector('.talla-header');
+        const cells = document.querySelectorAll('.talla-cell');
+        
+        if (anyClothingProduct) {
+            if (header) header.style.display = '';
+            cells.forEach(cell => cell.style.display = '');
+        } else {
+            if (header) header.style.display = 'none';
+            cells.forEach(cell => cell.style.display = 'none');
+        }
+    }
     
     // Function to setup product change listeners
     function setupProductListeners(container = document, triggerChange = true) {
@@ -316,7 +399,10 @@ document.addEventListener('DOMContentLoaded', function(){
                 const productId = this.value;
                 const row = this.closest('tr');
                 const unidadInput = row.querySelector('input[name*="[unidad_medida]"]');
+                const fechaCaducidadInput = row.querySelector('.fecha-caducidad-input');
+                const tallaSelect = row.querySelector('.talla-select');
                 
+                // Handle unit autofill
                 if (unidadInput && productId && productosUnidades[productId]) {
                     unidadInput.value = productosUnidades[productId];
                     unidadInput.setAttribute('readonly', 'readonly');
@@ -326,6 +412,25 @@ document.addEventListener('DOMContentLoaded', function(){
                     unidadInput.removeAttribute('readonly');
                     unidadInput.style.backgroundColor = '';
                 }
+                
+                // Get product category
+                const categoria = productId ? productosCategorias[productId] : null;
+                const isFoodProduct = categoria === 'Alimentos';
+                const isClothingProduct = categoria === 'Ropa';
+                
+                // Handle fecha_caducidad for food products
+                if (fechaCaducidadInput && !isFoodProduct) {
+                    fechaCaducidadInput.value = '';
+                }
+                
+                // Handle talla for clothing products
+                if (tallaSelect && !isClothingProduct) {
+                    tallaSelect.value = '';
+                }
+                
+                // Update column visibility after any product change
+                updateFechaCaducidadColumnVisibility();
+                updateTallaColumnVisibility();
             });
             
             // Trigger change event for existing selections if requested
@@ -595,6 +700,9 @@ document.addEventListener('DOMContentLoaded', function(){
             if(allRows.length > 1){
                 row.remove();
                 console.log('Fila eliminada');
+                // Update column visibility after removing a row
+                updateFechaCaducidadColumnVisibility();
+                updateTallaColumnVisibility();
             } else {
                 alert('Debe mantener al menos un detalle.');
             }

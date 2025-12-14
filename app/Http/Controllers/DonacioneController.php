@@ -47,8 +47,13 @@ class DonacioneController extends Controller
         $espacios = Espacio::where('estado', 'disponible')->pluck('codigo_espacio', 'id_espacio');
 
         // Get products with their unit measurements for auto-fill
-        $productosData = Producto::select('id_producto', 'nombre', 'unidad_medida')->get();
+        $productosData = Producto::with('categoriaProducto')->select('id_producto', 'nombre', 'unidad_medida', 'id_categoria')->get();
         $productosUnidades = $productosData->pluck('unidad_medida', 'id_producto')->toArray();
+
+        // Map productos to their categories for frontend logic
+        $productosCategorias = $productosData->mapWithKeys(function ($producto) {
+            return [$producto->id_producto => $producto->categoriaProducto ? $producto->categoriaProducto->nombre : null];
+        })->toArray();
 
         // Provide an empty model instance so the form can safely access $donacion
         $donacion = new Donacione();
@@ -59,7 +64,10 @@ class DonacioneController extends Controller
         $almacenCentral = \App\Models\Almacene::where('nombre', 'LIKE', '%Central%')->first();
         $defaultAlmacenId = $almacenCentral ? $almacenCentral->id_almacen : null;
 
-        return view('donaciones.create', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades', 'almacenes', 'categorias', 'defaultAlmacenId'));
+        // Get tallas for clothing products
+        $tallas = \App\Models\Talla::pluck('talla', 'id_talla');
+
+        return view('donaciones.create', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades', 'productosCategorias', 'almacenes', 'categorias', 'defaultAlmacenId', 'tallas'));
     }
 
     public function store(DonacioneRequest $request): RedirectResponse
@@ -129,23 +137,29 @@ class DonacioneController extends Controller
                             'descripcion' => $det['descripcion'] ?? null,
                             'id_talla' => $det['id_talla'] ?? null,
                             'id_genero' => $det['id_genero'] ?? null,
+                            'fecha_caducidad' => $det['fecha_caducidad'] ?? null,
                         ]);
 
                         \Log::info("Detalle #{$index} creado:", ['id' => $detalle->id_detalle]);
 
-                        $espacio = Espacio::find($det['id_espacio']);
-                        if ($espacio && $espacio->estado === 'lleno') {
-                            throw new \Exception("El espacio {$espacio->codigo_espacio} está marcado como lleno y no puede recibir más productos.");
+                        // Only create location if espacio is provided
+                        if (!empty($det['id_espacio'])) {
+                            $espacio = Espacio::find($det['id_espacio']);
+                            if ($espacio && $espacio->estado === 'lleno') {
+                                throw new \Exception("El espacio {$espacio->codigo_espacio} está marcado como lleno y no puede recibir más productos.");
+                            }
+
+                            UbicacionesDonacione::create([
+                                'id_detalle' => $detalle->id_detalle,
+                                'id_espacio' => $det['id_espacio'],
+                                'fecha_ingreso' => now(),
+                                'cantidad_ubicada' => (int) $det['cantidad'],
+                            ]);
+
+                            \Log::info("Ubicación para detalle #{$index} creada");
+                        } else {
+                            \Log::info("No se creó ubicación para detalle #{$index} - espacio no proporcionado");
                         }
-
-                        UbicacionesDonacione::create([
-                            'id_detalle' => $detalle->id_detalle,
-                            'id_espacio' => $det['id_espacio'],
-                            'fecha_ingreso' => now(),
-                            'cantidad_ubicada' => (int) $det['cantidad'],
-                        ]);
-
-                        \Log::info("Ubicación para detalle #{$index} creada");
                     }
                 }
 
@@ -187,8 +201,14 @@ class DonacioneController extends Controller
         $espacios = Espacio::where('estado', 'disponible')->pluck('codigo_espacio', 'id_espacio');
 
         // Get products with their unit measurements for auto-fill
-        $productosData = Producto::select('id_producto', 'nombre', 'unidad_medida')->get();
+        $productosData = Producto::with('categoriaProducto')->select('id_producto', 'nombre', 'unidad_medida', 'id_categoria')->get();
         $productosUnidades = $productosData->pluck('unidad_medida', 'id_producto')->toArray();
+
+        // Map productos to their categories for frontend logic
+        $productosCategorias = $productosData->mapWithKeys(function ($producto) {
+            return [$producto->id_producto => $producto->categoriaProducto ? $producto->categoriaProducto->nombre : null];
+        })->toArray();
+
         $almacenes = \App\Models\Almacene::pluck('nombre', 'id_almacen');
         $categorias = \App\Models\CategoriasProducto::pluck('nombre', 'id_categoria');
 
@@ -196,7 +216,10 @@ class DonacioneController extends Controller
         $almacenCentral = \App\Models\Almacene::where('nombre', 'LIKE', '%Central%')->first();
         $defaultAlmacenId = $almacenCentral ? $almacenCentral->id_almacen : null;
 
-        return view('donaciones.edit', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades', 'almacenes', 'categorias', 'defaultAlmacenId'));
+        // Get tallas for clothing products
+        $tallas = \App\Models\Talla::pluck('talla', 'id_talla');
+
+        return view('donaciones.edit', compact('donacion', 'donantes', 'campanas', 'puntos', 'productos', 'espacios', 'productosUnidades', 'productosCategorias', 'almacenes', 'categorias', 'defaultAlmacenId', 'tallas'));
     }
 
     public function update(DonacioneRequest $request, Donacione $donacione): RedirectResponse
@@ -267,19 +290,23 @@ class DonacioneController extends Controller
                             'descripcion' => $det['descripcion'] ?? null,
                             'id_talla' => $det['id_talla'] ?? null,
                             'id_genero' => $det['id_genero'] ?? null,
+                            'fecha_caducidad' => $det['fecha_caducidad'] ?? null,
                         ]);
 
-                        $espacio = Espacio::find($det['id_espacio']);
-                        if ($espacio && $espacio->estado === 'lleno') {
-                            throw new \Exception("El espacio {$espacio->codigo_espacio} está marcado como lleno y no puede recibir más productos.");
+                        // Only create location if espacio is provided
+                        if (!empty($det['id_espacio'])) {
+                            $espacio = Espacio::find($det['id_espacio']);
+                            if ($espacio && $espacio->estado === 'lleno') {
+                                throw new \Exception("El espacio {$espacio->codigo_espacio} está marcado como lleno y no puede recibir más productos.");
+                            }
+
+                            UbicacionesDonacione::create([
+                                'id_detalle' => $detalle->id_detalle,
+                                'id_espacio' => $det['id_espacio'],
+                                'fecha_ingreso' => now(),
+                                'cantidad_ubicada' => (int) $det['cantidad'],
+                            ]);
                         }
-
-                        UbicacionesDonacione::create([
-                            'id_detalle' => $detalle->id_detalle,
-                            'id_espacio' => $det['id_espacio'],
-                            'fecha_ingreso' => now(),
-                            'cantidad_ubicada' => (int) $det['cantidad'],
-                        ]);
                     }
                 }
             });
