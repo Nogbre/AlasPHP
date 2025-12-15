@@ -202,13 +202,12 @@
                             <th>Producto</th>
                             <th width="15%">Cantidad Total</th>
                             <th width="15%">Unidad</th>
-                            <th width="20%">Espacios</th>
-                            <th width="15%">F. Caducidad</th>
+                            <th width="25%">Espacios</th>
                         </tr>
                     </thead>
                     <tbody>
                         @php
-                            // Group products by id_producto but also collect expiration dates
+                            // Group products by id_producto
                             $productosAgrupados = [];
                             foreach ($donacion->detalles as $det) {
                                 $idProducto = $det->id_producto;
@@ -217,8 +216,7 @@
                                         'nombre' => $det->producto->nombre ?? 'N/A',
                                         'cantidad' => 0,
                                         'unidad_medida' => $det->unidad_medida ?? $det->producto->unidad_medida ?? '',
-                                        'espacios' => [],
-                                        'fecha_caducidad' => $det->fecha_caducidad
+                                        'espacios' => []
                                     ];
                                 }
                                 $productosAgrupados[$idProducto]['cantidad'] += $det->cantidad;
@@ -244,16 +242,6 @@
                                     @endforeach
                                     @if(empty($producto['espacios']))
                                         <span class="text-muted">N/A</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($producto['fecha_caducidad'])
-                                        <span class="badge badge-warning badge-lg">
-                                            <i class="far fa-calendar-alt"></i>
-                                            {{ \Carbon\Carbon::parse($producto['fecha_caducidad'])->format('d/m/Y') }}
-                                        </span>
-                                    @else
-                                        <span class="text-muted">-</span>
                                     @endif
                                 </td>
                             </tr>

@@ -316,7 +316,7 @@ return [
             'text' => 'search',
         ],
         [
-            'text' => 'Dashboard',
+            'text' => 'Estadísticas',
             'url' => 'home',
             'icon' => 'fas fa-fw fa-tachometer-alt',
         ],
@@ -413,12 +413,6 @@ return [
             'url' => '/reportes',
             'icon' => 'fas fa-fw fa-chart-bar',
             'can' => 'ver-almacen',
-        ],
-        ['header' => 'SOPORTE'],
-        [
-            'text' => 'Centro de Soporte',
-            'url' => 'helpdesk',
-            'icon' => 'fas fa-fw fa-headset',
         ],
     ],
 
