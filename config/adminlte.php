@@ -316,7 +316,7 @@ return [
             'text' => 'search',
         ],
         [
-            'text' => 'Dashboard',
+            'text' => 'Estadísticas',
             'url' => 'home',
             'icon' => 'fas fa-fw fa-tachometer-alt',
         ],

@@ -1,10 +1,10 @@
 @extends('adminlte::page')
 
-@section('title', 'Dashboard')
+@section('title', 'Estadísticas')
 
 @section('content_header')
 <div class="d-flex justify-content-between align-items-center">
-    <h1><i class="fas fa-chart-line"></i> Dashboard Principal</h1>
+    <h1><i class="fas fa-chart-line"></i> Estadísticas Principales</h1>
     <small class="text-muted">Sistema de Gestión de Donaciones</small>
 </div>
 @stop
