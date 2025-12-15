@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\PaqueteController;
 use App\Http\Controllers\Auth\RegistroSimpleController;
 
 // Rutas públicas de autenticación
+Route::post('/donante-auth/register', [DonanteAuthController::class, 'register']);
 Route::post('/donante-auth/login', [DonanteAuthController::class, 'login']);
 Route::post('/auth/login', [VoluntarioAuthController::class, 'login']);
 

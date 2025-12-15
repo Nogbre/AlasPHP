@@ -11,6 +11,70 @@ use Illuminate\Validation\ValidationException;
 class DonanteAuthController extends Controller
 {
     /**
+     * Registro de nuevo donante
+     * 
+     * POST /api/donante-auth/register
+     * Body: { "nombre": "string", "email": "string", "telefono": "string", "contrasena_hash": "string", "direccion": "string", "tipo": "persona|empresa" }
+     */
+    public function register(Request $request)
+    {
+        try {
+            $request->validate([
+                'nombre' => 'required|string|max:255',
+                'email' => 'required|email|unique:donantes,email',
+                'telefono' => 'required|string|max:20',
+                'contrasena_hash' => 'required|string|min:6',
+                'direccion' => 'nullable|string',
+                'tipo' => 'required|in:persona,empresa',
+            ], [
+                'email.unique' => 'El correo electrónico ya está registrado.',
+                'tipo.in' => 'El tipo debe ser "persona" o "empresa".',
+            ]);
+
+            // Crear el donante
+            $donante = Donante::create([
+                'nombre' => $request->nombre,
+                'email' => $request->email,
+                'telefono' => $request->telefono,
+                'direccion' => $request->direccion,
+                'tipo' => $request->tipo,
+                'password' => Hash::make($request->contrasena_hash),
+                'fecha_registro' => now(),
+                'cambiar_password' => false,
+            ]);
+
+            // Generar token
+            $token = $donante->createToken('donante-app')->plainTextToken;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Donante registrado exitosamente',
+                'token' => $token,
+                'donante' => [
+                    'id' => $donante->id_donante,
+                    'nombre' => $donante->nombre,
+                    'email' => $donante->email,
+                    'telefono' => $donante->telefono,
+                    'tipo' => $donante->tipo,
+                    'cambiar_password' => $donante->cambiar_password,
+                ]
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de validación',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al registrar el donante',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Login de donante
      * 
      * Endpoint esperado por app móvil: POST /api/donante-auth/login
