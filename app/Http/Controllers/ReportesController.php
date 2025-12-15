@@ -37,23 +37,23 @@ class ReportesController extends Controller
             $request->fecha_inicio . ' 00:00:00',
             $request->fecha_fin . ' 23:59:59'
         ])
-        ->with(['donante', 'campana', 'detalles', 'dinero'])
-        ->get();
+            ->with(['donante', 'campana', 'detalles', 'dinero'])
+            ->get();
 
         $totalDonaciones = $donaciones->count();
-        
+
         // Calcular monto total (solo donaciones en dinero)
-        $totalMonto = $donaciones->filter(function($donacion) {
+        $totalMonto = $donaciones->filter(function ($donacion) {
             return $donacion->tipo === 'dinero' && $donacion->dinero;
-        })->sum(function($donacion) {
+        })->sum(function ($donacion) {
             return $donacion->dinero->monto ?? 0;
         });
-        
+
         $donacionesPorTipo = $donaciones->groupBy('tipo')->map(function ($grupo) {
             $cantidadDinero = $grupo->filter(fn($d) => $d->tipo === 'dinero' && $d->dinero)->count();
             $montoDinero = $grupo->filter(fn($d) => $d->tipo === 'dinero' && $d->dinero)
                 ->sum(fn($d) => $d->dinero->monto ?? 0);
-            
+
             return [
                 'cantidad' => $grupo->count(),
                 'monto' => $montoDinero,
@@ -88,7 +88,7 @@ class ReportesController extends Controller
     public function inventarioPorAlmacen(Request $request)
     {
         $almacenId = $request->almacen_id;
-        
+
         $almacenes = Almacene::with(['estantes.espacios.ubicacionesDonaciones.donacionDetalle.producto.categoriaProducto'])
             ->when($almacenId, function ($query) use ($almacenId) {
                 return $query->where('id_almacen', $almacenId);
@@ -100,49 +100,49 @@ class ReportesController extends Controller
             'donacionDetalle.producto.categoriaProducto',
             'espacio.estante.almacene'
         ])
-        ->when($almacenId, function ($query) use ($almacenId) {
-            return $query->whereHas('espacio.estante.almacene', function ($q) use ($almacenId) {
-                $q->where('id_almacen', $almacenId);
-            });
-        })
-        ->whereHas('donacionDetalle.producto') // Solo ubicaciones con producto válido
-        ->get();
+            ->when($almacenId, function ($query) use ($almacenId) {
+                return $query->whereHas('espacio.estante.almacene', function ($q) use ($almacenId) {
+                    $q->where('id_almacen', $almacenId);
+                });
+            })
+            ->whereHas('donacionDetalle.producto') // Solo ubicaciones con producto válido
+            ->get();
 
         // Agrupar por producto para calcular totales
-        $productosAgrupados = $ubicaciones->groupBy(function($ubicacion) {
+        $productosAgrupados = $ubicaciones->groupBy(function ($ubicacion) {
             return $ubicacion->donacionDetalle->id_producto ?? 0;
         })
-        ->filter(function($grupo, $key) {
-            return $key > 0; // Filtrar productos con ID 0 o null
-        })
-        ->map(function($grupo) {
-            $primerItem = $grupo->first();
-            $detalle = $primerItem->donacionDetalle;
-            
-            // Agrupar ubicaciones por almacén/estante/espacio y sumar cantidades
-            $ubicacionesAgrupadas = $grupo->groupBy(function($ub) {
-                $almacen = $ub->espacio->estante->almacene->nombre ?? 'N/A';
-                $estante = $ub->espacio->estante->codigo_estante ?? 'N/A';
-                $espacio = $ub->espacio->codigo_espacio ?? 'N/A';
-                return $almacen . '|' . $estante . '|' . $espacio;
-            })->map(function($ubicacionesGrupo) {
-                $primera = $ubicacionesGrupo->first();
-                return [
-                    'almacen' => $primera->espacio->estante->almacene->nombre ?? 'N/A',
-                    'estante' => $primera->espacio->estante->codigo_estante ?? 'N/A',
-                    'espacio' => $primera->espacio->codigo_espacio ?? 'N/A',
-                    'cantidad' => $ubicacionesGrupo->sum('cantidad_ubicada')
+            ->filter(function ($grupo, $key) {
+                return $key > 0; // Filtrar productos con ID 0 o null
+            })
+            ->map(function ($grupo) {
+                $primerItem = $grupo->first();
+                $detalle = $primerItem->donacionDetalle;
+
+                // Agrupar ubicaciones por almacén/estante/espacio y sumar cantidades
+                $ubicacionesAgrupadas = $grupo->groupBy(function ($ub) {
+                    $almacen = $ub->espacio->estante->almacene->nombre ?? 'N/A';
+                    $estante = $ub->espacio->estante->codigo_estante ?? 'N/A';
+                    $espacio = $ub->espacio->codigo_espacio ?? 'N/A';
+                    return $almacen . '|' . $estante . '|' . $espacio;
+                })->map(function ($ubicacionesGrupo) {
+                    $primera = $ubicacionesGrupo->first();
+                    return [
+                        'almacen' => $primera->espacio->estante->almacene->nombre ?? 'N/A',
+                        'estante' => $primera->espacio->estante->codigo_estante ?? 'N/A',
+                        'espacio' => $primera->espacio->codigo_espacio ?? 'N/A',
+                        'cantidad' => $ubicacionesGrupo->sum('cantidad_ubicada')
+                    ];
+                })->values();
+
+                return (object) [
+                    'id_producto' => $detalle->id_producto ?? 0,
+                    'nombre_producto' => $detalle->producto->nombre ?? 'N/A',
+                    'categoria' => $detalle->producto->categoriaProducto->nombre ?? 'N/A',
+                    'cantidad_total' => $grupo->sum('cantidad_ubicada'),
+                    'ubicaciones' => $ubicacionesAgrupadas
                 ];
             })->values();
-            
-            return (object)[
-                'id_producto' => $detalle->id_producto ?? 0,
-                'nombre_producto' => $detalle->producto->nombre ?? 'N/A',
-                'categoria' => $detalle->producto->categoriaProducto->nombre ?? 'N/A',
-                'cantidad_total' => $grupo->sum('cantidad_ubicada'),
-                'ubicaciones' => $ubicacionesAgrupadas
-            ];
-        })->values();
 
         $totalProductos = $productosAgrupados->count();
         $cantidadTotal = $productosAgrupados->sum('cantidad_total');
@@ -235,27 +235,27 @@ class ReportesController extends Controller
         $salidas = RegistrosSalida::with([
             'paquete.detalles.donacionDetalle.producto'
         ])
-        ->when($request->fecha_inicio && $request->fecha_fin, function ($query) use ($request) {
-            return $query->whereBetween('fecha_salida', [
-                $request->fecha_inicio . ' 00:00:00',
-                $request->fecha_fin . ' 23:59:59'
-            ]);
-        })
-        ->get();
+            ->when($request->fecha_inicio && $request->fecha_fin, function ($query) use ($request) {
+                return $query->whereBetween('fecha_salida', [
+                    $request->fecha_inicio . ' 00:00:00',
+                    $request->fecha_fin . ' 23:59:59'
+                ]);
+            })
+            ->get();
 
         $totalSalidas = $salidas->count();
-        $cantidadTotal = $salidas->sum(function($salida) {
+        $cantidadTotal = $salidas->sum(function ($salida) {
             return $salida->paquete->detalles->sum('cantidad_usada');
         });
 
         // Agrupar productos por salida
-        $salidasDetalladas = $salidas->map(function($salida) {
+        $salidasDetalladas = $salidas->map(function ($salida) {
             return [
                 'id_salida' => $salida->id_salida,
                 'fecha_salida' => $salida->fecha_salida,
                 'destino' => $salida->destino,
                 'paquete_codigo' => $salida->paquete->codigo_paquete ?? 'N/A',
-                'productos' => $salida->paquete->detalles->map(function($detalle) {
+                'productos' => $salida->paquete->detalles->map(function ($detalle) {
                     return [
                         'nombre' => $detalle->donacionDetalle->producto->nombre ?? 'N/A',
                         'cantidad' => $detalle->cantidad_usada
@@ -293,7 +293,7 @@ class ReportesController extends Controller
                 $now = Carbon::now();
                 if ($request->estado === 'activas') {
                     return $query->where('fecha_inicio', '<=', $now)
-                                 ->where('fecha_fin', '>=', $now);
+                        ->where('fecha_fin', '>=', $now);
                 } elseif ($request->estado === 'finalizadas') {
                     return $query->where('fecha_fin', '<', $now);
                 } elseif ($request->estado === 'proximas') {
@@ -330,6 +330,120 @@ class ReportesController extends Controller
         ));
     }
 
+    // Reporte de distribución de paquetes
+    public function reporteDistribucion(Request $request)
+    {
+        // Get all distribution records with their packages
+        $salidas = RegistrosSalida::with([
+            'paquete.detalles.donacionDetalle.producto'
+        ])
+            ->when($request->fecha_inicio && $request->fecha_fin, function ($query) use ($request) {
+                return $query->whereBetween('fecha_salida', [
+                    $request->fecha_inicio . ' 00:00:00',
+                    $request->fecha_fin . ' 23:59:59'
+                ]);
+            })
+            ->when($request->destino, function ($query) use ($request) {
+                return $query->where('destino', 'like', '%' . $request->destino . '%');
+            })
+            ->when($request->encargado, function ($query) use ($request) {
+                return $query->where('encargado', 'like', '%' . $request->encargado . '%');
+            })
+            ->orderBy('fecha_salida', 'desc')
+            ->get();
+
+        // Get all packages
+        $totalPaquetes = \App\Models\Paquete::count();
+
+        // KPIs
+        $totalDistribuido = $salidas->count();
+        $pendienteDistribucion = $totalPaquetes - $totalDistribuido;
+
+        // Top destinations
+        $destinosFrecuentes = $salidas->groupBy('destino')
+            ->map->count()
+            ->sortDesc()
+            ->take(10);
+
+        $destinoMasFrecuente = $destinosFrecuentes->keys()->first() ?? 'N/A';
+        $destinoMasFrecuenteCount = $destinosFrecuentes->first() ?? 0;
+
+        // Last shipment
+        $ultimoEnvio = $salidas->first();
+        $ultimoEnvioFecha = $ultimoEnvio ? \Carbon\Carbon::parse($ultimoEnvio->fecha_salida)->format('d/m/Y') : 'N/A';
+
+        // Distribution by month (last 12 months)
+        $distribucionMensual = $salidas
+            ->groupBy(function ($salida) {
+                return \Carbon\Carbon::parse($salida->fecha_salida)->format('Y-m');
+            })
+            ->map->count()
+            ->sortKeys()
+            ->take(12);
+
+        // Prepare detailed data
+        $salidasDetalladas = $salidas->map(function ($salida) {
+            $productos = $salida->paquete ? $salida->paquete->detalles->map(function ($detalle) {
+                return [
+                    'nombre' => $detalle->donacionDetalle->producto->nombre ?? 'N/A',
+                    'cantidad' => $detalle->cantidad_usada
+                ];
+            })->values() : collect();
+
+            return [
+                'id_salida' => $salida->id_salida,
+                'codigo_paquete' => $salida->paquete->codigo_paquete ?? 'N/A',
+                'fecha_salida' => $salida->fecha_salida,
+                'destino' => $salida->destino,
+                'encargado' => $salida->encargado,
+                'observaciones' => $salida->observaciones,
+                'productos' => $productos,
+                'total_items' => $productos->sum('cantidad')
+            ];
+        });
+
+        // Get unique destinations and responsibles for filters
+        $destinosUnicos = RegistrosSalida::select('destino')
+            ->distinct()
+            ->whereNotNull('destino')
+            ->orderBy('destino')
+            ->pluck('destino');
+
+        $encargadosUnicos = RegistrosSalida::select('encargado')
+            ->distinct()
+            ->whereNotNull('encargado')
+            ->orderBy('encargado')
+            ->pluck('encargado');
+
+        if ($request->formato === 'pdf') {
+            return $this->exportarPDF('distribucion_paquetes', compact(
+                'salidasDetalladas',
+                'totalDistribuido',
+                'pendienteDistribucion',
+                'destinoMasFrecuente',
+                'request'
+            ));
+        }
+
+        if ($request->formato === 'excel') {
+            return $this->exportarExcel('distribucion_paquetes', $salidasDetalladas);
+        }
+
+        return view('reportes.distribucion', compact(
+            'totalDistribuido',
+            'pendienteDistribucion',
+            'destinoMasFrecuente',
+            'destinoMasFrecuenteCount',
+            'ultimoEnvioFecha',
+            'destinosFrecuentes',
+            'distribucionMensual',
+            'salidasDetalladas',
+            'destinosUnicos',
+            'encargadosUnicos',
+            'request'
+        ));
+    }
+
     private function exportarPDF($vista, $data)
     {
         $pdf = app('dompdf.wrapper');
@@ -340,7 +454,7 @@ class ReportesController extends Controller
     private function exportarExcel($nombre, $datos)
     {
         $filename = "reporte_{$nombre}_" . date('Y-m-d_His') . '.xls';
-        
+
         $headers = [
             'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
@@ -349,9 +463,9 @@ class ReportesController extends Controller
             'Expires' => '0'
         ];
 
-        $callback = function() use ($datos, $nombre) {
+        $callback = function () use ($datos, $nombre) {
             echo "\xEF\xBB\xBF"; // UTF-8 BOM
-            
+
             // Estilos HTML/CSS para Excel
             echo '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
             echo '<head>';
@@ -368,7 +482,7 @@ class ReportesController extends Controller
             echo '</style>';
             echo '</head>';
             echo '<body>';
-            
+
             if ($nombre === 'donaciones_periodo') {
                 echo '<div class="header">📊 REPORTE DE DONACIONES</div>';
                 echo '<div class="info">Generado: ' . now()->format('d/m/Y H:i') . '</div>';
@@ -376,7 +490,7 @@ class ReportesController extends Controller
                 echo '<thead><tr>';
                 echo '<th>ID</th><th>Fecha</th><th>Donante</th><th>Campaña</th><th>Tipo</th><th>Monto</th><th>Items</th>';
                 echo '</tr></thead><tbody>';
-                
+
                 foreach ($datos as $item) {
                     $monto = 0;
                     $items = 0;
@@ -384,7 +498,7 @@ class ReportesController extends Controller
                         $monto = $item->dinero->monto;
                     }
                     $items = $item->detalles->count();
-                    
+
                     echo '<tr>';
                     echo '<td>' . $item->id_donacion . '</td>';
                     echo '<td>' . \Carbon\Carbon::parse($item->fecha)->format('d/m/Y H:i') . '</td>';
@@ -396,7 +510,7 @@ class ReportesController extends Controller
                     echo '</tr>';
                 }
                 echo '</tbody></table>';
-                
+
             } elseif ($nombre === 'inventario_almacen') {
                 echo '<div class="header">📦 REPORTE DE INVENTARIO</div>';
                 echo '<div class="info">Generado: ' . now()->format('d/m/Y H:i') . '</div>';
@@ -404,12 +518,12 @@ class ReportesController extends Controller
                 echo '<thead><tr>';
                 echo '<th>ID</th><th>Producto</th><th>Categoría</th><th>Cantidad Total</th><th>Ubicaciones</th>';
                 echo '</tr></thead><tbody>';
-                
+
                 foreach ($datos as $item) {
-                    $ubicacionesStr = $item->ubicaciones->map(function($ub) {
+                    $ubicacionesStr = $item->ubicaciones->map(function ($ub) {
                         return $ub['almacen'] . ' / ' . $ub['estante'] . ' / ' . $ub['espacio'] . ' (' . $ub['cantidad'] . ')';
                     })->join('; ');
-                    
+
                     echo '<tr>';
                     echo '<td>' . $item->id_producto . '</td>';
                     echo '<td><strong>' . $item->nombre_producto . '</strong></td>';
@@ -419,7 +533,7 @@ class ReportesController extends Controller
                     echo '</tr>';
                 }
                 echo '</tbody></table>';
-                
+
             } elseif ($nombre === 'solicitudes_recoleccion') {
                 echo '<div class="header">🚚 REPORTE DE SOLICITUDES DE RECOLECCIÓN</div>';
                 echo '<div class="info">Generado: ' . now()->format('d/m/Y H:i') . '</div>';
@@ -427,13 +541,13 @@ class ReportesController extends Controller
                 echo '<thead><tr>';
                 echo '<th>ID</th><th>Donante</th><th>Dirección</th><th>Fecha Programada</th><th>Estado</th><th>Recolector</th>';
                 echo '</tr></thead><tbody>';
-                
+
                 foreach ($datos as $item) {
                     $recolectorNombre = 'Sin asignar';
                     if ($item->usuario) {
                         $recolectorNombre = trim($item->usuario->nombres . ' ' . $item->usuario->apellidos);
                     }
-                    
+
                     echo '<tr>';
                     echo '<td>' . $item->id_solicitud . '</td>';
                     echo '<td>' . ($item->donante->nombre ?? 'N/A') . '</td>';
@@ -444,7 +558,7 @@ class ReportesController extends Controller
                     echo '</tr>';
                 }
                 echo '</tbody></table>';
-                
+
             } elseif ($nombre === 'salidas_productos') {
                 echo '<div class="header">📤 REPORTE DE SALIDAS DE PRODUCTOS</div>';
                 echo '<div class="info">Generado: ' . now()->format('d/m/Y H:i') . '</div>';
@@ -452,12 +566,12 @@ class ReportesController extends Controller
                 echo '<thead><tr>';
                 echo '<th>ID</th><th>Fecha Salida</th><th>Destino</th><th>Paquete</th><th>Productos</th>';
                 echo '</tr></thead><tbody>';
-                
+
                 foreach ($datos as $salida) {
-                    $productosStr = collect($salida['productos'])->map(function($p) {
+                    $productosStr = collect($salida['productos'])->map(function ($p) {
                         return $p['nombre'] . ' (' . $p['cantidad'] . ')';
                     })->join('; ');
-                    
+
                     echo '<tr>';
                     echo '<td>' . $salida['id_salida'] . '</td>';
                     echo '<td>' . \Carbon\Carbon::parse($salida['fecha_salida'])->format('d/m/Y H:i') . '</td>';
@@ -467,7 +581,7 @@ class ReportesController extends Controller
                     echo '</tr>';
                 }
                 echo '</tbody></table>';
-                
+
             } elseif ($nombre === 'campanas_reporte') {
                 echo '<div class="header">📢 REPORTE DE CAMPAÑAS</div>';
                 echo '<div class="info">Generado: ' . now()->format('d/m/Y H:i') . '</div>';
@@ -475,12 +589,12 @@ class ReportesController extends Controller
                 echo '<thead><tr>';
                 echo '<th>ID</th><th>Nombre</th><th>Fecha Inicio</th><th>Fecha Fin</th><th>Total Donaciones</th><th>Monto Recaudado</th>';
                 echo '</tr></thead><tbody>';
-                
+
                 foreach ($datos as $item) {
                     $montoDinero = $item->donaciones
                         ->filter(fn($d) => $d->tipo === 'dinero' && $d->dinero)
                         ->sum(fn($d) => $d->dinero->monto ?? 0);
-                        
+
                     echo '<tr>';
                     echo '<td>' . $item->id_campana . '</td>';
                     echo '<td><strong>' . $item->nombre . '</strong></td>';
@@ -491,8 +605,36 @@ class ReportesController extends Controller
                     echo '</tr>';
                 }
                 echo '</tbody></table>';
+            } elseif ($nombre === 'distribucion_paquetes') {
+                echo '<div class="header">📦 REPORTE DE DISTRIBUCIÓN DE PAQUETES</div>';
+                echo '<div class="info">Generado: ' . now()->format('d/m/Y H:i') . '</div>';
+                echo '<table>';
+                echo '<thead><tr>';
+                echo '<th>ID Salida</th>';
+                echo '<th>Fecha Salida</th>';
+                echo '<th>Destino</th>';
+                echo '<th>Encargado</th>';
+                echo '<th>Paquete Código</th>';
+                echo '<th>Productos</th>';
+                echo '</tr></thead><tbody>';
+
+                foreach ($datos as $salida) {
+                    $productosStr = collect($salida['productos'])->map(function ($p) {
+                        return $p['nombre'] . ' (' . $p['cantidad'] . ')';
+                    })->join('; ');
+
+                    echo '<tr>';
+                    echo '<td>' . $salida['id_salida'] . '</td>';
+                    echo '<td>' . \Carbon\Carbon::parse($salida['fecha_salida'])->format('d/m/Y H:i') . '</td>';
+                    echo '<td>' . ($salida['destino'] ?? '-') . '</td>';
+                    echo '<td>' . ($salida['encargado'] ?? '-') . '</td>';
+                    echo '<td>' . ($salida['paquete_codigo'] ?? '-') . '</td>';
+                    echo '<td>' . $productosStr . '</td>';
+                    echo '</tr>';
+                }
+                echo '</tbody></table>';
             }
-            
+
             echo '</body></html>';
         };
 

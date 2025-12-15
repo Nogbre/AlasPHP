@@ -17,6 +17,7 @@ use App\Models\PaqueteDetalle;
  * @property $descripcion
  * @property $id_talla
  * @property $id_genero
+ * @property $fecha_caducidad
  *
  * @property Producto $producto
  * @package App
@@ -36,7 +37,8 @@ class DonacionDetalle extends Model
         'unidad_medida',
         'descripcion',
         'id_talla',
-        'id_genero'
+        'id_genero',
+        'fecha_caducidad'
     ];
 
     public function producto()

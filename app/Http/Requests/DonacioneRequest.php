@@ -37,7 +37,7 @@ class DonacioneRequest extends FormRequest
             $rules['detalles.*.unidad_medida'] = 'nullable|string|max:50';
             $rules['detalles.*.id_talla'] = 'nullable|exists:tallas,id_talla';
             $rules['detalles.*.id_genero'] = 'nullable|exists:generos_ropa,id_genero';
-            $rules['detalles.*.id_espacio'] = 'required|exists:espacios,id_espacio';
+            $rules['detalles.*.id_espacio'] = 'nullable|exists:espacios,id_espacio';
         }
 
         return $rules;

@@ -362,14 +362,13 @@ return [
             'icon' => 'fas fa-fw fa-hand-holding-heart',
             'can' => 'ver-donantes',
         ],
-        
+
         ['header' => 'ALMACÉN', 'can' => 'ver-almacen'],
         // Administrador y Almacenista
         [
             'text' => 'Almacenes',
             'url' => '/almacene',
             'icon' => 'fas fa-fw fa-store',
-            'can' => 'ver-almacen',
         ],
         [
             'text' => 'Estantes',
@@ -393,7 +392,7 @@ return [
             'text' => 'Solicitudes de Recolección',
             'url' => '/solicitudes-recoleccions',
             'icon' => 'fas fa-fw fa-clipboard-list',
-            'can' => 'gestionar-solicitudes',
+            'can' => 'registrar-donaciones',
         ],
         [
             'text' => 'Paquetes',
@@ -407,7 +406,7 @@ return [
             'icon' => 'fas fa-fw fa-sign-out-alt',
             'can' => 'gestionar-almacen',
         ],
-        
+
         ['header' => 'ANÁLISIS', 'can' => 'ver-almacen'],
         [
             'text' => 'Reportes',
