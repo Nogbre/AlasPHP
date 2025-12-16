@@ -88,3 +88,7 @@ docker-compose exec app php artisan [comando]
 docker-compose exec app chmod -R 775 storage bootstrap/cache
 docker-compose exec app chown -R www-data:www-data storage bootstrap/cache
 ```
+
+## Despliegue con docker
+
+Para comprobar la información del despliegue usando Docker, consulte el documento **Docker.md**.
