@@ -40,6 +40,7 @@ Route::get('/donaciones/especie/{id}/detalle', [DonacionController::class, 'getI
 Route::get('/categorias', [CategoriaController::class, 'getAllWithProducts']);
 Route::get('/almacenes-completo', [AlmacenController::class, 'getAllWithStructure']);
 Route::get('/donantes', [DonanteController::class, 'index']);
+Route::get('/users/ci', [UserController::class, 'getCIList']);
 
 // Rutas protegidas con autenticación Sanctum
 Route::middleware('auth:sanctum')->group(function () {

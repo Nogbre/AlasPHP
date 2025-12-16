@@ -29,6 +29,31 @@ class UserController extends Controller
         return Usuario::select('id_usuario', 'nombres', 'apellidos', 'ci', 'email', 'rol')->paginate(20);
     }
 
+    /**
+     * GET /api/users/ci
+     * Retorna lista de todos los CIs de usuarios
+     */
+    public function getCIList()
+    {
+        try {
+            $cis = Usuario::whereNotNull('ci')
+                ->pluck('ci')
+                ->toArray();
+
+            return response()->json([
+                'lista_ci' => $cis,
+                'total' => count($cis)
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener lista de CIs',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function store(Request $request)
     {
         //
