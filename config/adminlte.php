@@ -374,7 +374,7 @@ return [
             'text' => 'Estantes',
             'url' => '/estante',
             'icon' => 'fas fa-fw fa-layer-group',
-            'can' => 'ver-almacen',
+            'can' => 'gestionar-almacen',
         ],
         [
             'text' => 'Espacios',

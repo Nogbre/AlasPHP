@@ -65,11 +65,13 @@
 <div class="card card-primary card-outline">
     <div class="card-header">
         <h3 class="card-title">Información Completa</h3>
-        <div class="card-tools">
-            <a href="{{ route('espacio.edit', $espacio->id_espacio) }}" class="btn btn-warning btn-sm">
-                <i class="fas fa-edit"></i> Editar
-            </a>
-        </div>
+        @can('gestionar-almacen')
+            <div class="card-tools">
+                <a href="{{ route('espacio.edit', $espacio->id_espacio) }}" class="btn btn-warning btn-sm">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+            </div>
+        @endcan
     </div>
     <div class="card-body">
         <dl class="row">
@@ -113,17 +115,19 @@
         <a href="{{ route('espacio.index') }}" class="btn btn-secondary">
             Volver al Listado
         </a>
-        <a href="{{ route('espacio.edit', $espacio->id_espacio) }}" class="btn btn-warning">
-            <i class="fas fa-edit"></i> Editar Espacio
-        </a>
-        <form action="{{ route('espacio.destroy', $espacio->id_espacio) }}" method="POST" style="display: inline;"
-            onsubmit="return confirm('¿Está seguro de eliminar este espacio?');">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger">
-                <i class="fas fa-trash"></i> Eliminar
-            </button>
-        </form>
+        @can('gestionar-almacen')
+            <a href="{{ route('espacio.edit', $espacio->id_espacio) }}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar Espacio
+            </a>
+            <form action="{{ route('espacio.destroy', $espacio->id_espacio) }}" method="POST" style="display: inline;"
+                onsubmit="return confirm('¿Está seguro de eliminar este espacio?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </form>
+        @endcan
     </div>
 </div>
 @stop

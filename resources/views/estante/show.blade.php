@@ -49,11 +49,13 @@
 <div class="card card-primary card-outline">
     <div class="card-header">
         <h3 class="card-title">Información Completa</h3>
-        <div class="card-tools">
-            <a href="{{ route('estante.edit', $estante->id_estante) }}" class="btn btn-warning btn-sm">
-                <i class="fas fa-edit"></i> Editar
-            </a>
-        </div>
+        @can('gestionar-almacen')
+            <div class="card-tools">
+                <a href="{{ route('estante.edit', $estante->id_estante) }}" class="btn btn-warning btn-sm">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+            </div>
+        @endcan
     </div>
     <div class="card-body">
         <dl class="row">
@@ -116,18 +118,20 @@
                                     <span class="badge badge-secondary ml-2">Vacío</span>
                                 @endif
                             </h5>
-                            <div onclick="event.stopPropagation();">
-                                <form action="{{ route('espacio.toggleStatus', $espacio->id_espacio) }}" method="POST"
-                                    style="display: inline;">
-                                    @csrf
-                                    <button type="submit"
-                                        class="btn btn-sm {{ $espacio->estado === 'lleno' ? 'btn-outline-success' : 'btn-outline-danger' }}"
-                                        title="{{ $espacio->estado === 'lleno' ? 'Marcar como disponible' : 'Marcar como lleno' }}">
-                                        <i class="fas {{ $espacio->estado === 'lleno' ? 'fa-check-circle' : 'fa-ban' }}"></i>
-                                        {{ $espacio->estado === 'lleno' ? 'Marcar Disponible' : 'Marcar Lleno' }}
-                                    </button>
-                                </form>
-                            </div>
+                            @can('gestionar-almacen')
+                                <div onclick="event.stopPropagation();">
+                                    <form action="{{ route('espacio.toggleStatus', $espacio->id_espacio) }}" method="POST"
+                                        style="display: inline;">
+                                        @csrf
+                                        <button type="submit"
+                                            class="btn btn-sm {{ $espacio->estado === 'lleno' ? 'btn-outline-success' : 'btn-outline-danger' }}"
+                                            title="{{ $espacio->estado === 'lleno' ? 'Marcar como disponible' : 'Marcar como lleno' }}">
+                                            <i class="fas {{ $espacio->estado === 'lleno' ? 'fa-check-circle' : 'fa-ban' }}"></i>
+                                            {{ $espacio->estado === 'lleno' ? 'Marcar Disponible' : 'Marcar Lleno' }}
+                                        </button>
+                                    </form>
+                                </div>
+                            @endcan
                         </div>
                     </div>
                     <div class="collapse show" id="productos-{{ $espacio->id_espacio }}">
@@ -294,17 +298,19 @@
         <a href="{{ route('almacene.show', $estante->id_almacen) }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Volver al Almacén
         </a>
-        <a href="{{ route('estante.edit', $estante->id_estante) }}" class="btn btn-warning">
-            <i class="fas fa-edit"></i> Editar Estante
-        </a>
-        <form action="{{ route('estante.destroy', $estante->id_estante) }}" method="POST" style="display: inline;"
-            onsubmit="return confirm('¿Está seguro de eliminar este estante?');">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger">
-                <i class="fas fa-trash"></i> Eliminar
-            </button>
-        </form>
+        @can('gestionar-almacen')
+            <a href="{{ route('estante.edit', $estante->id_estante) }}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar Estante
+            </a>
+            <form action="{{ route('estante.destroy', $estante->id_estante) }}" method="POST" style="display: inline;"
+                onsubmit="return confirm('¿Está seguro de eliminar este estante?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </form>
+        @endcan
     </div>
 </div>
 @stop

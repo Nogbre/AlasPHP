@@ -112,7 +112,6 @@
                             <option value="">-- Seleccione --</option>
                             <option value="efectivo" {{ old('metodo_pago', $donacion?->dinero->metodo_pago ?? '') === 'efectivo' ? 'selected' : '' }}>Efectivo</option>
                             <option value="transferencia" {{ old('metodo_pago', $donacion?->dinero->metodo_pago ?? '') === 'transferencia' ? 'selected' : '' }}>Transferencia</option>
-                            <option value="pasarela" {{ old('metodo_pago', $donacion?->dinero->metodo_pago ?? '') === 'pasarela' ? 'selected' : '' }}>Pasarela</option>
                         </select>
                     </div>
                 </div>

@@ -207,9 +207,12 @@
             <select name="rol" class="form-control @error('rol') is-invalid @enderror" id="rol">
                 <option value="">Seleccione un rol</option>
                 @foreach($roles ?? [] as $role)
-                    <option value="{{ $role->name }}" {{ old('rol', $usuario?->getRoleNames()->first()) == $role->name ? 'selected' : '' }}>
-                        {{ $role->name }}
-                    </option>
+                    {{-- Ocultar temporalmente el rol Almacenista --}}
+                    @if($role->name !== 'Almacenista')
+                        <option value="{{ $role->name }}" {{ old('rol', $usuario?->getRoleNames()->first()) == $role->name ? 'selected' : '' }}>
+                            {{ $role->name }}
+                        </option>
+                    @endif
                 @endforeach
             </select>
             @error('rol')
