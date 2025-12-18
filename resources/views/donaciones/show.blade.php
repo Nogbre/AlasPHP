@@ -75,11 +75,13 @@
 <div class="card card-primary card-outline">
     <div class="card-header">
         <h3 class="card-title">Información General</h3>
-        <div class="card-tools">
-            <a href="{{ route('donaciones.edit', $donacion->id_donacion) }}" class="btn btn-warning btn-sm">
-                <i class="fas fa-edit"></i> Editar
-            </a>
-        </div>
+        @can('gestionar-donaciones')
+            <div class="card-tools">
+                <a href="{{ route('donaciones.edit', $donacion->id_donacion) }}" class="btn btn-warning btn-sm">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+            </div>
+        @endcan
     </div>
     <div class="card-body">
         <dl class="row">
@@ -259,17 +261,19 @@
         <a href="{{ route('donaciones.index') }}" class="btn btn-secondary">
             Volver al Listado
         </a>
-        <a href="{{ route('donaciones.edit', $donacion->id_donacion) }}" class="btn btn-warning">
-            <i class="fas fa-edit"></i> Editar Donación
-        </a>
-        <form action="{{ route('donaciones.destroy', $donacion->id_donacion) }}" method="POST" style="display: inline;"
-            onsubmit="return confirm('¿Está seguro de eliminar esta donación?');">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger">
-                <i class="fas fa-trash"></i> Eliminar
-            </button>
-        </form>
+        @can('gestionar-donaciones')
+            <a href="{{ route('donaciones.edit', $donacion->id_donacion) }}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar Donación
+            </a>
+            <form action="{{ route('donaciones.destroy', $donacion->id_donacion) }}" method="POST" style="display: inline;"
+                onsubmit="return confirm('¿Está seguro de eliminar esta donación?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </form>
+        @endcan
     </div>
 </div>
 @stop

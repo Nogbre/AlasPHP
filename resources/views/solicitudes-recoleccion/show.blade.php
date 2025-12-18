@@ -66,12 +66,14 @@
 <div class="card card-primary card-outline">
     <div class="card-header">
         <h3 class="card-title">Información General</h3>
-        <div class="card-tools">
-            <a href="{{ route('solicitudes-recoleccions.edit', $solicitudesRecoleccion->id_solicitud) }}"
-                class="btn btn-warning btn-sm">
-                <i class="fas fa-edit"></i> Editar
-            </a>
-        </div>
+        @can('gestionar-solicitudes-recoleccion')
+            <div class="card-tools">
+                <a href="{{ route('solicitudes-recoleccions.edit', $solicitudesRecoleccion->id_solicitud) }}"
+                    class="btn btn-warning btn-sm">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+            </div>
+        @endcan
     </div>
     <div class="card-body">
         <dl class="row">
@@ -139,19 +141,21 @@
         <a href="{{ route('solicitudes-recoleccions.index') }}" class="btn btn-secondary">
             Volver al Listado
         </a>
-        <a href="{{ route('solicitudes-recoleccions.edit', $solicitudesRecoleccion->id_solicitud) }}"
-            class="btn btn-warning">
-            <i class="fas fa-edit"></i> Editar Solicitud
-        </a>
-        <form action="{{ route('solicitudes-recoleccions.destroy', $solicitudesRecoleccion->id_solicitud) }}"
-            method="POST" style="display: inline;"
-            onsubmit="return confirm('¿Está seguro de eliminar esta solicitud?');">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger">
-                <i class="fas fa-trash"></i> Eliminar
-            </button>
-        </form>
+        @can('gestionar-solicitudes-recoleccion')
+            <a href="{{ route('solicitudes-recoleccions.edit', $solicitudesRecoleccion->id_solicitud) }}"
+                class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar Solicitud
+            </a>
+            <form action="{{ route('solicitudes-recoleccions.destroy', $solicitudesRecoleccion->id_solicitud) }}"
+                method="POST" style="display: inline;"
+                onsubmit="return confirm('¿Está seguro de eliminar esta solicitud?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </form>
+        @endcan
     </div>
 </div>
 @stop

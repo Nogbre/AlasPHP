@@ -25,12 +25,15 @@ class PermissionsSeeder extends Seeder
             'ver-categorias',
             'ver-productos',
             'ver-donantes',
+            'gestionar-donantes',
             'ver-almacen',
             'gestionar-almacen',
             'registrar-donaciones',
+            'gestionar-donaciones',
             'consultar-donaciones',
             'consultar-inventario',
             'gestionar-solicitudes',
+            'gestionar-solicitudes-recoleccion',
         ];
 
         foreach ($permissions as $permission) {
@@ -50,6 +53,7 @@ class PermissionsSeeder extends Seeder
         $voluntario = Role::where('name', 'Voluntario')->where('guard_name', 'web')->first();
         if ($voluntario) {
             // Voluntario puede ver campañas, inventario, donaciones y crear solicitudes de recolección
+            // NO puede editar/eliminar donaciones, donantes, campañas ni solicitudes de recolección
             $voluntario->syncPermissions([
                 'ver-campanas',
                 'ver-donantes',
@@ -67,9 +71,12 @@ class PermissionsSeeder extends Seeder
                 'ver-almacen',
                 'gestionar-almacen',
                 'registrar-donaciones',
+                'gestionar-donaciones',
                 'consultar-donaciones',
                 'consultar-inventario',
                 'gestionar-solicitudes',
+                'gestionar-solicitudes-recoleccion',
+                'gestionar-donantes',
             ]);
         }
     }

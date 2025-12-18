@@ -61,11 +61,13 @@
 <div class="card card-primary card-outline">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-info-circle"></i> Información Completa</h3>
-        <div class="card-tools">
-            <a href="{{ route('almacene.edit', $almacene->id_almacen) }}" class="btn btn-warning btn-sm">
-                <i class="fas fa-edit"></i> Editar
-            </a>
-        </div>
+        @can('gestionar-almacen')
+            <div class="card-tools">
+                <a href="{{ route('almacene.edit', $almacene->id_almacen) }}" class="btn btn-warning btn-sm">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+            </div>
+        @endcan
     </div>
     <div class="card-body">
         <div class="row">
@@ -101,9 +103,11 @@
                     <div class="callout callout-warning">
                         <h5><i class="fas fa-exclamation-triangle"></i> Sin Ubicación GPS</h5>
                         <p>Este almacén no tiene registrada su ubicación GPS.</p>
-                        <a href="{{ route('almacene.edit', $almacene->id_almacen) }}" class="btn btn-sm btn-warning">
-                            <i class="fas fa-edit"></i> Agregar Ubicación
-                        </a>
+                        @can('gestionar-almacen')
+                            <a href="{{ route('almacene.edit', $almacene->id_almacen) }}" class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i> Agregar Ubicación
+                            </a>
+                        @endcan
                     </div>
                 @endif
             </div>
@@ -141,12 +145,14 @@
 <div class="card card-info card-outline">
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-inbox"></i> Estantes del Almacén</h3>
-        <div class="card-tools">
-            <a href="{{ route('estante.create', ['id_almacen' => $almacene->id_almacen]) }}"
-                class="btn btn-success btn-sm">
-                <i class="fas fa-plus"></i> Nuevo Estante
-            </a>
-        </div>
+        @can('gestionar-almacen')
+            <div class="card-tools">
+                <a href="{{ route('estante.create', ['id_almacen' => $almacene->id_almacen]) }}"
+                    class="btn btn-success btn-sm">
+                    <i class="fas fa-plus"></i> Nuevo Estante
+                </a>
+            </div>
+        @endcan
     </div>
     <div class="card-body">
         @if($estantes->count() > 0)
@@ -171,19 +177,21 @@
                                         title="Ver detalles">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a class="btn btn-warning btn-sm" href="{{ route('estante.edit', $estante->id_estante) }}"
-                                        title="Editar">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('estante.destroy', $estante->id_estante) }}" method="POST"
-                                        style="display: inline;"
-                                        onsubmit="return confirm('¿Está seguro de eliminar este estante?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    @can('gestionar-almacen')
+                                        <a class="btn btn-warning btn-sm" href="{{ route('estante.edit', $estante->id_estante) }}"
+                                            title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('estante.destroy', $estante->id_estante) }}" method="POST"
+                                            style="display: inline;"
+                                            onsubmit="return confirm('¿Está seguro de eliminar este estante?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endcan
                                 </div>
                             </td>
                         </tr>
@@ -205,17 +213,19 @@
         <a href="{{ route('almacene.index') }}" class="btn btn-secondary">
             <i class="fas fa-list"></i> Volver al Listado
         </a>
-        <a href="{{ route('almacene.edit', $almacene->id_almacen) }}" class="btn btn-warning">
-            <i class="fas fa-edit"></i> Editar Almacén
-        </a>
-        <form action="{{ route('almacene.destroy', $almacene->id_almacen) }}" method="POST" style="display: inline;"
-            onsubmit="return confirm('¿Está seguro de eliminar este almacén?');">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger">
-                <i class="fas fa-trash"></i> Eliminar
-            </button>
-        </form>
+        @can('gestionar-almacen')
+            <a href="{{ route('almacene.edit', $almacene->id_almacen) }}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar Almacén
+            </a>
+            <form action="{{ route('almacene.destroy', $almacene->id_almacen) }}" method="POST" style="display: inline;"
+                onsubmit="return confirm('¿Está seguro de eliminar este almacén?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </form>
+        @endcan
     </div>
 </div>
 @stop

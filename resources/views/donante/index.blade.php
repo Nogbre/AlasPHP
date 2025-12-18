@@ -80,19 +80,21 @@
                                     title="Ver detalles">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a class="btn btn-warning btn-sm" href="{{ route('donante.edit', $donante->id_donante) }}"
-                                    title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('donante.destroy', $donante->id_donante) }}" method="POST"
-                                    style="display: inline;"
-                                    onsubmit="return confirm('¿Está seguro de eliminar este donante?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+                                @can('gestionar-donantes')
+                                    <a class="btn btn-warning btn-sm" href="{{ route('donante.edit', $donante->id_donante) }}"
+                                        title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('donante.destroy', $donante->id_donante) }}" method="POST"
+                                        style="display: inline;"
+                                        onsubmit="return confirm('¿Está seguro de eliminar este donante?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                @endcan
                             </div>
                         </td>
                     </tr>

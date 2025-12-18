@@ -94,20 +94,22 @@
                                     title="Ver detalles">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a class="btn btn-warning btn-sm"
-                                    href="{{ route('solicitudes-recoleccions.edit', $solicitud->id_solicitud) }}"
-                                    title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form action="{{ route('solicitudes-recoleccions.destroy', $solicitud->id_solicitud) }}"
-                                    method="POST" style="display: inline;"
-                                    onsubmit="return confirm('¿Está seguro de eliminar esta solicitud?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+                                @can('gestionar-solicitudes-recoleccion')
+                                    <a class="btn btn-warning btn-sm"
+                                        href="{{ route('solicitudes-recoleccions.edit', $solicitud->id_solicitud) }}"
+                                        title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('solicitudes-recoleccions.destroy', $solicitud->id_solicitud) }}"
+                                        method="POST" style="display: inline;"
+                                        onsubmit="return confirm('¿Está seguro de eliminar esta solicitud?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                @endcan
                             </div>
                         </td>
                     </tr>

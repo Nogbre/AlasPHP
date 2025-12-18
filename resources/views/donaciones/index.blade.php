@@ -124,22 +124,24 @@
                                     title="Ver detalles">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a class="btn btn-warning btn-sm"
-                                    href="{{ route('donaciones.edit', $donacion->id_donacion) }}" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form id="delete-form-{{ $donacion->id_donacion }}"
-                                    action="{{ route('donaciones.destroy', $donacion->id_donacion) }}" method="POST"
-                                    style="display: inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <input type="hidden" name="deleted_reason"
-                                        id="deleted-reason-{{ $donacion->id_donacion }}">
-                                    <button type="button" class="btn btn-danger btn-sm delete-btn"
-                                        data-id="{{ $donacion->id_donacion }}" data-type="donación" title="Eliminar">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+                                @can('gestionar-donaciones')
+                                    <a class="btn btn-warning btn-sm"
+                                        href="{{ route('donaciones.edit', $donacion->id_donacion) }}" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form id="delete-form-{{ $donacion->id_donacion }}"
+                                        action="{{ route('donaciones.destroy', $donacion->id_donacion) }}" method="POST"
+                                        style="display: inline;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <input type="hidden" name="deleted_reason"
+                                            id="deleted-reason-{{ $donacion->id_donacion }}">
+                                        <button type="button" class="btn btn-danger btn-sm delete-btn"
+                                            data-id="{{ $donacion->id_donacion }}" data-type="donación" title="Eliminar">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                @endcan
                             </div>
                         </td>
                     </tr>

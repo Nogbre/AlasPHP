@@ -78,9 +78,11 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        <a href="{{ route('donante.edit', $donante->id_donante) }}" class="btn btn-warning">
-                            <i class="fas fa-edit"></i> Editar
-                        </a>
+                        @can('gestionar-donantes')
+                            <a href="{{ route('donante.edit', $donante->id_donante) }}" class="btn btn-warning">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                        @endcan
                         <a href="{{ route('donante.index') }}" class="btn btn-secondary float-right">
                             <i class="fas fa-arrow-left"></i> Volver
                         </a>

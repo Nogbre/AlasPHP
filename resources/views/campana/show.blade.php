@@ -55,11 +55,13 @@
 <div class="card card-primary card-outline">
     <div class="card-header">
         <h3 class="card-title">Información General</h3>
-        <div class="card-tools">
-            <a href="{{ route('campana.edit', $campana->id_campana) }}" class="btn btn-warning btn-sm">
-                <i class="fas fa-edit"></i> Editar
-            </a>
-        </div>
+        @can('gestionar-campanas')
+            <div class="card-tools">
+                <a href="{{ route('campana.edit', $campana->id_campana) }}" class="btn btn-warning btn-sm">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+            </div>
+        @endcan
     </div>
     <div class="card-body">
         <dl class="row">
@@ -147,17 +149,19 @@
         <a href="{{ route('campana.index') }}" class="btn btn-secondary">
             Volver al Listado
         </a>
-        <a href="{{ route('campana.edit', $campana->id_campana) }}" class="btn btn-warning">
-            <i class="fas fa-edit"></i> Editar Campaña
-        </a>
-        <form action="{{ route('campana.destroy', $campana->id_campana) }}" method="POST" style="display: inline;"
-            onsubmit="return confirm('¿Está seguro de eliminar esta campaña?');">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger">
-                <i class="fas fa-trash"></i> Eliminar
-            </button>
-        </form>
+        @can('gestionar-campanas')
+            <a href="{{ route('campana.edit', $campana->id_campana) }}" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Editar Campaña
+            </a>
+            <form action="{{ route('campana.destroy', $campana->id_campana) }}" method="POST" style="display: inline;"
+                onsubmit="return confirm('¿Está seguro de eliminar esta campaña?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </form>
+        @endcan
     </div>
 </div>
 @stop
