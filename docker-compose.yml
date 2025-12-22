@@ -13,7 +13,10 @@ services:
       DB_DATABASE: donaciones_db
       DB_USERNAME: admin
       DB_PASSWORD: admin123
-      APP_URL: http://192.168.0.102/donaciones
+      APP_URL: https://192.168.0.102/donaciones # Update with your production domain
+      APP_ENV: production
+      SESSION_SECURE_COOKIE: true
+      SESSION_SAME_SITE: lax
       MAIL_MAILER: smtp
       MAIL_HOST: smtp.gmail.com
       MAIL_PORT: 587
@@ -22,7 +25,7 @@ services:
       MAIL_ENCRYPTION: tls
       MAIL_FROM_ADDRESS: proyectourbanointegrador@gmail.com
       MAIL_FROM_NAME: "SISTEMA DE DONACIONES"
-      API_BASE_URL_ADS: http://gatealas.dasalas.shop
+      API_BASE_URL_ADS: https://gatealas.dasalas.shop
       HELPDESK_API_URL: https://proyecto-de-ultimo-minuto.online
     depends_on:
       - db

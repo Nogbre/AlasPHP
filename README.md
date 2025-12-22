@@ -128,7 +128,7 @@ Edita el archivo `.env` con tus datos:
 APP_NAME="Sistema de Donaciones"
 APP_ENV=local
 APP_DEBUG=true
-APP_URL=http://localhost:8000
+APP_URL=https://localhost
 
 # Base de datos PostgreSQL
 DB_CONNECTION=pgsql
@@ -138,8 +138,15 @@ DB_DATABASE=donaciones_php3
 DB_USERNAME=postgres
 DB_PASSWORD=tu_password_aqui
 
+# Session Security (HTTPS)
+SESSION_SECURE_COOKIE=true
+SESSION_SAME_SITE=lax
+
 # URL del API Gateway (para búsqueda de usuarios)
-API_BASE_URL_ADS=http://gatealas.dasalas.shop
+API_BASE_URL_ADS=https://gatealas.dasalas.shop
+
+# URL del Helpdesk API
+HELPDESK_API_URL=https://proyecto-de-ultimo-minuto.online
 
 # Configuración de correo
 MAIL_MAILER=smtp
@@ -294,15 +301,48 @@ GET /api/gateway/registro/ci/{ci}
 En el archivo `.env`:
 
 ```env
-API_BASE_URL_ADS=http://gatealas.dasalas.shop
+API_BASE_URL_ADS=https://gatealas.dasalas.shop
+HELPDESK_API_URL=https://proyecto-de-ultimo-minuto.online
 ```
 
 ### Funcionamiento
 
 Cuando un usuario ingresa un CI en el formulario de registro:
-1. El sistema hace una petición al gateway
+1. El sistema hace una petición al gateway vía HTTPS
 2. Si encuentra datos, autocompletará los campos: nombres, apellidos y teléfono
 3. Muestra un mensaje indicando de qué sistema provienen los datos
+
+## 🔒 Configuración SSL/HTTPS
+
+### Producción con Reverse Proxy
+
+El sistema está diseñado para funcionar detrás de un reverse proxy (Nginx Proxy Manager o Traefik) con SSL/TLS:
+
+1. **Configurar el Reverse Proxy**:
+   - Instalar certificado SSL (Let's Encrypt recomendado)
+   - Configurar proxy pass hacia el contenedor `donaciones:80`
+   - El proxy manejará la terminación SSL
+
+2. **Variables de Entorno Requeridas**:
+   ```env
+   APP_ENV=production
+   APP_URL=https://tu-dominio.com
+   SESSION_SECURE_COOKIE=true
+   SESSION_SAME_SITE=lax
+   API_BASE_URL_ADS=https://gatealas.dasalas.shop
+   ```
+
+3. **Trust Proxies**: El sistema ya incluye middleware para detectar HTTPS correctamente cuando está detrás de un proxy.
+
+4. **HSTS Headers**: Nginx está configurado con headers de seguridad SSL automáticamente.
+
+### Verificar Configuración SSL
+
+Después de configurar SSL:
+- ✅ Verificar que `APP_URL` use `https://`
+- ✅ Confirmar que las cookies tienen flag `Secure`
+- ✅ Probar que todos los assets cargan con HTTPS
+- ✅ Verificar que las APIs externas respondan correctamente
 
 ## 🛠️ Tecnologías Utilizadas
 

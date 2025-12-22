@@ -183,17 +183,70 @@ Simplemente añade nuevas líneas:
 
 ```yaml
 environment:
-  APP_ENV: local
+  APP_ENV: production
+  APP_URL: https://tu-dominio.com
+  SESSION_SECURE_COOKIE: true
+  SESSION_SAME_SITE: lax
   LOG_CHANNEL: stack
   QUEUE_CONNECTION: database
   MAIL_MAILER: smtp
   MAIL_HOST: smtp.gmail.com
+  API_BASE_URL_ADS: https://gatealas.dasalas.shop
+  HELPDESK_API_URL: https://proyecto-de-ultimo-minuto.online
 ```
 
 ### ⚠ Importante
 
 * Estas variables **sobrescriben** las del `.env` dentro del contenedor.
 * Si agregas nuevas variables, asegúrate de que existan también en tu `.env.example`.
+* **Para producción con SSL**: Usa URLs con `https://` y configura `SESSION_SECURE_COOKIE=true`.
+
+---
+
+# 🔒 Configuración SSL/HTTPS con Reverse Proxy
+
+Este proyecto está diseñado para funcionar detrás de un **reverse proxy** (como Nginx Proxy Manager o Traefik) que maneja SSL/TLS.
+
+### Arquitectura de Red
+
+```
+Internet → Reverse Proxy (SSL) → [proxy-network] → Nginx Container :80 → Laravel :9000
+```
+
+### Configuración del Reverse Proxy
+
+1. **Instalar certificado SSL** (Let's Encrypt recomendado):
+   - Configurar dominio en el reverse proxy
+   - Generar certificado automático
+   - Configurar renovación automática
+
+2. **Proxy Pass**:
+   - Apuntar al contenedor: `donaciones:80`
+   - Habilitar WebSocket support (opcional)
+   - Forward headers: `X-Forwarded-For`, `X-Forwarded-Proto`, `X-Forwarded-Host`
+
+3. **Variables de entorno requeridas**:
+   ```yaml
+   environment:
+     APP_ENV: production
+     APP_URL: https://tu-dominio.com
+     SESSION_SECURE_COOKIE: true
+     SESSION_SAME_SITE: lax
+     API_BASE_URL_ADS: https://gatealas.dasalas.shop
+   ```
+
+### Verificación Post-Configuración
+
+```bash
+# Verificar que el contenedor esté en las redes correctas
+docker inspect donaciones | grep -A 10 "Networks"
+
+# Debe mostrar: donaciones-net, internal-network, proxy-network
+```
+
+### Trust Proxies
+
+El sistema ya incluye middleware `TrustProxies` configurado para detectar HTTPS correctamente cuando está detrás de un proxy.
 
 ---
 

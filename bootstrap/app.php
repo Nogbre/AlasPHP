@@ -16,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust proxies for HTTPS detection behind reverse proxy
+        $middleware->trustProxies(at: '*');
+        
         // Forzar Accept: application/json para todas las rutas API
         $middleware->api(prepend: [
             \Illuminate\Http\Middleware\HandleCors::class,
